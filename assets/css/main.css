@@ -1,5 +1,5 @@
 @import url(fontawesome-all.min.css);
-@import url("https://fonts.googleapis.com/css?family=Merriweather:300,700,300italic,700italic|Source+Sans+Pro:900");
+@import url("https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap");
 
 /*
 	Massively by HTML5 UP
@@ -148,8 +148,8 @@ input, select, textarea {
 	}
 
 	body, input, select, textarea {
-		font-family: "Merriweather", Georgia, serif;
-		font-weight: 300;
+		font-family: "Baloo 2", cursive, sans-serif;
+		font-weight: 400;
 		font-size: 1rem;
 		line-height: 2.375;
 	}
@@ -181,8 +181,8 @@ input, select, textarea {
 	}
 
 	h1, h2, h3, h4, h5, h6 {
-		font-family: "Source Sans Pro", Helvetica, sans-serif;
-		font-weight: 900;
+		font-family: "Baloo 2", cursive, sans-serif;
+		font-weight: 700;
 		line-height: 1.5;
 		letter-spacing: 0.075em;
 		text-transform: uppercase;
@@ -2078,9 +2078,9 @@ input, select, textarea {
 		border-radius: 0;
 		cursor: pointer;
 		display: inline-block;
-		font-family: "Source Sans Pro", Helvetica, sans-serif;
+		font-family: "Baloo 2", cursive, sans-serif;
 		font-size: 0.8rem;
-		font-weight: 900;
+		font-weight: 700;
 		letter-spacing: 0.075em;
 		height: 3rem;
 		line-height: 3rem;
@@ -2313,8 +2313,8 @@ input, select, textarea {
 
 	label {
 		display: block;
-		font-family: "Source Sans Pro", Helvetica, sans-serif;
-		font-weight: 900;
+		font-family: "Baloo 2", cursive, sans-serif;
+		font-weight: 700;
 		line-height: 1.5;
 		letter-spacing: 0.075em;
 		font-size: 0.8rem;
@@ -2407,7 +2407,7 @@ input, select, textarea {
 			display: inline-block;
 			font-size: 1rem;
 			letter-spacing: 0;
-			font-family: "Merriweather", Georgia, serif;
+			font-family: "Baloo 2", cursive, sans-serif;
 			text-transform: none;
 			font-weight: 300;
 			padding-left: 2.8rem;
@@ -2426,7 +2426,7 @@ input, select, textarea {
 				line-height: 1;
 				text-transform: none !important;
 				font-family: 'Font Awesome 5 Free';
-				font-weight: 900;
+				font-weight: 700;
 			}
 
 			input[type="checkbox"] + label:before,
@@ -2579,7 +2579,7 @@ input, select, textarea {
 		}
 
 		.icon.solid:before {
-			font-weight: 900;
+			font-weight: 700;
 		}
 
 		.icon.brands:before {
@@ -3023,9 +3023,9 @@ input, select, textarea {
 		}
 
 		table th {
-			font-family: "Source Sans Pro", Helvetica, sans-serif;
+			font-family: "Baloo 2", cursive, sans-serif;
 			font-size: 0.8rem;
-			font-weight: 900;
+			font-weight: 700;
 			letter-spacing: 0.075em;
 			line-height: 1.5;
 			padding: 0 0.75rem 0.75rem 0.75rem;
@@ -3123,9 +3123,9 @@ input, select, textarea {
 			transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, color 0.2s ease-in-out;
 			border: solid 2px;
 			display: inline-block;
-			font-family: "Source Sans Pro", Helvetica, sans-serif;
+			font-family: "Baloo 2", cursive, sans-serif;
 			font-size: 0.8rem;
-			font-weight: 900;
+			font-weight: 700;
 			height: 3rem;
 			letter-spacing: 0.075em;
 			line-height: calc(3rem - 4px);
@@ -3152,7 +3152,7 @@ input, select, textarea {
 				line-height: 1;
 				text-transform: none !important;
 				font-family: 'Font Awesome 5 Free';
-				font-weight: 900;
+				font-weight: 700;
 			}
 
 			.pagination .next:before, .pagination .previous:before {
@@ -3566,9 +3566,9 @@ input, select, textarea {
 			border-style: solid;
 			border-color: #ffffff;
 			border-width: 5px !important;
-			font-family: "Source Sans Pro", Helvetica, sans-serif;
+			font-family: "Baloo 2", cursive, sans-serif;
 			font-size: 2.25rem;
-			font-weight: 900;
+			font-weight: 700;
 			letter-spacing: 0.075em;
 			line-height: 1;
 			padding: 1rem 1.75rem;
@@ -3691,8 +3691,8 @@ input, select, textarea {
 			-webkit-flex-shrink: 1;
 			-ms-flex-shrink: 1;
 			flex-shrink: 1;
-			font-family: "Source Sans Pro", Helvetica, sans-serif;
-			font-weight: 900;
+			font-family: "Baloo 2", cursive, sans-serif;
+			font-weight: 700;
 			letter-spacing: 0.075em;
 			list-style: none;
 			margin-bottom: 0;
@@ -4387,9 +4387,9 @@ input, select, textarea {
 		position: relative;
 		color: rgba(255, 255, 255, 0.25);
 		cursor: default;
-		font-family: "Source Sans Pro", Helvetica, sans-serif;
+		font-family: "Baloo 2", cursive, sans-serif;
 		font-size: 0.8rem;
-		font-weight: 900;
+		font-weight: 700;
 		letter-spacing: 0.075em;
 		line-height: 1.5;
 		text-align: center;
@@ -4497,9 +4497,9 @@ input, select, textarea {
 		right: 0.75rem;
 		border: 0;
 		color: #ffffff;
-		font-family: "Source Sans Pro", Helvetica, sans-serif;
+		font-family: "Baloo 2", cursive, sans-serif;
 		font-size: 0.9rem;
-		font-weight: 900;
+		font-weight: 700;
 		letter-spacing: 0.075em;
 		padding: 0.375rem 1.25rem;
 		text-transform: uppercase;
@@ -4516,7 +4516,7 @@ input, select, textarea {
 			line-height: 1;
 			text-transform: none !important;
 			font-family: 'Font Awesome 5 Free';
-			font-weight: 900;
+			font-weight: 700;
 		}
 
 		#navPanelToggle:before {
@@ -4589,10 +4589,10 @@ input, select, textarea {
 				#navPanel .links li a {
 					border-bottom: 0;
 					display: block;
-					font-family: "Source Sans Pro", Helvetica, sans-serif;
+					font-family: "Baloo 2", cursive, sans-serif;
 					font-size: 0.9rem;
 					font-size: 0.9rem;
-					font-weight: 900;
+					font-weight: 700;
 					letter-spacing: 0.075em;
 					padding: 0.75rem 0;
 					text-transform: uppercase;
@@ -4634,7 +4634,7 @@ input, select, textarea {
 				line-height: 1;
 				text-transform: none !important;
 				font-family: 'Font Awesome 5 Free';
-				font-weight: 900;
+				font-weight: 700;
 			}
 
 			#navPanel .close:before {
