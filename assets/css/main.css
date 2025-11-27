@@ -331,6 +331,11 @@ input, select, textarea {
 		align-items: stretch;
 	}
 
+.compact-text p {
+	line-height: 1.75;
+	margin: 0 0 1rem 0;
+}
+
 		.row > * {
 			box-sizing: border-box;
 		}
@@ -3779,7 +3784,7 @@ input, select, textarea {
 		}
 
 		#main > .post {
-			padding: 8rem 8rem 6rem 8rem ;
+			padding: 4rem 8rem 6rem 8rem ;
 		}
 
 			#main > .post header.major > .date {
@@ -3793,13 +3798,14 @@ input, select, textarea {
 			}
 
 			#main > .post.featured {
+				padding-top: 4rem;
 				text-align: center;
 			}
 
 			@media screen and (max-width: 1280px) {
 
 				#main > .post {
-					padding: 6rem 4rem 4rem 4rem ;
+					padding: 4rem 4rem 4rem 4rem ;
 				}
 
 			}
