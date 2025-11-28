@@ -312,18 +312,25 @@
 
 						// Re-apply zebra striping logic for grid layout
 						// We need to manually handle the background colors because CSS nth-child counts hidden rows
+						const isDesktop = window.innerWidth >= 737;
+						
 						visibleRows.forEach((row, index) => {
 							// Reset styles first
 							row.style.backgroundColor = '';
 							
-							// Logic: Pairs of 2 (Gray, Gray, White, White)
-							// Index 0, 1 -> Gray
-							// Index 2, 3 -> White
-							// Index 4, 5 -> Gray
-							// ...
-							// Formula: Math.floor(index / 2) % 2 === 0 ? Gray : White
+							let shouldBeGray = false;
 							
-							if (Math.floor(index / 2) % 2 === 0) {
+							if (isDesktop) {
+								// Desktop: Pairs of 2 (Gray, Gray, White, White)
+								// Formula: Math.floor(index / 2) % 2 === 0 ? Gray : White
+								shouldBeGray = Math.floor(index / 2) % 2 === 0;
+							} else {
+								// Mobile: Alternating (Gray, White, Gray, White)
+								// Formula: index % 2 === 0 ? Gray : White
+								shouldBeGray = index % 2 === 0;
+							}
+							
+							if (shouldBeGray) {
 								row.style.backgroundColor = 'rgba(220, 220, 220, 0.25)';
 							} else {
 								row.style.backgroundColor = 'transparent';
@@ -342,14 +349,18 @@
 							const secondLastRow = visibleRows.length > 1 ? visibleRows[visibleRows.length - 2] : null;
 							
 							if (lastRow) lastRow.querySelector('td').style.borderBottom = 'none';
-							// In a 2-column grid, the second to last item might also be at the bottom visually
-							if (secondLastRow && visibleRows.length % 2 === 0) {
+							
+							// In a 2-column grid (desktop), the second to last item might also be at the bottom visually
+							if (isDesktop && secondLastRow && visibleRows.length % 2 === 0) {
 								secondLastRow.querySelector('td').style.borderBottom = 'none';
 							}
 						}
 					}
 
 					searchInput.addEventListener('input', filterRepertoire);
+					
+					// Re-calculate on resize to switch between mobile/desktop striping
+					window.addEventListener('resize', filterRepertoire);
 					
 					filterAll.addEventListener('click', () => {
 						showYoutubeOnly = false;
