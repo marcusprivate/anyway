@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <section class="contact">
                 <h3>Contact</h3>
                 <p>
-                    <strong>Telefoon:</strong> <a href="#">(000) 000-0000</a><br />
+                    <strong>Telefoon:</strong> <a href="tel:+31653245253">06 53 24 52 53</a><br />
                     <strong>E-mail:</strong> <a href="mailto:anywaytexel@xs4all.nl">anywaytexel@xs4all.nl</a>
                 </p>
                 <h3>Social</h3>
