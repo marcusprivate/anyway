@@ -186,17 +186,22 @@
 						let maxTableHeight = 0;
 						const totalPages = Math.ceil(agendaData.length / itemsPerPage);
 						
-						// Render each page to find the tallest one
-						for (let i = 1; i <= totalPages; i++) {
+						if (totalPages === 0) {
 							tbody.innerHTML = '';
-							const start = (i - 1) * itemsPerPage;
-							const end = start + itemsPerPage;
-							const items = agendaData.slice(start, end);
-							items.forEach((item, idx) => tbody.appendChild(createRow(item, start + idx)));
-							
-							const height = table.offsetHeight;
-							if (height > maxTableHeight) {
-								maxTableHeight = height;
+							maxTableHeight = table.offsetHeight;
+						} else {
+							// Render each page to find the tallest one
+							for (let i = 1; i <= totalPages; i++) {
+								tbody.innerHTML = '';
+								const start = (i - 1) * itemsPerPage;
+								const end = start + itemsPerPage;
+								const items = agendaData.slice(start, end);
+								items.forEach((item, idx) => tbody.appendChild(createRow(item, start + idx)));
+								
+								const height = table.offsetHeight;
+								if (height > maxTableHeight) {
+									maxTableHeight = height;
+								}
 							}
 						}
 						

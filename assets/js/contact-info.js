@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+(function() {
     const footer = document.getElementById('footer');
     if (footer) {
         footer.innerHTML = `
@@ -16,4 +16,4 @@ document.addEventListener('DOMContentLoaded', function() {
             </section>
         `;
     }
-});
+})();
