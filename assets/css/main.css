@@ -4878,9 +4878,20 @@ tr.next-show td {
     color: #ffffff !important;
 }
 
+.segmented-control button:hover {
+    box-shadow: none !important;
+    transform: none !important;
+}
+
 .segmented-control button:hover:not(.active) {
-    background-color: rgba(33, 41, 49, 0.05);
+    background-color: transparent;
     border-color: #212931;
+    color: #212931 !important;
+}
+
+.segmented-control button.active:hover {
+    background-color: #212931;
+    color: #ffffff !important;
 }
 
 #blog-year {
