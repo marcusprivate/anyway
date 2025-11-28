@@ -212,42 +212,15 @@
 						}
 						
 						// Set fixed height on wrapper to prevent jumping
-						// Add a small buffer (e.g., 5px) to prevent vertical scrollbars due to sub-pixel rendering
-						function updateTableHeight() {
-							// Temporarily remove height to let it flow naturally
+						// Add a buffer to prevent vertical scrollbars due to sub-pixel rendering
+						tableWrapper.style.height = (maxTableHeight + 20) + 'px';
+						tableWrapper.style.overflowY = 'hidden';
+
+						// Reset on resize to prevent content cutoff
+						window.addEventListener('resize', function() {
 							tableWrapper.style.height = 'auto';
-							
-							// We need to find the max height again because row heights might have changed due to text wrapping
-							let currentMaxHeight = 0;
-							
-							// This is expensive to do on every resize if we re-render everything.
-							// Instead, let's just set min-height to the current page's height, 
-							// or better yet, just let it be auto and accept the jumpiness on mobile?
-							// Or, we can just re-calculate the max height of the *current* page and ensure the wrapper is at least that tall?
-							
-							// Actually, the "prevent jumping" is mostly for when switching pages.
-							// If we resize, the user expects things to move.
-							// But if we have a fixed height, we must update it.
-							
-							// A simpler approach for resize:
-							// Just re-run the max height calculation? No, that renders all pages. Too slow.
-							
-							// Compromise: On resize, remove the fixed height. 
-							// When pagination happens, we can re-calculate if needed, or just let it be.
-							// But the original intent was to keep the footer from jumping up and down.
-							
-							// Let's try to be smart. 
-							// If we are on desktop, rows probably don't wrap much.
-							// If we are on mobile, they might.
-							
-							// Let's just re-calculate max height on resize, but debounce it?
-							// Or simpler: Just set min-height instead of height?
-							// If we set min-height to the tallest page, it won't shrink, but it can grow.
-							// That solves the overflow issue!
-						}
-						
-						// Instead of height, let's use min-height.
-						tableWrapper.style.minHeight = (maxTableHeight + 5) + 'px';
+							tableWrapper.style.overflowY = 'visible';
+						});
 						
 						// Render initial page (which is now set to the page containing the next show)
 						renderTable(currentPage);
