@@ -33,6 +33,14 @@ function parseDate(dateStr) {
     const dmy = str.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})$/);
     if (dmy) return new Date(dmy[3], dmy[2] - 1, dmy[1]);
 
+    // Try extracting a date pattern (e.g. "17 en 18 may 2024" -> "18 may 2024")
+    // This finds the last number followed by a month and year
+    const complexDate = str.match(/(\d{1,2})\s+([a-z]+)\s+(\d{4})/);
+    if (complexDate) {
+        const extractedDate = new Date(`${complexDate[1]} ${complexDate[2]} ${complexDate[3]}`);
+        if (!isNaN(extractedDate.getTime())) return extractedDate;
+    }
+
     return new Date(0); // Unknown format
 }
 
