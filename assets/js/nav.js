@@ -15,7 +15,7 @@
     ];
 
     const socialIcons = [
-        { label: 'Facebook', href: '#', iconClass: 'icon brands fa-facebook-f' },
+        { label: 'Facebook', href: 'https://www.facebook.com/anywaytexel', iconClass: 'icon brands fa-facebook-f' },
         { label: 'Instagram', href: '#', iconClass: 'icon brands fa-instagram' }
     ];
 

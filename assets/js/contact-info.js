@@ -10,7 +10,7 @@
                 </p>
                 <h3>Social</h3>
                 <ul class="icons alt">
-                    <li><a href="#" class="icon brands alt fa-facebook-f"><span class="label">Facebook</span></a></li>
+                    <li><a href="https://www.facebook.com/anywaytexel" class="icon brands alt fa-facebook-f" target="_blank" rel="noopener noreferrer"><span class="label">Facebook</span></a></li>
                     <li><a href="#" class="icon brands alt fa-instagram"><span class="label">Instagram</span></a></li>
                 </ul>
             </section>

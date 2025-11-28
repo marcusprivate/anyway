@@ -92,6 +92,7 @@ input, select, textarea {
 
 	html {
 		box-sizing: border-box;
+		scroll-behavior: smooth;
 	}
 
 	*, *:before, *:after {
@@ -2132,10 +2133,10 @@ input, select, textarea {
 		-webkit-appearance: none;
 		-ms-appearance: none;
 		appearance: none;
-		-moz-transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, color 0.2s ease-in-out;
-		-webkit-transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, color 0.2s ease-in-out;
-		-ms-transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, color 0.2s ease-in-out;
-		transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, color 0.2s ease-in-out;
+		-moz-transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, color 0.2s ease-in-out, transform 0.2s ease-in-out;
+		-webkit-transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, color 0.2s ease-in-out, transform 0.2s ease-in-out;
+		-ms-transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, color 0.2s ease-in-out, transform 0.2s ease-in-out;
+		transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, color 0.2s ease-in-out, transform 0.2s ease-in-out;
 		border: 0;
 		border-radius: 0;
 		cursor: pointer;
@@ -2279,6 +2280,7 @@ input, select, textarea {
 		.button:hover {
 			box-shadow: inset 0 0 0 2px #18bfef;
 			color: #18bfef !important;
+			transform: translateY(-2px);
 		}
 
 		input[type="submit"].primary,
@@ -3690,10 +3692,10 @@ input, select, textarea {
 		display: -webkit-flex;
 		display: -ms-flex;
 		display: flex;
-		-moz-transition: -moz-transform 1s ease, opacity 1s ease;
-		-webkit-transition: -webkit-transform 1s ease, opacity 1s ease;
-		-ms-transition: -ms-transform 1s ease, opacity 1s ease;
-		transition: transform 1s ease, opacity 1s ease;
+		-moz-transition: -moz-transform 1s ease, opacity 1s ease, background-color 0.5s ease;
+		-webkit-transition: -webkit-transform 1s ease, opacity 1s ease, background-color 0.5s ease;
+		-ms-transition: -ms-transform 1s ease, opacity 1s ease, background-color 0.5s ease;
+		transition: transform 1s ease, opacity 1s ease, background-color 0.5s ease;
 		background: rgba(255, 255, 255, 0.175);
 		height: 4rem;
 		line-height: 4rem;
@@ -3704,6 +3706,23 @@ input, select, textarea {
 		width: calc(100% - 4rem);
 		max-width: 72rem;
 		z-index: 2;
+	}
+
+	/* Sticky Nav */
+	@media screen and (min-width: 981px) {
+		#nav.sticky {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			margin: 0 auto;
+			transform: none;
+			background-color: rgba(33, 41, 49, 0.95);
+			backdrop-filter: blur(10px);
+			-webkit-backdrop-filter: blur(10px);
+			box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+			z-index: 10000;
+		}
 	}
 
 		#nav ul.divided li {

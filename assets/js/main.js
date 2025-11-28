@@ -196,6 +196,39 @@
 					$navPanel
 						.css('transition', 'none');
 
+	// Sticky Nav.
+		if ($nav.length > 0) {
+			var navTop = $nav.offset().top;
+			
+			function updateNavTop() {
+				if ($window.width() > 980) {
+					var wasSticky = $nav.hasClass('sticky');
+					if (wasSticky) {
+						$nav.removeClass('sticky');
+					}
+					navTop = $nav.offset().top;
+					if (wasSticky) {
+						$window.trigger('scroll');
+					}
+				} else {
+					$nav.removeClass('sticky');
+				}
+			}
+
+			$window.on('resize', updateNavTop);
+			$window.on('load', updateNavTop);
+
+			$window.on('scroll', function() {
+				if ($window.width() > 980) {
+					if ($window.scrollTop() >= navTop) {
+						$nav.addClass('sticky');
+					} else {
+						$nav.removeClass('sticky');
+					}
+				}
+			});
+		}
+
 	// Intro.
 		var $intro = $('#intro');
 
