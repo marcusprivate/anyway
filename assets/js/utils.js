@@ -1,0 +1,59 @@
+/**
+ * Shared utility functions for Anyway website
+ */
+
+// Helper to parse dates robustly (handles Dutch months, DD-MM-YYYY, etc.)
+function parseDate(dateStr) {
+    if (!dateStr) return new Date(0);
+    
+    // Normalize
+    let str = dateStr.trim().toLowerCase();
+
+    // Map Dutch months to English
+    const months = {
+        'januari': 'January', 'februari': 'February', 'maart': 'March', 'april': 'April', 'mei': 'May', 'juni': 'June',
+        'juli': 'July', 'augustus': 'August', 'september': 'September', 'oktober': 'October', 'november': 'November', 'december': 'December',
+        'jan': 'Jan', 'feb': 'Feb', 'mrt': 'Mar', 'apr': 'Apr', 'jun': 'Jun', 'jul': 'Jul', 'aug': 'Aug', 'sep': 'Sep', 'okt': 'Oct', 'nov': 'Nov', 'dec': 'Dec',
+        'jan.': 'Jan', 'feb.': 'Feb', 'mrt.': 'Mar', 'apr.': 'Apr', 'jun.': 'Jun', 'jul.': 'Jul', 'aug.': 'Aug', 'sep.': 'Sep', 'sept.': 'Sep', 'okt.': 'Oct', 'nov.': 'Nov', 'dec.': 'Dec'
+    };
+
+    // Replace month names
+    for (let [nl, en] of Object.entries(months)) {
+        if (str.includes(nl)) {
+            str = str.replace(nl, en);
+            break;
+        }
+    }
+
+    // Try parsing as standard date string
+    let date = new Date(str);
+    if (!isNaN(date.getTime())) return date;
+
+    // Try parsing DD-MM-YYYY or DD/MM/YYYY
+    const dmy = str.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})$/);
+    if (dmy) return new Date(dmy[3], dmy[2] - 1, dmy[1]);
+
+    return new Date(0); // Unknown format
+}
+
+// Helper to check if a date is in the past
+function isPast(dateStr) {
+    const eventDate = parseDate(dateStr);
+    const now = new Date();
+    now.setHours(0,0,0,0);
+    return eventDate < now;
+}
+
+// Helper to determine if a link is external and return attributes
+function getLinkAttributes(url) {
+    if (!url || url.startsWith('#')) return '';
+    try {
+        const linkUrl = new URL(url, window.location.href);
+        if (linkUrl.hostname !== window.location.hostname) {
+            return ' target="_blank" rel="noopener noreferrer"';
+        }
+    } catch (e) {
+        // Ignore invalid URLs
+    }
+    return '';
+}

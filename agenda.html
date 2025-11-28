@@ -24,14 +24,7 @@
 
 				<!-- Nav -->
 					<nav id="nav">
-						<ul class="links">
-							<li><a href="index.html">Anyway</a></li>
-							<li class="active"><a href="agenda.html">Agenda</a></li>
-						</ul>
-						<ul class="icons">
-							<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
-							<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
-						</ul>
+						<!-- Navigation loaded via JS -->
 					</nav>
 
 				<!-- Main -->
@@ -42,32 +35,28 @@
 								<header class="major">
 									<h1>Agenda</h1>
 								</header>
-								<div class="table-wrapper">
+																<div class="table-wrapper">
 									<table>
 										<thead>
 											<tr>
 												<th>Datum</th>
-												<th>Tijd</th>
 												<th>Locatie</th>
 												<th>Evenement</th>
 											</tr>
 										</thead>
-										<tbody>
-											<tr>
-												<td>12 Mei 2024</td>
-												<td>20:00</td>
-												<td>Theater de Vest, Alkmaar</td>
-												<td>Voorjaarsconcert</td>
-											</tr>
-											<tr>
-												<td>25 Juni 2024</td>
-												<td>14:30</td>
-												<td>Kerkplein, Hoorn</td>
-												<td>Zomerfestival</td>
-											</tr>
+										<tbody id="agenda-body">
+											<!-- Agenda items will be loaded here dynamically -->
 										</tbody>
 									</table>
 								</div>
+								
+								<!-- Pagination Controls -->
+								<div class="pagination-controls" style="text-align: center; margin-top: 2em;">
+									<a id="prev-btn" class="button small disabled">Vorige</a>
+									<span id="page-info" style="margin: 0 1em;">Pagina 1</span>
+									<a id="next-btn" class="button small">Volgende</a>
+								</div>
+
 								<div class="image main"><img src="images/pic01.jpg" alt="" /></div>
 							</section>
 
@@ -75,19 +64,7 @@
 
 				<!-- Footer -->
 					<footer id="footer">
-						<section class="contact">
-							<h3>Contact</h3>
-							<p>
-								<strong>Adres:</strong> 1234 Somewhere Road #87257, Nashville, TN 00000-0000<br />
-								<strong>Telefoon:</strong> <a href="#">(000) 000-0000</a><br />
-								<strong>E-mail:</strong> <a href="#">info@untitled.tld</a>
-							</p>
-							<h3>Social</h3>
-							<ul class="icons alt">
-								<li><a href="#" class="icon brands alt fa-facebook-f"><span class="label">Facebook</span></a></li>
-								<li><a href="#" class="icon brands alt fa-instagram"><span class="label">Instagram</span></a></li>
-							</ul>
-						</section>
+						<!-- Contact info loaded via JS -->
 					</footer>
 
 				<!-- Copyright -->
@@ -104,7 +81,175 @@
 			<script src="assets/js/browser.min.js"></script>
 			<script src="assets/js/breakpoints.min.js"></script>
 			<script src="assets/js/util.js"></script>
+			<script src="assets/js/utils.js"></script>
+			<script src="assets/js/nav.js"></script>
 			<script src="assets/js/main.js"></script>
+			<script src="assets/js/agenda_data.js"></script>
+			<script src="assets/js/contact-info.js"></script>
+			<script>
+				document.addEventListener('DOMContentLoaded', function() {
+					const tbody = document.getElementById('agenda-body');
+					const prevBtn = document.getElementById('prev-btn');
+					const nextBtn = document.getElementById('next-btn');
+					const pageInfo = document.getElementById('page-info');
+					const tableWrapper = document.querySelector('.table-wrapper');
+					const table = tableWrapper.querySelector('table');
+					
+					const itemsPerPage = 10;
+					let currentPage = 1;
+					let nextShowIndex = -1;
+					
+					function createRow(item, index) {
+						const row = document.createElement('tr');
+						
+						if (isPast(item.date)) {
+							row.classList.add('past-event');
+						} else if (index === nextShowIndex) {
+							row.classList.add('next-show');
+							// Add a "Next Show" badge or label if desired, or just rely on styling
+						}
+
+						const dateCell = document.createElement('td');
+						dateCell.textContent = item.date;
+						if (index === nextShowIndex) {
+							dateCell.innerHTML += ' <span class="next-show-badge">Eerstvolgende</span>';
+						}
+						row.appendChild(dateCell);
+						
+						const locationCell = document.createElement('td');
+						locationCell.textContent = item.location;
+						row.appendChild(locationCell);
+						
+						const eventCell = document.createElement('td');
+						eventCell.textContent = item.event;
+						row.appendChild(eventCell);
+						
+						return row;
+					}
+
+					function renderTable(page) {
+						tbody.innerHTML = '';
+						
+						const start = (page - 1) * itemsPerPage;
+						const end = start + itemsPerPage;
+						const paginatedItems = agendaData.slice(start, end);
+						
+						paginatedItems.forEach((item, i) => {
+							tbody.appendChild(createRow(item, start + i));
+						});
+
+						// Update controls
+						pageInfo.textContent = `Pagina ${currentPage} van ${Math.ceil(agendaData.length / itemsPerPage)}`;
+						
+						if (currentPage === 1) {
+							prevBtn.classList.add('disabled');
+						} else {
+							prevBtn.classList.remove('disabled');
+						}
+						
+						if (end >= agendaData.length) {
+							nextBtn.classList.add('disabled');
+						} else {
+							nextBtn.classList.remove('disabled');
+						}
+					}
+
+					if (typeof agendaData !== 'undefined') {
+						// Calculate next show index (assuming descending order: Future -> Past)
+						for (let i = 0; i < agendaData.length; i++) {
+							if (isPast(agendaData[i].date)) {
+								if (i > 0) {
+									nextShowIndex = i - 1;
+								}
+								break;
+							}
+						}
+						// Edge case: All future
+						if (nextShowIndex === -1 && agendaData.length > 0 && !isPast(agendaData[agendaData.length-1].date)) {
+							nextShowIndex = agendaData.length - 1;
+						}
+
+						// If the next show is on a later page, maybe we should jump to that page?
+						// For now, let's just start at page 1. If the next show is far in the future (top of list), it will be on page 1.
+						// If the next show is the *last* future event, it might be on page 2 or 3 if there are many future events.
+						// But usually "Next Show" is the one closest to today.
+						// If the list is descending (2026, 2025...), the closest to today is the *last* one before the past ones.
+						// So it could be deep in the list.
+						
+						// Let's calculate which page the next show is on and start there.
+						if (nextShowIndex !== -1) {
+							currentPage = Math.floor(nextShowIndex / itemsPerPage) + 1;
+						}
+
+
+						// Calculate max height
+						let maxTableHeight = 0;
+						const totalPages = Math.ceil(agendaData.length / itemsPerPage);
+						
+						// Render each page to find the tallest one
+						for (let i = 1; i <= totalPages; i++) {
+							tbody.innerHTML = '';
+							const start = (i - 1) * itemsPerPage;
+							const end = start + itemsPerPage;
+							const items = agendaData.slice(start, end);
+							items.forEach((item, idx) => tbody.appendChild(createRow(item, start + idx)));
+							
+							const height = table.offsetHeight;
+							if (height > maxTableHeight) {
+								maxTableHeight = height;
+							}
+						}
+						
+						// Set fixed height on wrapper to prevent jumping
+						// Add a small buffer (e.g., 5px) to prevent vertical scrollbars due to sub-pixel rendering
+						tableWrapper.style.height = (maxTableHeight + 5) + 'px';
+						
+						// Render initial page (which is now set to the page containing the next show)
+						renderTable(currentPage);
+
+						prevBtn.addEventListener('click', (e) => {
+							e.preventDefault();
+							if (currentPage > 1) {
+								currentPage--;
+								renderTable(currentPage);
+							}
+						});
+
+						nextBtn.addEventListener('click', (e) => {
+							e.preventDefault();
+							if ((currentPage * itemsPerPage) < agendaData.length) {
+								currentPage++;
+								renderTable(currentPage);
+							}
+						});
+
+					} else {
+						console.error('Agenda data not found.');
+					}
+				});
+			</script>
+			<style>
+				tr.next-show {
+					background-color: rgba(24, 191, 239, 0.1);
+					border-left: 4px solid #18bfef;
+				}
+				tr.next-show td {
+					font-weight: 600;
+					color: #212931;
+				}
+				.next-show-badge {
+					display: inline-block;
+					background-color: #18bfef;
+					color: white;
+					font-size: 0.7em;
+					padding: 2px 6px;
+					border-radius: 4px;
+					margin-left: 8px;
+					text-transform: uppercase;
+					letter-spacing: 1px;
+					vertical-align: middle;
+				}
+			</style>
 
 	</body>
 </html>

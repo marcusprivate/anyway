@@ -3047,6 +3047,17 @@ input, select, textarea {
 
 			}
 
+			@media screen and (max-width: 480px) {
+				table td {
+					padding: 0.5rem 0.25rem;
+					font-size: 0.8rem;
+				}
+				table th {
+					padding: 0 0.25rem 0.5rem 0.25rem;
+					font-size: 0.8rem;
+				}
+			}
+
 		table thead {
 			border-bottom: solid 2px;
 		}
@@ -4694,3 +4705,11 @@ input, select, textarea {
 		}
 
 	}
+/* Agenda Past Events */
+tr.past-event {
+    opacity: 0.5;
+    filter: grayscale(100%);
+}
+tr.past-event td {
+    color: #aaa;
+}

@@ -1,0 +1,261 @@
+<!DOCTYPE HTML>
+<!--
+	Massively by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Blog - Anyway</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+		<style>
+			@media screen and (max-width: 736px) {
+				#main > footer {
+					padding-bottom: 4rem !important;
+				}
+			}
+		</style>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Header -->
+					<header id="header">
+						<a href="index.html" class="logo">Anyway</a>
+					</header>
+
+				<!-- Nav -->
+					<nav id="nav">
+						<!-- Navigation loaded via JS -->
+					</nav>
+
+				<!-- Main -->
+					<div id="main">
+
+						<!-- Post -->
+							<section class="post" style="padding-bottom: 1rem;">
+								<header class="major" style="margin-bottom: 0;">
+									<h1 style="margin-bottom: 0;">Blog</h1>
+								</header>
+								<div class="row gtr-uniform" style="margin-top: 1rem; justify-content: center;">
+									<div class="col-6 col-12-xsmall">
+										<input type="text" id="blog-search" value="" placeholder="Zoeken..." />
+									</div>
+									<div class="col-3 col-12-xsmall">
+										<select id="blog-year">
+											<option value="">Alle jaren</option>
+										</select>
+									</div>
+								</div>
+							</section>
+
+						<!-- Posts -->
+							<section class="posts" id="blog-container">
+								<!-- Blog posts will be loaded here dynamically -->
+							</section>
+
+						<!-- Footer -->
+							<footer>
+								<div class="pagination-controls" style="text-align: center; margin-top: 2em;">
+									<a id="prev-btn" class="button small disabled">Vorige</a>
+									<span id="page-info" style="margin: 0 1em;">Pagina 1</span>
+									<a id="next-btn" class="button small">Volgende</a>
+								</div>
+							</footer>
+
+					</div>
+
+				<!-- Footer -->
+					<footer id="footer">
+						<!-- Contact info loaded via JS -->
+					</footer>
+
+				<!-- Copyright -->
+					<div id="copyright">
+						<ul><li>Design: <a href="https://html5up.net">HTML5 UP</a></li></ul>
+					</div>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/utils.js"></script>
+			<script src="assets/js/nav.js"></script>
+			<script src="assets/js/main.js"></script>
+			<script src="assets/js/contact-info.js"></script>
+			<script src="assets/js/blog_data.js"></script>
+			<script>
+				document.addEventListener('DOMContentLoaded', function() {
+					const blogContainer = document.getElementById('blog-container');
+					const prevBtn = document.getElementById('prev-btn');
+					const nextBtn = document.getElementById('next-btn');
+					const pageInfo = document.getElementById('page-info');
+					const searchInput = document.getElementById('blog-search');
+					const yearSelect = document.getElementById('blog-year');
+					
+					const itemsPerPage = 6; // 6 items per page for grid layout
+					let currentPage = 1;
+					let currentData = []; // Will hold filtered data
+
+					function createPost(item) {
+						const article = document.createElement('article');
+						const linkAttributes = getLinkAttributes(item.link);
+						
+						let imageHtml = '';
+						if (item.image) {
+							imageHtml = `<a href="${item.link || '#'}" class="image fit"${linkAttributes}><img src="${item.image}" alt="" /></a>`;
+						}
+
+						let linkHtml = '';
+						if (item.link) {
+							linkHtml = `
+								<ul class="actions special">
+									<li><a href="${item.link}" class="button"${linkAttributes}>Meer info</a></li>
+								</ul>`;
+						}
+
+						// Process content to make external links open in new tab
+						let processedContent = item.content;
+						if (item.content && item.content.includes('<a')) {
+							const tempDiv = document.createElement('div');
+							tempDiv.innerHTML = item.content;
+							const contentLinks = tempDiv.querySelectorAll('a');
+							contentLinks.forEach(link => {
+								if (link.hostname !== window.location.hostname) {
+									link.setAttribute('target', '_blank');
+									link.setAttribute('rel', 'noopener noreferrer');
+								}
+							});
+							processedContent = tempDiv.innerHTML;
+						}
+
+						article.innerHTML = `
+							<header>
+								<span class="date">${item.date}</span>
+								<h2><a href="${item.link || '#'}"${linkAttributes}>${item.title}</a></h2>
+							</header>
+							${imageHtml}
+							<p>${processedContent}</p>
+							${linkHtml}
+						`;
+						
+						return article;
+					}
+
+					function renderBlog(page) {
+						blogContainer.innerHTML = '';
+						
+						const start = (page - 1) * itemsPerPage;
+						const end = start + itemsPerPage;
+						const paginatedItems = currentData.slice(start, end);
+						
+						if (paginatedItems.length === 0) {
+							blogContainer.innerHTML = '<p style="text-align: center; width: 100%;">Geen resultaten gevonden.</p>';
+						} else {
+							paginatedItems.forEach(item => {
+								blogContainer.appendChild(createPost(item));
+							});
+						}
+
+						// Update controls
+						const totalPages = Math.ceil(currentData.length / itemsPerPage);
+						pageInfo.textContent = `Pagina ${currentPage} van ${totalPages || 1}`;
+						
+						if (currentPage === 1) {
+							prevBtn.classList.add('disabled');
+						} else {
+							prevBtn.classList.remove('disabled');
+						}
+						
+						if (end >= currentData.length) {
+							nextBtn.classList.add('disabled');
+						} else {
+							nextBtn.classList.remove('disabled');
+						}
+					}
+
+					function filterPosts() {
+						const searchTerm = searchInput.value.toLowerCase();
+						const selectedYear = yearSelect.value;
+
+						currentData = blogData.filter(item => {
+							const matchesSearch = item.title.toLowerCase().includes(searchTerm) || 
+												  item.content.toLowerCase().includes(searchTerm);
+							
+							// Parse year robustly
+							const itemDate = parseDate(item.date);
+							const itemYear = itemDate.getFullYear().toString();
+							const matchesYear = selectedYear === '' || itemYear === selectedYear;
+
+							return matchesSearch && matchesYear;
+						});
+
+						currentPage = 1;
+						renderBlog(currentPage);
+					}
+
+					if (typeof blogData !== 'undefined' && blogData.length > 0) {
+						// Sort data by date (newest first)
+						blogData.sort((a, b) => parseDate(b.date) - parseDate(a.date));
+
+						// Initialize data
+						currentData = [...blogData];
+
+						// Populate years
+						const years = [...new Set(blogData.map(item => parseDate(item.date).getFullYear().toString()))].sort().reverse();
+						years.forEach(year => {
+							if (year !== '1970') { // Filter out invalid dates
+								const option = document.createElement('option');
+								option.value = year;
+								option.textContent = year;
+								yearSelect.appendChild(option);
+							}
+						});
+
+						// Initial render
+						renderBlog(currentPage);
+
+						// Event listeners
+						searchInput.addEventListener('input', filterPosts);
+						yearSelect.addEventListener('change', filterPosts);
+
+						prevBtn.addEventListener('click', (e) => {
+							e.preventDefault();
+							if (currentPage > 1) {
+								currentPage--;
+								renderBlog(currentPage);
+								document.getElementById('main').scrollIntoView({ behavior: 'smooth' });
+							}
+						});
+
+						nextBtn.addEventListener('click', (e) => {
+							e.preventDefault();
+							if ((currentPage * itemsPerPage) < currentData.length) {
+								currentPage++;
+								renderBlog(currentPage);
+								document.getElementById('main').scrollIntoView({ behavior: 'smooth' });
+							}
+						});
+					} else {
+						blogContainer.innerHTML = '<p>Geen blog items gevonden.</p>';
+						pageInfo.style.display = 'none';
+						prevBtn.style.display = 'none';
+						nextBtn.style.display = 'none';
+						// Hide filters if no data
+						if(searchInput) searchInput.parentElement.parentElement.style.display = 'none';
+					}
+				});
+			</script>
+
+	</body>
+</html>
