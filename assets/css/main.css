@@ -4806,8 +4806,7 @@ tr.next-show td {
 }
 
 /* Custom: Enhanced Blog Search UI */
-#blog-search {
-    border-radius: 3rem;
+#blog-search, #repertoire-search {
     border-color: #212931;
     padding-left: 2.75rem;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23212931' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
@@ -4816,14 +4815,48 @@ tr.next-show td {
     transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
-#blog-search:focus {
+#blog-search:focus, #repertoire-search:focus {
     border-color: #18bfef;
     box-shadow: 0 0 0 2px rgba(24, 191, 239, 0.2);
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2318bfef' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
 }
 
+/* Custom: Segmented Control for Repertoire */
+.segmented-control {
+    display: flex;
+    width: 100%;
+}
+
+.segmented-control button {
+    flex: 1;
+    border: solid 2px #212931;
+    background: transparent;
+    color: #212931 !important;
+    font-size: 0.8rem;
+    height: 3rem;
+    line-height: calc(3rem - 4px);
+    padding: 0;
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none !important;
+    transition: all 0.2s ease-in-out;
+}
+
+.segmented-control button:first-child {
+    border-right: none;
+}
+
+.segmented-control button.active {
+    background-color: #212931;
+    color: #ffffff !important;
+}
+
+.segmented-control button:hover:not(.active) {
+    background-color: rgba(33, 41, 49, 0.05);
+    border-color: #212931;
+}
+
 #blog-year {
-    border-radius: 3rem;
     border-color: #212931;
     cursor: pointer;
     transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;

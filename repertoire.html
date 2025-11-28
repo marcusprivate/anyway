@@ -37,9 +37,22 @@
 									<h1>Repertoire</h1>
 								</header>
 
+								<!-- Search & Filter -->
+								<div class="row gtr-uniform" style="margin-bottom: 2rem; justify-content: center;">
+									<div class="col-6 col-12-xsmall">
+										<input type="text" id="repertoire-search" value="" placeholder="Zoek een nummer..." />
+									</div>
+									<div class="col-4 col-12-xsmall">
+										<div class="segmented-control">
+											<button id="filter-all" class="active">Alle nummers</button>
+											<button id="filter-video">Video's</button>
+										</div>
+									</div>
+								</div>
+
 								<div class="table-wrapper">
-									<table class="alt repertoire-grid">
-										<tbody>
+									<table class="alt repertoire-grid" id="repertoire-table">
+										<tbody id="repertoire-body">
 											<tr>
 												<td>1. <a href="https://www.youtube.com/watch?v=CHiaqh0hHxI" target="_blank" rel="noopener noreferrer">MEDLEY <i class="icon brands fa-youtube"></i></a></td>
 											</tr>
@@ -268,6 +281,94 @@
 			<script src="assets/js/nav.js"></script>
 			<script src="assets/js/main.js"></script>
 			<script src="assets/js/contact-info.js"></script>
+			<script>
+				document.addEventListener('DOMContentLoaded', function() {
+					const searchInput = document.getElementById('repertoire-search');
+					const filterAll = document.getElementById('filter-all');
+					const filterVideo = document.getElementById('filter-video');
+					let showYoutubeOnly = false;
+					
+					const tableBody = document.getElementById('repertoire-body');
+					const rows = Array.from(tableBody.getElementsByTagName('tr'));
+
+					function filterRepertoire() {
+						const searchTerm = searchInput.value.toLowerCase();
+						let visibleRows = [];
+
+						rows.forEach(row => {
+							const text = row.textContent.toLowerCase();
+							const hasYoutube = row.querySelector('a[href*="youtu"]');
+							
+							const matchesSearch = text.includes(searchTerm);
+							const matchesYoutube = !showYoutubeOnly || hasYoutube;
+
+							if (matchesSearch && matchesYoutube) {
+								row.style.display = '';
+								visibleRows.push(row);
+							} else {
+								row.style.display = 'none';
+							}
+						});
+
+						// Re-apply zebra striping logic for grid layout
+						// We need to manually handle the background colors because CSS nth-child counts hidden rows
+						visibleRows.forEach((row, index) => {
+							// Reset styles first
+							row.style.backgroundColor = '';
+							
+							// Logic: Pairs of 2 (Gray, Gray, White, White)
+							// Index 0, 1 -> Gray
+							// Index 2, 3 -> White
+							// Index 4, 5 -> Gray
+							// ...
+							// Formula: Math.floor(index / 2) % 2 === 0 ? Gray : White
+							
+							if (Math.floor(index / 2) % 2 === 0) {
+								row.style.backgroundColor = 'rgba(220, 220, 220, 0.25)';
+							} else {
+								row.style.backgroundColor = 'transparent';
+							}
+						});
+						
+						// Fix borders for the last visible row(s)
+						// Reset borders
+						rows.forEach(r => {
+							const td = r.querySelector('td');
+							if(td) td.style.borderBottom = '';
+						});
+
+						if (visibleRows.length > 0) {
+							const lastRow = visibleRows[visibleRows.length - 1];
+							const secondLastRow = visibleRows.length > 1 ? visibleRows[visibleRows.length - 2] : null;
+							
+							if (lastRow) lastRow.querySelector('td').style.borderBottom = 'none';
+							// In a 2-column grid, the second to last item might also be at the bottom visually
+							if (secondLastRow && visibleRows.length % 2 === 0) {
+								secondLastRow.querySelector('td').style.borderBottom = 'none';
+							}
+						}
+					}
+
+					searchInput.addEventListener('input', filterRepertoire);
+					
+					filterAll.addEventListener('click', () => {
+						showYoutubeOnly = false;
+						filterAll.classList.add('active');
+						filterVideo.classList.remove('active');
+						filterRepertoire();
+					});
+
+					filterVideo.addEventListener('click', () => {
+						showYoutubeOnly = true;
+						filterVideo.classList.add('active');
+						filterAll.classList.remove('active');
+						filterRepertoire();
+					});
+					
+					// Initial run to set striping correctly if needed
+					filterRepertoire();
+				});
+			</script>
 
 	</body>
 </html>
