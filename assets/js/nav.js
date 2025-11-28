@@ -15,8 +15,7 @@
     ];
 
     const socialIcons = [
-        { label: 'Facebook', href: 'https://www.facebook.com/anywaytexel', iconClass: 'icon brands fa-facebook-f' },
-        { label: 'Instagram', href: '#', iconClass: 'icon brands fa-instagram' }
+        { label: 'YouTube', href: 'https://www.youtube.com/@anywaytexel', iconClass: 'icon brands fa-youtube' }
     ];
 
     // Build Links List
