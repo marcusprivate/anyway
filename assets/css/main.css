@@ -347,16 +347,7 @@ input, select, textarea {
 		border-bottom: none;
 	}
 
-	/* Fix zebra striping for 2-column grid (Pairs: Gray, Gray, White, White) */
-	table.repertoire-grid tbody tr:nth-child(4n + 1),
-	table.repertoire-grid tbody tr:nth-child(4n + 2) {
-		background-color: rgba(220, 220, 220, 0.25);
-	}
-	
-	table.repertoire-grid tbody tr:nth-child(4n + 3),
-	table.repertoire-grid tbody tr:nth-child(4n + 4) {
-		background-color: transparent;
-	}
+	/* Zebra striping is handled by JS to support filtering */
 }
 
 	strong, b {
