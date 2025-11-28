@@ -3160,6 +3160,14 @@ input, select, textarea {
 			background-color: rgba(220, 220, 220, 0.25);
 		}
 
+		table.no-stripe tbody tr:nth-child(2n + 1) {
+			background-color: transparent;
+		}
+
+		table tbody tr.highlight-row {
+			background-color: rgba(220, 220, 220, 0.25);
+		}
+
 		table tbody tr:hover {
 			background-color: rgba(24, 191, 239, 0.15) !important;
 		}

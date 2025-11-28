@@ -160,7 +160,7 @@
 						}
 					}
 
-					if (typeof agendaData !== 'undefined') {
+					if (typeof agendaData !== 'undefined' && agendaData.length > 0) {
 						// Calculate next show index (assuming descending order: Future -> Past)
 						for (let i = 0; i < agendaData.length; i++) {
 							if (isPast(agendaData[i].date)) {
@@ -257,7 +257,10 @@
 						});
 
 					} else {
-						console.error('Agenda data not found.');
+						tbody.innerHTML = '<tr><td colspan="3" style="text-align: center;">Geen agenda items gevonden.</td></tr>';
+						pageInfo.style.display = 'none';
+						prevBtn.style.display = 'none';
+						nextBtn.style.display = 'none';
 					}
 				});
 			</script>

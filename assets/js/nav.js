@@ -30,7 +30,7 @@
     // Build Icons List
     let iconsHtml = '<ul class="icons">';
     socialIcons.forEach(icon => {
-        iconsHtml += `<li><a href="${icon.href}" class="${icon.iconClass}"><span class="label">${icon.label}</span></a></li>`;
+        iconsHtml += `<li><a href="${icon.href}" class="${icon.iconClass}" target="_blank" rel="noopener noreferrer"><span class="label">${icon.label}</span></a></li>`;
     });
     iconsHtml += '</ul>';
 

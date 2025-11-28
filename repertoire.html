@@ -51,7 +51,7 @@
 								</div>
 
 								<div class="table-wrapper">
-									<table class="alt repertoire-grid" id="repertoire-table">
+									<table class="alt repertoire-grid no-stripe" id="repertoire-table">
 										<tbody id="repertoire-body">
 											<tr>
 												<td>1. <a href="https://www.youtube.com/watch?v=CHiaqh0hHxI" target="_blank" rel="noopener noreferrer">MEDLEY <i class="icon brands fa-youtube"></i></a></td>
@@ -316,7 +316,7 @@
 						
 						visibleRows.forEach((row, index) => {
 							// Reset styles first
-							row.style.backgroundColor = '';
+							row.classList.remove('highlight-row');
 							
 							let shouldBeGray = false;
 							
@@ -331,9 +331,7 @@
 							}
 							
 							if (shouldBeGray) {
-								row.style.backgroundColor = 'rgba(220, 220, 220, 0.25)';
-							} else {
-								row.style.backgroundColor = 'transparent';
+								row.classList.add('highlight-row');
 							}
 						});
 						
