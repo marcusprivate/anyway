@@ -4916,3 +4916,20 @@ tr.next-show td {
 		margin-right: auto;
 	}
 }
+
+/* Custom: Agenda Table Fixed Widths */
+.agenda-table {
+    table-layout: fixed;
+}
+
+.agenda-table th:nth-child(1) {
+    width: 25%;
+}
+
+.agenda-table th:nth-child(2) {
+    width: 37.5%;
+}
+
+.agenda-table th:nth-child(3) {
+    width: 37.5%;
+}
