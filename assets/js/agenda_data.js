@@ -1,11 +1,47 @@
 const agendaData = [
     {
+        "date": "17 januari 2027",
+        "location": "Haarlem",
+        "event": "Huiskamerfestival"
+    },
+    {
+        "date": "29 mei 2026",
+        "location": "Castricum",
+        "event": "Besloten optreden bij Vrouwen Contact Castricum"
+    },
+    {
+        "date": "22, 23 en 24 mei 2026",
+        "location": "Den Hoorn",
+        "event": "Huiskamerfestival Broadway Den Hoorn"
+    },
+    {
+        "date": "20 december",
+        "location": "Amersfoort",
+        "event": "Besloten optreden"
+    },
+    {
+        "date": "20 december",
+        "location": "Castricum",
+        "event": "Candle Light Shopping"
+    },
+    {
+        "date": "16 december",
+        "location": "Texel",
+        "event": "Alzheimer Wintercafé"
+    },
+    {
+        "date": "12 april",
+        "location": "Castricum",
+        "event": "Privé optreden voor de verjaardag van onze zangjuf"
+    },
+
+    {
         "date": "14 mei 2026",
         "location": "Texel",
         "event": "Buitengewoon Texel"
     },
     {
-        "date": "2 oktober 2025",
+        "date": "2 november 2025",
         "location": "Drachten",
         "event": "A capella festival in de Lawei"
     },
