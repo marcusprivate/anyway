@@ -245,6 +245,8 @@
 
 						prevBtn.addEventListener('click', (e) => {
 							e.preventDefault();
+							e.stopPropagation();
+							prevBtn.blur(); // Remove focus to prevent ghost clicks on touch devices
 							if (currentPage > 1) {
 								currentPage--;
 								renderTable(currentPage);
@@ -253,6 +255,8 @@
 
 						nextBtn.addEventListener('click', (e) => {
 							e.preventDefault();
+							e.stopPropagation();
+							nextBtn.blur(); // Remove focus to prevent ghost clicks on touch devices
 							if ((currentPage * itemsPerPage) < agendaData.length) {
 								currentPage++;
 								renderTable(currentPage);
