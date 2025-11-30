@@ -161,6 +161,9 @@
 					}
 
 					if (typeof agendaData !== 'undefined' && agendaData.length > 0) {
+						// Sort agendaData by date descending (Newest/Future first)
+						agendaData.sort((a, b) => parseDate(b.date) - parseDate(a.date));
+
 						// Calculate next show index (assuming descending order: Future -> Past)
 						for (let i = 0; i < agendaData.length; i++) {
 							if (isPast(agendaData[i].date)) {

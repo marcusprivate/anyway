@@ -18,10 +18,12 @@ function parseDate(dateStr) {
     };
 
     // Replace month names
+    // Use a global regex to replace all occurrences of month names
     for (let [nl, en] of Object.entries(months)) {
-        if (str.includes(nl)) {
-            str = str.replace(nl, en);
-            break;
+        // Escape the month name for use in regex (though these are simple strings)
+        const regex = new RegExp(nl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+        if (regex.test(str)) {
+            str = str.replace(regex, en);
         }
     }
 
@@ -35,7 +37,8 @@ function parseDate(dateStr) {
 
     // Try extracting a date pattern (e.g. "17 en 18 may 2024" -> "18 may 2024")
     // This finds the last number followed by a month and year
-    const complexDate = str.match(/(\d{1,2})\s+([a-z]+)\s+(\d{4})/);
+    // Improved regex to handle optional dot after month and case insensitivity
+    const complexDate = str.match(/(\d{1,2})\s+([a-z]+)\.?\s+(\d{4})/i);
     if (complexDate) {
         const extractedDate = new Date(`${complexDate[1]} ${complexDate[2]} ${complexDate[3]}`);
         if (!isNaN(extractedDate.getTime())) return extractedDate;
