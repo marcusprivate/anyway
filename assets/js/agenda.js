@@ -148,35 +148,39 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 250);
         });
 
-        prevBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            // Use setTimeout to ensure blur happens after the event loop, fixing ghost clicks
-            setTimeout(() => {
-                prevBtn.blur();
-                document.body.focus(); // Force focus away
-            }, 10);
-            
-            if (currentPage > 1) {
-                currentPage--;
+        function changePage(delta) {
+            const newPage = currentPage + delta;
+            const totalPages = Math.ceil(agendaData.length / itemsPerPage);
+            if (newPage >= 1 && newPage <= totalPages) {
+                currentPage = newPage;
                 renderTable(currentPage);
             }
-        });
+        }
 
-        nextBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            // Use setTimeout to ensure blur happens after the event loop, fixing ghost clicks
-            setTimeout(() => {
-                nextBtn.blur();
-                document.body.focus(); // Force focus away
-            }, 10);
+        function addNavButtonListener(btn, delta) {
+            let lastTouchTime = 0;
 
-            if ((currentPage * itemsPerPage) < agendaData.length) {
-                currentPage++;
-                renderTable(currentPage);
-            }
-        });
+            // Handle touch events to prevent focus and ghost clicks
+            btn.addEventListener('touchend', (e) => {
+                e.preventDefault(); // Prevents mouse emulation and focus
+                e.stopPropagation();
+                lastTouchTime = new Date().getTime();
+                changePage(delta);
+            });
+
+            // Handle click events for non-touch devices
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const now = new Date().getTime();
+                // Ignore click if it happened shortly after touchend (ghost click)
+                if (now - lastTouchTime < 500) return;
+                changePage(delta);
+            });
+        }
+
+        addNavButtonListener(prevBtn, -1);
+        addNavButtonListener(nextBtn, 1);
 
         // Swipe functionality
         let touchStartX = 0;
@@ -227,16 +231,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if (Math.abs(distanceX) > Math.abs(distanceY) && Math.abs(distanceX) > minSwipeDistance) {
                 if (distanceX > 0) {
                     // Swiped Right -> Previous Page
-                    if (currentPage > 1) {
-                        currentPage--;
-                        renderTable(currentPage);
-                    }
+                    changePage(-1);
                 } else {
                     // Swiped Left -> Next Page
-                    if ((currentPage * itemsPerPage) < agendaData.length) {
-                        currentPage++;
-                        renderTable(currentPage);
-                    }
+                    changePage(1);
                 }
             }
             
