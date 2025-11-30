@@ -89,7 +89,11 @@ document.addEventListener('DOMContentLoaded', function() {
     searchInput.addEventListener('input', renderRepertoire);
     
     // Re-render on resize to switch between mobile/desktop striping
-    window.addEventListener('resize', renderRepertoire);
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(renderRepertoire, 250);
+    });
     
     filterAll.addEventListener('click', () => {
         showYoutubeOnly = false;
