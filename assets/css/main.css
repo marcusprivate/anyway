@@ -3155,7 +3155,8 @@ input, select, textarea {
 			background-color: transparent;
 		}
 
-		table tbody tr.highlight-row {
+		table tbody tr.highlight-row,
+		table.no-stripe tbody tr.highlight-row {
 			background-color: rgba(220, 220, 220, 0.25);
 		}
 
