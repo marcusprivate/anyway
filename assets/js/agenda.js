@@ -1,0 +1,229 @@
+document.addEventListener('DOMContentLoaded', function() {
+    const tbody = document.getElementById('agenda-body');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const pageInfo = document.getElementById('page-info');
+    const tableWrapper = document.querySelector('.table-wrapper');
+    const table = tableWrapper.querySelector('table');
+    
+    const itemsPerPage = 10;
+    let currentPage = 1;
+    let nextShowIndex = -1;
+    
+    function createRow(item, index) {
+        const row = document.createElement('tr');
+        
+        if (isPast(item.date)) {
+            row.classList.add('past-event');
+        } else if (index === nextShowIndex) {
+            row.classList.add('next-show');
+            // Add a "Next Show" badge or label if desired, or just rely on styling
+        }
+
+        const dateCell = document.createElement('td');
+        dateCell.textContent = item.date;
+        if (index === nextShowIndex) {
+            dateCell.innerHTML += ' <span class="next-show-badge">Eerstvolgende</span>';
+        }
+        row.appendChild(dateCell);
+        
+        const locationCell = document.createElement('td');
+        locationCell.textContent = item.location;
+        row.appendChild(locationCell);
+        
+        const eventCell = document.createElement('td');
+        eventCell.textContent = item.event;
+        row.appendChild(eventCell);
+        
+        return row;
+    }
+
+    function renderTable(page) {
+        tbody.innerHTML = '';
+        
+        const start = (page - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+        const paginatedItems = agendaData.slice(start, end);
+        
+        paginatedItems.forEach((item, i) => {
+            tbody.appendChild(createRow(item, start + i));
+        });
+
+        // Update controls
+        pageInfo.textContent = `Pagina ${currentPage} van ${Math.ceil(agendaData.length / itemsPerPage)}`;
+        
+        if (currentPage === 1) {
+            prevBtn.classList.add('disabled');
+        } else {
+            prevBtn.classList.remove('disabled');
+        }
+        
+        if (end >= agendaData.length) {
+            nextBtn.classList.add('disabled');
+        } else {
+            nextBtn.classList.remove('disabled');
+        }
+    }
+
+    if (typeof agendaData !== 'undefined' && agendaData.length > 0) {
+        // Sort agendaData by date descending (Newest/Future first)
+        agendaData.sort((a, b) => parseDate(b.date) - parseDate(a.date));
+
+        // Calculate next show index (assuming descending order: Future -> Past)
+        for (let i = 0; i < agendaData.length; i++) {
+            if (isPast(agendaData[i].date)) {
+                if (i > 0) {
+                    nextShowIndex = i - 1;
+                }
+                break;
+            }
+        }
+        // Edge case: All future
+        if (nextShowIndex === -1 && agendaData.length > 0 && !isPast(agendaData[agendaData.length-1].date)) {
+            nextShowIndex = agendaData.length - 1;
+        }
+
+        // If the next show is on a later page, maybe we should jump to that page?
+        // For now, let's just start at page 1. If the next show is far in the future (top of list), it will be on page 1.
+        // If the next show is the *last* future event, it might be on page 2 or 3 if there are many future events.
+        // But usually "Next Show" is the one closest to today.
+        // If the list is descending (2026, 2025...), the closest to today is the *last* one before the past ones.
+        // So it could be deep in the list.
+        
+        // Let's calculate which page the next show is on and start there.
+        if (nextShowIndex !== -1) {
+            currentPage = Math.floor(nextShowIndex / itemsPerPage) + 1;
+        }
+
+
+        // Function to calculate and set max table height
+        function updateTableHeight() {
+            // Save current content to restore later
+            const savedContent = tbody.innerHTML;
+            
+            let maxTableHeight = 0;
+            const totalPages = Math.ceil(agendaData.length / itemsPerPage);
+            
+            // Temporarily remove height constraint to measure correctly
+            tableWrapper.style.height = 'auto';
+            tableWrapper.style.overflowY = 'visible';
+
+            if (totalPages === 0) {
+                tbody.innerHTML = '';
+                maxTableHeight = table.offsetHeight;
+            } else {
+                // Render each page to find the tallest one
+                for (let i = 1; i <= totalPages; i++) {
+                    tbody.innerHTML = '';
+                    const start = (i - 1) * itemsPerPage;
+                    const end = start + itemsPerPage;
+                    const items = agendaData.slice(start, end);
+                    items.forEach((item, idx) => tbody.appendChild(createRow(item, start + idx)));
+                    
+                    const height = table.offsetHeight;
+                    if (height > maxTableHeight) {
+                        maxTableHeight = height;
+                    }
+                }
+            }
+            
+            // Set fixed height on wrapper to prevent jumping
+            // Add a buffer to prevent vertical scrollbars due to sub-pixel rendering
+            tableWrapper.style.height = (maxTableHeight + 20) + 'px';
+            tableWrapper.style.overflowY = 'hidden';
+            
+            // Restore content (or re-render current page)
+            renderTable(currentPage);
+        }
+
+        // Initial calculation
+        updateTableHeight();
+
+        // Debounce resize event
+        let resizeTimer;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(function() {
+                updateTableHeight();
+            }, 250);
+        });
+
+        prevBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            prevBtn.blur(); // Remove focus to prevent ghost clicks on touch devices
+            if (currentPage > 1) {
+                currentPage--;
+                renderTable(currentPage);
+            }
+        });
+
+        nextBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            nextBtn.blur(); // Remove focus to prevent ghost clicks on touch devices
+            if ((currentPage * itemsPerPage) < agendaData.length) {
+                currentPage++;
+                renderTable(currentPage);
+            }
+        });
+
+        // Swipe functionality
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let touchEndX = 0;
+        let touchEndY = 0;
+        const minSwipeDistance = 30;
+
+        tableWrapper.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+            touchStartY = e.changedTouches[0].screenY;
+        }, {passive: true});
+
+        tableWrapper.addEventListener('touchmove', (e) => {
+            const currentX = e.changedTouches[0].screenX;
+            const currentY = e.changedTouches[0].screenY;
+            const diffX = Math.abs(currentX - touchStartX);
+            const diffY = Math.abs(currentY - touchStartY);
+
+            // If horizontal movement is dominant, prevent vertical scrolling
+            if (diffX > diffY && diffX > 5) {
+                e.preventDefault();
+            }
+        }, {passive: false});
+
+        tableWrapper.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            touchEndY = e.changedTouches[0].screenY;
+            handleSwipe();
+        }, {passive: true});
+
+        function handleSwipe() {
+            const distanceX = touchEndX - touchStartX;
+            const distanceY = touchEndY - touchStartY;
+            
+            // Check if horizontal swipe is dominant and long enough
+            if (Math.abs(distanceX) > Math.abs(distanceY) && Math.abs(distanceX) > minSwipeDistance) {
+                if (distanceX > 0) {
+                    // Swiped Right -> Previous Page
+                    if (currentPage > 1) {
+                        currentPage--;
+                        renderTable(currentPage);
+                    }
+                } else {
+                    // Swiped Left -> Next Page
+                    if ((currentPage * itemsPerPage) < agendaData.length) {
+                        currentPage++;
+                        renderTable(currentPage);
+                    }
+                }
+            }
+        }
+
+    } else {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align: center;">Geen agenda items gevonden.</td></tr>';
+        pageInfo.style.display = 'none';
+        prevBtn.style.display = 'none';
+        nextBtn.style.display = 'none';
+    }
+});
