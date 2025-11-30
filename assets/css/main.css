@@ -4787,11 +4787,11 @@ input, select, textarea {
 	}
 /* Agenda Past Events */
 tr.past-event {
-    opacity: 0.5;
+    opacity: 0.8;
     filter: grayscale(100%);
 }
 tr.past-event td {
-    color: #aaa;
+    color: #666;
 }
 
 /* Agenda Next Show */
