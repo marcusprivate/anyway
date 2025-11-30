@@ -259,6 +259,46 @@
 							}
 						});
 
+						// Swipe functionality
+						let touchStartX = 0;
+						let touchStartY = 0;
+						let touchEndX = 0;
+						let touchEndY = 0;
+						const minSwipeDistance = 50;
+
+						tableWrapper.addEventListener('touchstart', (e) => {
+							touchStartX = e.changedTouches[0].screenX;
+							touchStartY = e.changedTouches[0].screenY;
+						}, {passive: true});
+
+						tableWrapper.addEventListener('touchend', (e) => {
+							touchEndX = e.changedTouches[0].screenX;
+							touchEndY = e.changedTouches[0].screenY;
+							handleSwipe();
+						}, {passive: true});
+
+						function handleSwipe() {
+							const distanceX = touchEndX - touchStartX;
+							const distanceY = touchEndY - touchStartY;
+							
+							// Check if horizontal swipe is dominant and long enough
+							if (Math.abs(distanceX) > Math.abs(distanceY) && Math.abs(distanceX) > minSwipeDistance) {
+								if (distanceX > 0) {
+									// Swiped Right -> Previous Page
+									if (currentPage > 1) {
+										currentPage--;
+										renderTable(currentPage);
+									}
+								} else {
+									// Swiped Left -> Next Page
+									if ((currentPage * itemsPerPage) < agendaData.length) {
+										currentPage++;
+										renderTable(currentPage);
+									}
+								}
+							}
+						}
+
 					} else {
 						tbody.innerHTML = '<tr><td colspan="3" style="text-align: center;">Geen agenda items gevonden.</td></tr>';
 						pageInfo.style.display = 'none';
