@@ -160,22 +160,29 @@ document.addEventListener('DOMContentLoaded', function() {
         function addNavButtonListener(btn, delta) {
             let lastTouchTime = 0;
 
-            // Handle touch events to prevent focus and ghost clicks
-            btn.addEventListener('touchend', (e) => {
-                e.preventDefault(); // Prevents mouse emulation and focus
+            const handleAction = (e) => {
+                if (e.cancelable) e.preventDefault();
                 e.stopPropagation();
-                lastTouchTime = new Date().getTime();
+                
+                // CRITICAL: Remove focus from the button immediately.
+                // This prevents "sticky focus" where subsequent swipes might trigger the focused element.
+                btn.blur();
+                
                 changePage(delta);
+            };
+
+            // Handle touch events
+            btn.addEventListener('touchend', (e) => {
+                lastTouchTime = new Date().getTime();
+                handleAction(e);
             });
 
-            // Handle click events for non-touch devices
+            // Handle click events (for mouse/desktop or if touch event falls through)
             btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
                 const now = new Date().getTime();
-                // Ignore click if it happened shortly after touchend (ghost click)
+                // Ignore click if it happened shortly after touchend (ghost click prevention)
                 if (now - lastTouchTime < 500) return;
-                changePage(delta);
+                handleAction(e);
             });
         }
 
