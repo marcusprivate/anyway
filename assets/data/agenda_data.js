@@ -4,6 +4,7 @@ const agendaData = [
         "location": "Haarlem",
         "event": "Huiskamerfestival"
     },
+    
     {
         "date": "29 mei 2026",
         "location": "Castricum",
