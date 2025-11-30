@@ -151,7 +151,12 @@ document.addEventListener('DOMContentLoaded', function() {
         prevBtn.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            prevBtn.blur(); // Remove focus to prevent ghost clicks on touch devices
+            // Use setTimeout to ensure blur happens after the event loop, fixing ghost clicks
+            setTimeout(() => {
+                prevBtn.blur();
+                document.body.focus(); // Force focus away
+            }, 10);
+            
             if (currentPage > 1) {
                 currentPage--;
                 renderTable(currentPage);
@@ -161,7 +166,12 @@ document.addEventListener('DOMContentLoaded', function() {
         nextBtn.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            nextBtn.blur(); // Remove focus to prevent ghost clicks on touch devices
+            // Use setTimeout to ensure blur happens after the event loop, fixing ghost clicks
+            setTimeout(() => {
+                nextBtn.blur();
+                document.body.focus(); // Force focus away
+            }, 10);
+
             if ((currentPage * itemsPerPage) < agendaData.length) {
                 currentPage++;
                 renderTable(currentPage);
@@ -176,6 +186,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const minSwipeDistance = 30;
 
         tableWrapper.addEventListener('touchstart', (e) => {
+            if (e.touches.length > 1) return; // Ignore multi-touch
             touchStartX = e.changedTouches[0].screenX;
             touchStartY = e.changedTouches[0].screenY;
         }, {passive: true});
@@ -197,8 +208,18 @@ document.addEventListener('DOMContentLoaded', function() {
             touchEndY = e.changedTouches[0].screenY;
             handleSwipe();
         }, {passive: true});
+        
+        tableWrapper.addEventListener('touchcancel', (e) => {
+            touchStartX = 0;
+            touchStartY = 0;
+            touchEndX = 0;
+            touchEndY = 0;
+        }, {passive: true});
 
         function handleSwipe() {
+            // Ensure we have valid start coordinates
+            if (touchStartX === 0 && touchStartY === 0) return;
+
             const distanceX = touchEndX - touchStartX;
             const distanceY = touchEndY - touchStartY;
             
@@ -218,6 +239,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
             }
+            
+            // Reset coordinates
+            touchStartX = 0;
+            touchStartY = 0;
+            touchEndX = 0;
+            touchEndY = 0;
         }
 
     } else {
