@@ -4900,11 +4900,16 @@ tr.next-show td {
 }
 
 /* Custom: Resize main image on desktop */
-@media screen and (min-width: 700px) {
+@media screen and (min-width: 737px) {
 	#main-image {
-		width: 70%;
-		margin-left: auto;
-		margin-right: auto;
+		flex: 0 0 100%;
+		width: 100%;
+		margin: 1rem 0;
+	}
+	#main-image img {
+		width: 40%;
+		display: block;
+		margin: 0 auto;
 	}
 }
 
