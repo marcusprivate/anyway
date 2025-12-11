@@ -10,7 +10,8 @@
     const links = [
         { text: 'Anyway', href: 'index.html' },
         { text: 'Agenda', href: 'agenda.html' },
-        { text: 'Repertoire', href: 'repertoire.html' }
+        { text: 'Repertoire', href: 'repertoire.html' },
+        { text: 'Blog', href: 'blog.html' }
     ];
 
     const socialIcons = [

@@ -385,6 +385,12 @@ input, select, textarea {
 	margin: 0 0 1rem 0;
 }
 
+/* Match index line spacing for blog content */
+#blog-container p {
+	line-height: 1.75;
+	margin: 0 0 1rem 0;
+}
+
 		.row > * {
 			box-sizing: border-box;
 		}

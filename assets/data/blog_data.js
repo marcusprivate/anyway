@@ -1,37 +1,16 @@
 const blogData = [
     {
-        title: "Terugblik: Korenfestival Texel",
-        date: "15 november 2025",
-        image: "images/pic02.jpg",
-        content: "Wat een fantastische dag op het Korenfestival! We hebben genoten van de andere koren en natuurlijk van ons eigen optreden. Bekijk de foto's op onze Facebook pagina.",
-        link: "https://facebook.com/anywaytexel"
-    },
-    {
-        title: "Nieuw Repertoire",
-        date: "1 november 2025",
-        image: "", 
-        content: "We zijn druk bezig met het instuderen van nieuwe nummers voor het komende seizoen. Houd onze agenda in de gaten!",
+        title: "Tuinenfestival - Castricum",
+        date: "14 september 2025",
+        image: "images/20250914_tuinenfestival.jpg",
+        content: "Al meerdere jaren treden we op tijdens het Tuinenfestival in Castricum. Tientallen tuinen zijn dan gratis toegankelijk voor publiek en in elke tuin zijn er artiesten die optreden. Het was nog even spannend of het doorging omdat het natuurlijk een buitenevenement is en er veel regen dreigde maar gelukkig is dat niet uitgekomen. Ook de wind deed tijdens het optreden flink zijn best! Maar wij stonden mooi beschut in een partytent en hebben 2 optredens mogen verzorgen! Het was weer een feest om te zingen voor zoveel mensen en nog mooier dat er mensen in het publiek waren die zo genoten hadden dat ze het 2e optreden nog een keertje zijn komen kijken! Volgend jaar doen we weer mee!",
         link: ""
     },
     {
-        title: "Optreden Verzorgingshuis",
-        date: "20 oktober 2025",
-        image: "images/pic03.jpg",
-        content: "Een intiem optreden voor de bewoners. Het was hartverwarmend om te zien hoe de muziek mensen raakt.",
-        link: ""
-    },
-    {
-        title: "Repetitie weekend",
-        date: "5 oktober 2025",
-        image: "images/pic04.jpg",
-        content: "Een heel weekend zingen, lachen en nieuwe plannen maken. We zijn er weer helemaal klaar voor.",
-        link: ""
-    },
-    {
-        title: "Zomerstop voorbij",
-        date: "1 september 2025",
-        image: "",
-        content: "De vakanties zijn voorbij, we gaan weer beginnen! Elke week repeteren we weer met veel plezier.",
+        title: "Lawaai - Drachten",
+        date: "2 september 2025",
+        image: "images/20250902_lawaai.jpg", 
+        content: "We hadden nog nooit in Friesland opgetreden en aangezien Anneke hier opgegroeid is waren we blij dat we tijdens het Vocalink Korenfestival in Schouwburg De Lawei in Drachten mee konden doen.<br><br> Er waren 2 theaterzalen waar de hele dag door allerlei koren van groot naar klein optraden. Ook was er een jury aanwezig die het optreden dan beoordeelde. Dat blijft altijd weer spannend maar ook stimulerend om te lezen wat er goed was en waar nog aan gewerkt kan worden! We kregen hele mooie complimenten en zeker ook omdat we natuurlijk altijd het kleinste ‘koor’ zijn en in onze optredens ook altijd nog een theaterelement toegevoegd is. Dit maakt het voor het publiek vaak heel verrassend.",
         link: ""
     }
 ];
