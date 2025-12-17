@@ -28,7 +28,7 @@ const agendaData = [
     {
         "date": "16 december 2025",
         "location": "Texel",
-        "event": "Alzheimer Wintercafé"
+        "event": "Alzheimer Wintercafé (geannuleerd i.v.m. ziekte)"
     },
     {
         "date": "12 april 2025",
