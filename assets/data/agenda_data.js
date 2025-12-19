@@ -16,14 +16,14 @@ const agendaData = [
         "event": "Huiskamerfestival Broadway Den Hoorn"
     },
     {
-        "date": "20 december 2025",
+        "date": "21 december 2025",
         "location": "Amersfoort",
         "event": "Besloten optreden"
     },
     {
         "date": "20 december 2025",
         "location": "Castricum",
-        "event": "Candle Light Shopping"
+        "event": "Candle Light Shopping (geannuleerd i.v.m. ziekte)"
     },
     {
         "date": "16 december 2025",
