@@ -1,4 +1,17 @@
-document.addEventListener('DOMContentLoaded', function() {
+let agendaData = [];
+
+async function loadAgendaData() {
+    try {
+        const response = await fetch('content/agenda.yaml');
+        const yamlText = await response.text();
+        agendaData = jsyaml.load(yamlText);
+        initAgenda();
+    } catch (error) {
+        console.error('Error loading agenda data:', error);
+    }
+}
+
+function initAgenda() {
     const tbody = document.getElementById('agenda-body');
     const prevBtn = document.getElementById('prev-btn');
     const nextBtn = document.getElementById('next-btn');
@@ -65,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    if (typeof agendaData !== 'undefined' && agendaData.length > 0) {
+    if (agendaData.length > 0) {
         // Sort agendaData by date descending (Newest/Future first)
         agendaData.sort((a, b) => parseDate(b.date) - parseDate(a.date));
 
@@ -258,4 +271,6 @@ document.addEventListener('DOMContentLoaded', function() {
         prevBtn.style.display = 'none';
         nextBtn.style.display = 'none';
     }
-});
+}
+
+document.addEventListener('DOMContentLoaded', loadAgendaData);

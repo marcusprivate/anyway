@@ -1,4 +1,17 @@
-document.addEventListener('DOMContentLoaded', function() {
+let repertoireData = [];
+
+async function loadRepertoireData() {
+    try {
+        const response = await fetch('content/repertoire.yaml');
+        const yamlText = await response.text();
+        repertoireData = jsyaml.load(yamlText);
+        initRepertoire();
+    } catch (error) {
+        console.error('Error loading repertoire data:', error);
+    }
+}
+
+function initRepertoire() {
     const searchInput = document.getElementById('repertoire-search');
     const filterAll = document.getElementById('filter-all');
     const filterVideo = document.getElementById('filter-video');
@@ -6,9 +19,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     let showYoutubeOnly = false;
 
-    // Check if repertoireData is defined
-    if (typeof repertoireData === 'undefined') {
-        console.error('repertoireData is not defined. Make sure repertoire_data.js is included.');
+    if (repertoireData.length === 0) {
+        console.error('repertoireData is empty.');
         return;
     }
 
@@ -111,4 +123,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initial render
     renderRepertoire();
-});
+}
+
+document.addEventListener('DOMContentLoaded', loadRepertoireData);

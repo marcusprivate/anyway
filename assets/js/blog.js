@@ -112,7 +112,34 @@ document.addEventListener('DOMContentLoaded', function() {
         renderBlog(currentPage);
     }
 
-    if (typeof blogData !== 'undefined' && blogData.length > 0) {
+    let blogData = []; // Will hold all data loaded from YAML
+
+    // Function to load and parse YAML data
+    async function loadBlogData() {
+        try {
+            const response = await fetch('content/blog.yaml');
+            const yamlText = await response.text();
+            blogData = jsyaml.load(yamlText);
+            
+            if (blogData && blogData.length > 0) {
+                initializeBlog();
+            } else {
+                showNoData();
+            }
+        } catch (e) {
+            console.error('Error loading blog data:', e);
+            showNoData();
+        }
+    }
+
+    function showNoData() {
+        blogContainer.innerHTML = '<p>Geen blog items gevonden.</p>';
+        pageInfo.style.display = 'none';
+        prevBtn.style.display = 'none';
+        nextBtn.style.display = 'none';
+    }
+
+    function initializeBlog() {
         // Sort data by date (newest first)
         blogData.sort((a, b) => parseDate(b.date) - parseDate(a.date));
 
@@ -154,12 +181,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('main').scrollIntoView({ behavior: 'smooth' });
             }
         });
-    } else {
-        blogContainer.innerHTML = '<p>Geen blog items gevonden.</p>';
-        pageInfo.style.display = 'none';
-        prevBtn.style.display = 'none';
-        nextBtn.style.display = 'none';
-        // Hide filters if no data
-        if(searchInput) searchInput.parentElement.parentElement.style.display = 'none';
     }
+
+    // Start loading data
+    loadBlogData();
 });
