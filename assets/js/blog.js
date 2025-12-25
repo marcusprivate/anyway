@@ -42,6 +42,11 @@ document.addEventListener('DOMContentLoaded', function() {
             processedContent = tempDiv.innerHTML;
         }
 
+        // Convert newlines to <br> for display
+        if (processedContent) {
+            processedContent = processedContent.replace(/\n/g, '<br>');
+        }
+
         article.innerHTML = `
             <header>
                 <span class="date">${item.date}</span>

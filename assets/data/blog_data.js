@@ -10,7 +10,9 @@ const blogData = [
         title: "Vocalink korenfestival - Drachten",
         date: "2 november 2025",
         image: "images/20251102_vocallink_korenfestival.jpg", 
-        content: "We hadden nog nooit in Friesland opgetreden en aangezien Anneke hier opgegroeid is waren we blij dat we tijdens het Vocalink Korenfestival in Schouwburg De Lawei in Drachten mee konden doen.<br><br> Er waren 2 theaterzalen waar de hele dag door allerlei koren van groot naar klein optraden. Ook was er een jury aanwezig die het optreden dan beoordeelde. Dat blijft altijd weer spannend maar ook stimulerend om te lezen wat er goed was en waar nog aan gewerkt kan worden! We kregen hele mooie complimenten en zeker ook omdat we natuurlijk altijd het kleinste ‘koor’ zijn en in onze optredens ook altijd nog een theaterelement toegevoegd is. Dit maakt het voor het publiek vaak heel verrassend.",
+        content: `We hadden nog nooit in Friesland opgetreden en aangezien Anneke hier opgegroeid is waren we blij dat we tijdens het Vocalink Korenfestival in Schouwburg De Lawei in Drachten mee konden doen.
+
+Er waren 2 theaterzalen waar de hele dag door allerlei koren van groot naar klein optraden. Ook was er een jury aanwezig die het optreden dan beoordeelde. Dat blijft altijd weer spannend maar ook stimulerend om te lezen wat er goed was en waar nog aan gewerkt kan worden! We kregen hele mooie complimenten en zeker ook omdat we natuurlijk altijd het kleinste 'koor' zijn en in onze optredens ook altijd nog een theaterelement toegevoegd is. Dit maakt het voor het publiek vaak heel verrassend.`,
         link: ""
     }
 ];
