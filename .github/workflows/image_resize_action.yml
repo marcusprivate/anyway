@@ -1,0 +1,47 @@
+name: Resize & Convert Images
+
+on:
+  push:
+    paths:
+      - 'content/images/**/*.jpg'
+      - 'content/images/**/*.jpeg'
+      - 'content/images/**/*.png'
+      - 'content/images/**/*.tif'
+      - 'content/images/**/*.tiff'
+      - 'content/images/**/*.bmp'
+      - '!content/images/**/anyway.jpg'
+      - '!content/images/**/overlay.png'
+  workflow_dispatch:
+
+jobs:
+  resize:
+    runs-on: ubuntu-latest
+
+    # Needed to commit/push optimized images back
+    permissions:
+      contents: write
+
+    # Prevents infinite loop from bot's own commits
+    if: github.actor != 'github-actions[bot]'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install Pillow
+
+      - name: Run resize script
+        run: python resize_images.py
+
+      - name: Commit converted images
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --staged --quiet || git commit -m "Resize & convert images to WebP"
+          git push
