@@ -4,7 +4,7 @@ from PIL import Image, ImageOps
 
 INPUT_DIR = Path("content/images")
 YAML_FILES = [Path("content/blog.yaml")]
-IGNORE_FILES = {"anyway.jpg", "overlay.png"}
+IGNORE_FILES = {"anyway.jpg"}
 MAX_PX = 2048
 QUALITY = 85
 METHOD = 6
