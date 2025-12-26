@@ -9,8 +9,6 @@ on:
       - 'content/images/**/*.tif'
       - 'content/images/**/*.tiff'
       - 'content/images/**/*.bmp'
-      - '!content/images/**/anyway.jpg'
-      - '!content/images/**/overlay.png'
   workflow_dispatch:
 
 jobs:

@@ -4,6 +4,7 @@ from PIL import Image, ImageOps
 
 INPUT_DIR = Path("content/images")
 YAML_FILES = [Path("content/blog.yaml")]
+IGNORE_FILES = {"anyway.jpg", "overlay.png"}
 MAX_PX = 2048
 QUALITY = 85
 METHOD = 6
@@ -39,6 +40,11 @@ def main() -> int:
 
     for src in INPUT_DIR.rglob("*"):
         if not src.is_file() or src.suffix.lower() not in SUPPORTED:
+            continue
+
+        # Skip ignored files
+        if src.name.lower() in IGNORE_FILES:
+            print(f"Skipping ignored file: {src.name}")
             continue
 
         dst = src.with_suffix(".webp")
