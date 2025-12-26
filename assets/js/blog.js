@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         let imageHtml = '';
         if (item.image) {
-            imageHtml = `<a href="${item.link || '#'}" class="image fit"${linkAttributes}><img src="${item.image}" alt="" /></a>`;
+            imageHtml = `<span class="image fit"><img src="${item.image}" alt="" /></span>`;
         }
 
         let linkHtml = '';
@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
         article.innerHTML = `
             <header>
                 <span class="date">${item.date}</span>
-                <h2><a href="${item.link || '#'}"${linkAttributes}>${item.title}</a></h2>
+                <h2>${item.title}</h2>
             </header>
             ${imageHtml}
             <p>${processedContent}</p>
