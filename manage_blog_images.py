@@ -412,32 +412,33 @@ def main():
         print()
     
     # =========================================================================
-    # STEP 2: DELETE MD5 DUPLICATES
-    # Re-scan disk, find exact duplicates, delete immediately
+    # STEP 2: MD5 DUPLICATES (DISABLED)
+    # Disabled - relying on Step 4 visual check which has interactive prompts
+    # and won't accidentally delete files referenced in blog.yaml
     # =========================================================================
-    print("-" * 70)
-    print("Step 2: Checking for duplicate files (exact MD5 matches)...")
-    print("-" * 70 + "\n")
-    
-    duplicates = find_duplicates_to_delete(IMAGES_DIR)
-    
-    if not duplicates:
-        print("No duplicate files found.\n")
-    elif dry_run:
-        print(f"Found {len(duplicates)} duplicate file(s) to delete:\n")
-        for dup, correct in duplicates:
-            print(f"  DELETE: {dup.name}")
-            print(f"   KEEPS: {correct.name}")
-            print()
-    else:
-        print(f"Deleting {len(duplicates)} duplicate file(s)...")
-        for dup, correct in duplicates:
-            try:
-                dup.unlink()
-                print(f"  DELETED: {dup.name} (duplicate of {correct.name})")
-            except Exception as e:
-                print(f"  ERROR deleting {dup.name}: {e}")
-        print()
+    # print("-" * 70)
+    # print("Step 2: Checking for duplicate files (exact MD5 matches)...")
+    # print("-" * 70 + "\n")
+    # 
+    # duplicates = find_duplicates_to_delete(IMAGES_DIR)
+    # 
+    # if not duplicates:
+    #     print("No duplicate files found.\n")
+    # elif dry_run:
+    #     print(f"Found {len(duplicates)} duplicate file(s) to delete:\n")
+    #     for dup, correct in duplicates:
+    #         print(f"  DELETE: {dup.name}")
+    #         print(f"   KEEPS: {correct.name}")
+    #         print()
+    # else:
+    #     print(f"Deleting {len(duplicates)} duplicate file(s)...")
+    #     for dup, correct in duplicates:
+    #         try:
+    #             dup.unlink()
+    #             print(f"  DELETED: {dup.name} (duplicate of {correct.name})")
+    #         except Exception as e:
+    #             print(f"  ERROR deleting {dup.name}: {e}")
+    #     print()
     
     # =========================================================================
     # STEP 3: CHECK UNUSED IMAGES
