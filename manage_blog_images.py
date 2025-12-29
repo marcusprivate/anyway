@@ -204,21 +204,21 @@ def find_unused_images(images_dir, entries):
     
     return sorted(unused, key=lambda x: x.name)
 
-def find_visual_duplicates(images_dir, exclude=None):
-    """Find visually similar images using perceptual hashing.
+# Maximum hamming distance to consider images as visual duplicates
+# (perceptual hashes differ by at most this many bits)
+HASH_DISTANCE_THRESHOLD = 8
+
+def find_visual_duplicates(images_dir):
+    """Find visually similar images using perceptual hashing with hamming distance.
     
-    Args:
-        images_dir: Path to the images directory
-        exclude: Set of paths to exclude (e.g., files already marked for MD5 deletion)
+    Uses hamming distance to find near-matches, catching images that are
+    similar but not byte-identical (e.g., recompressed or resized versions).
     """
     if not IMAGEHASH_AVAILABLE:
         return []
     
-    if exclude is None:
-        exclude = set()
-    
     # Calculate perceptual hash for each image
-    image_hashes = {}  # hash -> [filepaths]
+    image_hashes = []  # list of (hash, filepath)
     
     for f in images_dir.iterdir():
         if not f.is_file():
@@ -227,33 +227,52 @@ def find_visual_duplicates(images_dir, exclude=None):
             continue
         if f.name in IGNORED_FILES:
             continue
-        if f in exclude:
-            continue
         
         try:
             with Image.open(f) as img:
-                # Use average hash - good for finding similar images
-                phash = str(imagehash.phash(img))
-                
-                if phash not in image_hashes:
-                    image_hashes[phash] = []
-                image_hashes[phash].append(f)
+                phash = imagehash.phash(img)
+                image_hashes.append((phash, f))
         except Exception as e:
             print(f"  WARNING: Could not process {f.name}: {e}")
     
-    # Find groups of similar images (exclude .jpg/.webp pairs with same name)
+    # Group images by similar hashes using hamming distance
+    # Use Union-Find to cluster similar images
+    n = len(image_hashes)
+    parent = list(range(n))
+    
+    def find(x):
+        if parent[x] != x:
+            parent[x] = find(parent[x])
+        return parent[x]
+    
+    def union(x, y):
+        px, py = find(x), find(y)
+        if px != py:
+            parent[px] = py
+    
+    # Compare all pairs and union if similar
+    for i in range(n):
+        for j in range(i + 1, n):
+            hash_i, _ = image_hashes[i]
+            hash_j, _ = image_hashes[j]
+            distance = hash_i - hash_j  # imagehash returns hamming distance
+            if distance <= HASH_DISTANCE_THRESHOLD:
+                union(i, j)
+    
+    # Collect groups
+    groups = {}
+    for i in range(n):
+        root = find(i)
+        if root not in groups:
+            groups[root] = []
+        groups[root].append(image_hashes[i][1])
+    
+    # Filter: only groups with multiple files and different stems
     duplicates = []
-    for phash, files in image_hashes.items():
+    for files in groups.values():
         if len(files) > 1:
-            # Group by stem to filter out format variants (image.jpg + image.webp)
-            stems = {}
-            for f in files:
-                if f.stem not in stems:
-                    stems[f.stem] = []
-                stems[f.stem].append(f)
-            
-            # Only report if there are files with DIFFERENT names (true duplicates)
-            if len(stems) > 1:
+            stems = set(f.stem for f in files)
+            if len(stems) > 1:  # Different filenames = true duplicates
                 duplicates.append(files)
     
     return duplicates
@@ -273,6 +292,14 @@ def main():
     # Parse blog.yaml
     entries = parse_blog_yaml(YAML_PATH)
     print(f"Found {len(entries)} blog entries\n")
+    
+    # =========================================================================
+    # STEP 1: RENAME FILES
+    # Scan for files that need renaming, apply immediately, then continue
+    # =========================================================================
+    print("-" * 70)
+    print("Step 1: Checking for files to rename...")
+    print("-" * 70 + "\n")
     
     renames = []
     
@@ -336,26 +363,93 @@ def main():
             }
         })
     
-    # Find duplicate files to clean up
+    if not renames:
+        print("No files need renaming.\n")
+    elif dry_run:
+        print(f"Found {len(renames)} file(s) to rename.\n")
+    else:
+        # Apply renames immediately
+        print(f"Renaming {len(renames)} file(s)...")
+        successful_yaml_updates = []
+        
+        for rename_info in renames:
+            old_path = rename_info['old']
+            new_path = rename_info['new']
+            siblings = rename_info['siblings']
+            yaml_update = rename_info['yaml_update']
+            
+            try:
+                if new_path.exists():
+                    print(f"  SKIP (target exists): {new_path.name}")
+                    continue
+                old_path.rename(new_path)
+                print(f"  RENAMED: {old_path.name} -> {new_path.name}")
+                successful_yaml_updates.append(yaml_update)
+                
+                # Rename sibling files
+                for sib_old, sib_new in siblings:
+                    try:
+                        if sib_new.exists():
+                            print(f"    SKIP sibling (target exists): {sib_new.name}")
+                        else:
+                            sib_old.rename(sib_new)
+                            print(f"    RENAMED sibling: {sib_old.name} -> {sib_new.name}")
+                    except Exception as e:
+                        print(f"    ERROR sibling: {sib_old.name}: {e}")
+            except Exception as e:
+                print(f"  ERROR: {old_path.name}: {e}")
+        
+        # Update blog.yaml
+        if successful_yaml_updates:
+            print("\nUpdating blog.yaml...")
+            content = YAML_PATH.read_text(encoding='utf-8')
+            for update in successful_yaml_updates:
+                if update['old'] in content:
+                    content = content.replace(update['old'], update['new'])
+                    print(f"  UPDATED: {update['old']} -> {update['new']}")
+            YAML_PATH.write_text(content, encoding='utf-8')
+        
+        print()
+    
+    # =========================================================================
+    # STEP 2: DELETE MD5 DUPLICATES
+    # Re-scan disk, find exact duplicates, delete immediately
+    # =========================================================================
     print("-" * 70)
-    print("Checking for duplicate files (exact MD5 matches)...")
+    print("Step 2: Checking for duplicate files (exact MD5 matches)...")
     print("-" * 70 + "\n")
     
     duplicates = find_duplicates_to_delete(IMAGES_DIR)
     
-    if duplicates:
+    if not duplicates:
+        print("No duplicate files found.\n")
+    elif dry_run:
         print(f"Found {len(duplicates)} duplicate file(s) to delete:\n")
         for dup, correct in duplicates:
             print(f"  DELETE: {dup.name}")
             print(f"   KEEPS: {correct.name}")
             print()
     else:
-        print("No duplicate files found.\n")
+        print(f"Deleting {len(duplicates)} duplicate file(s)...")
+        for dup, correct in duplicates:
+            try:
+                dup.unlink()
+                print(f"  DELETED: {dup.name} (duplicate of {correct.name})")
+            except Exception as e:
+                print(f"  ERROR deleting {dup.name}: {e}")
+        print()
     
-    # Find unused images
+    # =========================================================================
+    # STEP 3: CHECK UNUSED IMAGES
+    # Re-scan disk, report unused images (no deletion, just informational)
+    # =========================================================================
     print("-" * 70)
-    print("Checking for unused images...")
+    print("Step 3: Checking for unused images...")
     print("-" * 70 + "\n")
+    
+    # Re-parse blog.yaml in case it was updated
+    if not dry_run and renames:
+        entries = parse_blog_yaml(YAML_PATH)
     
     unused_images = find_unused_images(IMAGES_DIR, entries)
     
@@ -368,7 +462,15 @@ def main():
     else:
         print("No unused images found.\n")
     
-    # Build set of used filenames for visual duplicate detection
+    # =========================================================================
+    # STEP 4: VISUAL DUPLICATE DETECTION
+    # Re-scan disk, find visually similar images, prompt for deletion
+    # =========================================================================
+    print("-" * 70)
+    print("Step 4: Checking for visual duplicates...")
+    print("-" * 70 + "\n")
+    
+    # Build set of used filenames for display
     used_filenames = set()
     for entry in entries:
         image = entry.get('image', '')
@@ -376,26 +478,19 @@ def main():
             filename = unquote(image.split('/')[-1])
             used_filenames.add(filename)
     
-    # Find visual duplicates (images that look the same but have different names)
-    print("-" * 70)
-    print("Checking for visual duplicates...")
-    print("-" * 70 + "\n")
-    
-    visual_to_delete = []
-    visual_duplicates_found = False
-    
-    # Build set of files that will be auto-deleted by MD5 check (exclude from visual)
-    md5_duplicates_set = {dup for dup, _ in duplicates}
-    
-    if IMAGEHASH_AVAILABLE:
-        visual_duplicates = find_visual_duplicates(IMAGES_DIR, exclude=md5_duplicates_set)
+    if not IMAGEHASH_AVAILABLE:
+        print("Install 'imagehash' and 'Pillow' for visual duplicate detection.\n")
+        print("  pip install imagehash Pillow\n")
+    else:
+        # Fresh scan of disk (no exclusions needed - MD5 duplicates already deleted)
+        visual_duplicates = find_visual_duplicates(IMAGES_DIR)
         
-        if visual_duplicates:
-            visual_duplicates_found = True
+        if not visual_duplicates:
+            print("No visual duplicates found.\n")
+        else:
             print(f"Found {len(visual_duplicates)} group(s) of visually similar images:\n")
             
             for i, group in enumerate(visual_duplicates, 1):
-                # Separate files by naming convention
                 compliant = [f for f in group if follows_naming_convention(f.name)]
                 non_compliant = [f for f in group if not follows_naming_convention(f.name)]
                 
@@ -406,15 +501,18 @@ def main():
                     in_yaml = "📄" if img.name in used_filenames else "  "
                     print(f"    [{convention_mark}] {in_yaml} {img.name} ({size_kb:.1f} KB)")
                 
-                # If there's at least one compliant and one non-compliant, offer to delete
                 if compliant and non_compliant:
                     if dry_run:
                         print(f"    (Can delete {len(non_compliant)} non-compliant file(s) with --apply)")
                     else:
                         answer = input(f"  Delete {len(non_compliant)} non-compliant file(s)? [Y/n]: ").strip().lower()
                         if answer != 'n':
-                            visual_to_delete.extend(non_compliant)
-                            print(f"    → Marked {len(non_compliant)} file(s) for deletion")
+                            for dup in non_compliant:
+                                try:
+                                    dup.unlink()
+                                    print(f"    DELETED: {dup.name}")
+                                except Exception as e:
+                                    print(f"    ERROR: {dup.name}: {e}")
                         else:
                             print("    → Skipped")
                 else:
@@ -422,105 +520,15 @@ def main():
                 print()
             
             print("Legend: [✓] follows naming convention, [✗] doesn't, 📄 = used in blog.yaml\n")
-        else:
-            print("No visual duplicates found.\n")
-    else:
-        print("Install 'imagehash' and 'Pillow' for visual duplicate detection.\n")
-        print("  pip install imagehash Pillow\n")
     
-    if renames:
-        print(f"\nTotal: {len(renames)} file(s) to rename")
-    if duplicates:
-        print(f"Total: {len(duplicates)} duplicate file(s) to delete")
-    if visual_to_delete:
-        print(f"Total: {len(visual_to_delete)} visual duplicate(s) to delete")
-    
-    if not renames and not duplicates and not visual_to_delete and not visual_duplicates_found:
-        print("All images are already correctly named and no duplicates found!")
-        return
-    
-    print()
-    
+    # =========================================================================
+    # DONE
+    # =========================================================================
     if dry_run:
         print("Run with --apply to make these changes.")
-        return
-    
-    # Apply renames
-    successful_yaml_updates = []
-    if renames:
-        print("Renaming files...")
-    for rename_info in renames:
-        old_path = rename_info['old']
-        new_path = rename_info['new']
-        siblings = rename_info['siblings']
-        yaml_update = rename_info['yaml_update']
-        
-        try:
-            # Rename main file
-            if new_path.exists():
-                print(f"  SKIP (target exists): {new_path.name}")
-                continue
-            old_path.rename(new_path)
-            print(f"  RENAMED: {old_path.name} -> {new_path.name}")
-            successful_yaml_updates.append(yaml_update)
-            
-            # Rename sibling files (same stem, different extensions)
-            for sib_old, sib_new in siblings:
-                try:
-                    if sib_new.exists():
-                        print(f"    SKIP sibling (target exists): {sib_new.name}")
-                    else:
-                        sib_old.rename(sib_new)
-                        print(f"    RENAMED sibling: {sib_old.name} -> {sib_new.name}")
-                except Exception as e:
-                    print(f"    ERROR sibling: {sib_old.name}: {e}")
-                    
-        except Exception as e:
-            print(f"  ERROR: {old_path.name}: {e}")
-    
-    # Update blog.yaml only for successful renames
-    if successful_yaml_updates:
-        print("\nUpdating blog.yaml...")
-        content = YAML_PATH.read_text(encoding='utf-8')
-        
-        for update in successful_yaml_updates:
-            if update['old'] in content:
-                content = content.replace(update['old'], update['new'])
-                print(f"  UPDATED: {update['old']} -> {update['new']}")
-        
-        YAML_PATH.write_text(content, encoding='utf-8')
-    
-    # Delete duplicates (re-scan after renames to catch newly created duplicates)
-    if renames:
-        # Re-scan for duplicates after renames
-        duplicates = find_duplicates_to_delete(IMAGES_DIR)
-    
-    if duplicates:
-        print("\nDeleting duplicate files...")
-        for dup, correct in duplicates:
-            try:
-                if not dup.exists():
-                    print(f"  SKIP (already deleted): {dup.name}")
-                    continue
-                dup.unlink()
-                print(f"  DELETED: {dup.name} (duplicate of {correct.name})")
-            except Exception as e:
-                print(f"  ERROR deleting {dup.name}: {e}")
-    
-    # Delete visual duplicates that user confirmed
-    if visual_to_delete:
-        print("\nDeleting visual duplicate files...")
-        for dup in visual_to_delete:
-            try:
-                if not dup.exists():
-                    print(f"  SKIP (already deleted or renamed): {dup.name}")
-                    continue
-                dup.unlink()
-                print(f"  DELETED: {dup.name}")
-            except Exception as e:
-                print(f"  ERROR deleting {dup.name}: {e}")
-    
-    print("\nDone!")
+    else:
+        print("Done!")
 
 if __name__ == '__main__':
     main()
+
