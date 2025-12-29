@@ -2691,6 +2691,8 @@ input, select, textarea {
 
 			.image.fit img {
 				width: 100%;
+				max-height: 50vh;
+				object-fit: contain;
 			}
 
 		.image.main {
