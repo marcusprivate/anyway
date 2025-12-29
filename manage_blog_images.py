@@ -204,10 +204,18 @@ def find_unused_images(images_dir, entries):
     
     return sorted(unused, key=lambda x: x.name)
 
-def find_visual_duplicates(images_dir):
-    """Find visually similar images using perceptual hashing."""
+def find_visual_duplicates(images_dir, exclude=None):
+    """Find visually similar images using perceptual hashing.
+    
+    Args:
+        images_dir: Path to the images directory
+        exclude: Set of paths to exclude (e.g., files already marked for MD5 deletion)
+    """
     if not IMAGEHASH_AVAILABLE:
         return []
+    
+    if exclude is None:
+        exclude = set()
     
     # Calculate perceptual hash for each image
     image_hashes = {}  # hash -> [filepaths]
@@ -218,6 +226,8 @@ def find_visual_duplicates(images_dir):
         if f.suffix.lower() not in ['.webp', '.jpg', '.jpeg', '.png']:
             continue
         if f.name in IGNORED_FILES:
+            continue
+        if f in exclude:
             continue
         
         try:
@@ -265,7 +275,6 @@ def main():
     print(f"Found {len(entries)} blog entries\n")
     
     renames = []
-    yaml_updates = []
     
     for entry in entries:
         title = entry.get('title', '')
@@ -303,12 +312,28 @@ def main():
         
         print(f"RENAME: {current_filename}")
         print(f"    TO: {expected_filename}")
+        
+        # Also find sibling files with same stem but different extensions
+        current_stem = old_path.stem
+        expected_stem = new_path.stem
+        sibling_renames = []
+        for ext in ['.webp', '.jpg', '.jpeg', '.png']:
+            sibling = IMAGES_DIR / (current_stem + ext)
+            if sibling.exists() and sibling != old_path:
+                new_sibling = IMAGES_DIR / (expected_stem + ext)
+                sibling_renames.append((sibling, new_sibling))
+                print(f"  ALSO: {sibling.name} → {new_sibling.name}")
+        
         print()
         
-        renames.append((old_path, new_path))
-        yaml_updates.append({
-            'old': image,
-            'new': f"content/images/{expected_filename}"
+        renames.append({
+            'old': old_path,
+            'new': new_path,
+            'siblings': sibling_renames,
+            'yaml_update': {
+                'old': image,
+                'new': f"content/images/{expected_filename}"
+            }
         })
     
     # Find duplicate files to clean up
@@ -359,8 +384,11 @@ def main():
     visual_to_delete = []
     visual_duplicates_found = False
     
+    # Build set of files that will be auto-deleted by MD5 check (exclude from visual)
+    md5_duplicates_set = {dup for dup, _ in duplicates}
+    
     if IMAGEHASH_AVAILABLE:
-        visual_duplicates = find_visual_duplicates(IMAGES_DIR)
+        visual_duplicates = find_visual_duplicates(IMAGES_DIR, exclude=md5_duplicates_set)
         
         if visual_duplicates:
             visual_duplicates_found = True
@@ -418,27 +446,44 @@ def main():
         return
     
     # Apply renames
-    successful_renames = []
+    successful_yaml_updates = []
     if renames:
         print("Renaming files...")
-    for i, (old_path, new_path) in enumerate(renames):
+    for rename_info in renames:
+        old_path = rename_info['old']
+        new_path = rename_info['new']
+        siblings = rename_info['siblings']
+        yaml_update = rename_info['yaml_update']
+        
         try:
+            # Rename main file
             if new_path.exists():
                 print(f"  SKIP (target exists): {new_path.name}")
-            else:
-                old_path.rename(new_path)
-                print(f"  RENAMED: {old_path.name} -> {new_path.name}")
-                successful_renames.append(i)
+                continue
+            old_path.rename(new_path)
+            print(f"  RENAMED: {old_path.name} -> {new_path.name}")
+            successful_yaml_updates.append(yaml_update)
+            
+            # Rename sibling files (same stem, different extensions)
+            for sib_old, sib_new in siblings:
+                try:
+                    if sib_new.exists():
+                        print(f"    SKIP sibling (target exists): {sib_new.name}")
+                    else:
+                        sib_old.rename(sib_new)
+                        print(f"    RENAMED sibling: {sib_old.name} -> {sib_new.name}")
+                except Exception as e:
+                    print(f"    ERROR sibling: {sib_old.name}: {e}")
+                    
         except Exception as e:
             print(f"  ERROR: {old_path.name}: {e}")
     
     # Update blog.yaml only for successful renames
-    yaml_updates = [yaml_updates[i] for i in successful_renames] if yaml_updates else []
-    if yaml_updates:
+    if successful_yaml_updates:
         print("\nUpdating blog.yaml...")
         content = YAML_PATH.read_text(encoding='utf-8')
         
-        for update in yaml_updates:
+        for update in successful_yaml_updates:
             if update['old'] in content:
                 content = content.replace(update['old'], update['new'])
                 print(f"  UPDATED: {update['old']} -> {update['new']}")
