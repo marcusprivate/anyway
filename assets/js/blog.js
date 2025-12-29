@@ -1,14 +1,14 @@
 document.addEventListener('DOMContentLoaded', function() {
     const blogContainer = document.getElementById('blog-container');
-    const prevBtn = document.getElementById('prev-btn');
-    const nextBtn = document.getElementById('next-btn');
-    const pageInfo = document.getElementById('page-info');
+    const loadMoreBtn = document.getElementById('load-more-btn');
     const searchInput = document.getElementById('blog-search');
     const yearSelect = document.getElementById('blog-year');
     
-    const itemsPerPage = 6; // 6 items per page for grid layout
-    let currentPage = 1;
+    const itemsPerBatch = 6; // 6 items per batch for grid layout
+    let displayedCount = 0;
     let currentData = []; // Will hold filtered data
+    let isLoading = false; // Prevent rapid-fire loading
+    let scrollObserver = null; // IntersectionObserver instance
 
     function createPost(item) {
         const article = document.createElement('article');
@@ -61,40 +61,43 @@ document.addEventListener('DOMContentLoaded', function() {
         return article;
     }
 
-    function renderBlog(page) {
-        blogContainer.innerHTML = '';
+    function renderBlog(append = false) {
+        if (isLoading && append) return; // Only block append calls, not resets
+        isLoading = true;
         
-        const start = (page - 1) * itemsPerPage;
-        const end = start + itemsPerPage;
-        const paginatedItems = currentData.slice(start, end);
+        if (!append) {
+            blogContainer.innerHTML = '';
+            displayedCount = 0;
+        }
         
-        if (paginatedItems.length === 0) {
+        const start = displayedCount;
+        const end = Math.min(displayedCount + itemsPerBatch, currentData.length);
+        const itemsToShow = currentData.slice(start, end);
+        
+        if (currentData.length === 0) {
             blogContainer.innerHTML = '<p style="text-align: center; width: 100%;">Geen resultaten gevonden.</p>';
+            loadMoreBtn.style.display = 'none';
+            isLoading = false; // Reset loading flag
         } else {
-            paginatedItems.forEach(item => {
+            itemsToShow.forEach(item => {
                 blogContainer.appendChild(createPost(item));
             });
+            displayedCount = end;
+            
+            // Show/hide loading indicator
+            if (displayedCount >= currentData.length) {
+                loadMoreBtn.style.display = 'none';
+            } else {
+                loadMoreBtn.style.display = 'block';
+            }
+            
+            // Remove bottom border from articles that are at the bottom of their column
+            // Use setTimeout to ensure layout has finished rendering
+            setTimeout(() => {
+                removeBottomBordersFromColumnEnds();
+                isLoading = false; // Allow next load after render complete
+            }, 50);
         }
-
-        // Update controls
-        const totalPages = Math.ceil(currentData.length / itemsPerPage);
-        pageInfo.textContent = `Pagina ${currentPage} van ${totalPages || 1}`;
-        
-        if (currentPage === 1) {
-            prevBtn.classList.add('disabled');
-        } else {
-            prevBtn.classList.remove('disabled');
-        }
-        
-        if (end >= currentData.length) {
-            nextBtn.classList.add('disabled');
-        } else {
-            nextBtn.classList.remove('disabled');
-        }
-
-        // Remove bottom border from articles that are at the bottom of their column
-        // Use setTimeout to ensure layout has finished rendering
-        setTimeout(removeBottomBordersFromColumnEnds, 50);
     }
 
     function removeBottomBordersFromColumnEnds() {
@@ -156,8 +159,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return matchesSearch && matchesYear;
         });
 
-        currentPage = 1;
-        renderBlog(currentPage);
+        renderBlog(false); // Reset and show first batch
     }
 
     let blogData = []; // Will hold all data loaded from YAML
@@ -182,9 +184,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function showNoData() {
         blogContainer.innerHTML = '<p>Geen blog items gevonden.</p>';
-        pageInfo.style.display = 'none';
-        prevBtn.style.display = 'none';
-        nextBtn.style.display = 'none';
+        loadMoreBtn.style.display = 'none';
     }
 
     function initializeBlog() {
@@ -206,29 +206,20 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         // Initial render
-        renderBlog(currentPage);
+        renderBlog(false);
 
         // Event listeners
         searchInput.addEventListener('input', filterPosts);
         yearSelect.addEventListener('change', filterPosts);
 
-        prevBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (currentPage > 1) {
-                currentPage--;
-                renderBlog(currentPage);
-                document.getElementById('main').scrollIntoView({ behavior: 'smooth' });
+        // Infinite scroll: load more when user scrolls near bottom
+        scrollObserver = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting && displayedCount < currentData.length && !isLoading) {
+                renderBlog(true); // Append more items
             }
-        });
-
-        nextBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            if ((currentPage * itemsPerPage) < currentData.length) {
-                currentPage++;
-                renderBlog(currentPage);
-                document.getElementById('main').scrollIntoView({ behavior: 'smooth' });
-            }
-        });
+        }, { rootMargin: '200px' });
+        
+        scrollObserver.observe(loadMoreBtn);
     }
 
     // Start loading data
