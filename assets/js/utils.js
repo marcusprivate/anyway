@@ -9,6 +9,13 @@ function parseDate(dateStr) {
     // Normalize
     let str = dateStr.trim().toLowerCase();
 
+    // Handle multi-day formats like "17, 18 mei 2024" or "3, 4, 5 juni 2022"
+    // Extract the first day and the month/year
+    const multiDayMatch = str.match(/^(\d{1,2})(?:,\s*\d{1,2})+\s+(\w+)\s+(\d{4})$/);
+    if (multiDayMatch) {
+        str = `${multiDayMatch[1]} ${multiDayMatch[2]} ${multiDayMatch[3]}`;
+    }
+
     // Map Dutch months to English
     const months = {
         'januari': 'January', 'februari': 'February', 'maart': 'March', 'april': 'April', 'mei': 'May', 'juni': 'June',
