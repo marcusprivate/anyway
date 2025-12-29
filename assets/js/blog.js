@@ -91,7 +91,54 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             nextBtn.classList.remove('disabled');
         }
+
+        // Remove bottom border from articles that are at the bottom of their column
+        // Use setTimeout to ensure layout has finished rendering
+        setTimeout(removeBottomBordersFromColumnEnds, 50);
     }
+
+    function removeBottomBordersFromColumnEnds() {
+        const articles = blogContainer.querySelectorAll('article');
+        if (articles.length === 0) return;
+
+        // Reset all borders first (clear any inline styles)
+        articles.forEach(article => {
+            article.style.borderBottom = '';
+        });
+
+        // On mobile, CSS handles everything with !important - don't touch
+        if (window.innerWidth <= 736) {
+            return;
+        }
+
+        // Multi-column: find articles at the bottom of each column
+        // Group articles by their horizontal position (left offset)
+        const columns = {};
+        articles.forEach((article, index) => {
+            const left = article.offsetLeft;
+            if (!columns[left]) {
+                columns[left] = [];
+            }
+            columns[left].push({ article, index });
+        });
+
+        // For each column, find the last article (highest offsetTop)
+        Object.values(columns).forEach(columnArticles => {
+            let lastArticle = columnArticles[0];
+            columnArticles.forEach(item => {
+                if (item.article.offsetTop >= lastArticle.article.offsetTop) {
+                    lastArticle = item;
+                }
+            });
+            lastArticle.article.style.borderBottom = 'none';
+        });
+    }
+
+    // Re-run border detection on window resize (handles orientation change)
+    window.addEventListener('resize', () => {
+        clearTimeout(window.resizeTimer);
+        window.resizeTimer = setTimeout(removeBottomBordersFromColumnEnds, 100);
+    });
 
     function filterPosts() {
         const searchTerm = searchInput.value.toLowerCase();

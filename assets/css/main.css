@@ -3979,6 +3979,11 @@ input, select, textarea {
 				#main > .posts > article {
 					padding: 1.5rem;
 					margin-bottom: 1.5rem;
+					border-bottom: 3px solid #999999 !important;
+				}
+
+				#main > .posts > article:last-child {
+					border-bottom: none !important;
 				}
 
 				#main > .posts > article .image {
