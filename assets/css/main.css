@@ -3931,101 +3931,54 @@ input, select, textarea {
 			}
 
 		#main > .posts {
-			display: -moz-flex;
-			display: -webkit-flex;
-			display: -ms-flex;
-			display: flex;
-			-moz-flex-wrap: wrap;
-			-webkit-flex-wrap: wrap;
-			-ms-flex-wrap: wrap;
-			flex-wrap: wrap;
-			-moz-align-items: -moz-stretch;
-			-webkit-align-items: -webkit-stretch;
-			-ms-align-items: -ms-stretch;
-			align-items: stretch;
+			column-count: 2;
+			column-gap: 2rem;
 			text-align: center;
 			width: 100%;
 			padding: 0;
 		}
 
-			#main > .posts > * {
-				-moz-flex-shrink: 1;
-				-webkit-flex-shrink: 1;
-				-ms-flex-shrink: 1;
-				flex-shrink: 1;
-				-moz-flex-grow: 0;
-				-webkit-flex-grow: 0;
-				-ms-flex-grow: 0;
-				flex-grow: 0;
-			}
-
-			#main > .posts > * {
-				width: 50%;
-			}
-
-			#main > .posts > * {
-				padding: 4rem;
-				width: 50%;
-			}
-
 			#main > .posts > article {
-				border-color: #eeeeee;
-				border-left-width: 2px;
-				border-style: solid;
-				border-top-width: 2px;
+				break-inside: avoid;
+				-webkit-column-break-inside: avoid;
+				page-break-inside: avoid;
+				display: inline-block;
+				width: 100%;
+				padding: 2rem;
+				margin-bottom: 2rem;
+				border: none;
+				border-bottom: 3px solid #999999;
+				border-radius: 0;
 				text-align: center;
+				box-sizing: border-box;
 			}
 
 				#main > .posts > article > :last-child {
 					margin-bottom: 0;
 				}
 
-				#main > .posts > article:nth-child(2n - 1) {
-					border-left-width: 0;
-				}
-
-				#main > .posts > article:nth-child(-n + 2) {
-					border-top-width: 0;
-				}
-
 			@media screen and (max-width: 980px) {
 
-				#main > .posts > * {
-					width: 50%;
+				#main > .posts {
+					column-gap: 1.5rem;
 				}
 
-				#main > .posts > * {
-					padding: 2.5rem;
-					width: 50%;
+				#main > .posts > article {
+					padding: 1.5rem;
+					margin-bottom: 1.5rem;
 				}
 
 			}
 
 			@media screen and (max-width: 736px) {
 
-				#main > .posts > * {
-					width: 100%;
+				#main > .posts {
+					column-count: 1;
 				}
 
-				#main > .posts > * {
-					padding: 2rem;
-					width: 100%;
-				}
-
-				#main > .posts > article:nth-child(2n - 1) {
-					border-left-width: 2px;
-				}
-
-				#main > .posts > article:nth-child(-n + 2) {
-					border-top-width: 2px;
-				}
-
-				#main > .posts > article:nth-child(n) {
-					border-left-width: 0;
-				}
-
-				#main > .posts > article:nth-child(-n + 1) {
-					border-top-width: 0;
+				#main > .posts > article {
+					padding: 1.5rem;
+					margin-bottom: 1.5rem;
 				}
 
 				#main > .posts > article .image {
