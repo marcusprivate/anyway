@@ -25,13 +25,9 @@ function parseDate(dateStr) {
     };
 
     // Replace month names
-    // Use a global regex to replace all occurrences of month names
     for (let [nl, en] of Object.entries(months)) {
-        // Escape the month name for use in regex (though these are simple strings)
         const regex = new RegExp(nl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
-        if (regex.test(str)) {
-            str = str.replace(regex, en);
-        }
+        str = str.replace(regex, en);
     }
 
     // Try parsing as standard date string

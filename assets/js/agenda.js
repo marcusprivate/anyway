@@ -26,7 +26,11 @@ function initAgenda() {
     function createRow(item, index) {
         const row = document.createElement('tr');
         
-        if (isPast(item.date)) {
+        const itemDate = item.date || '';
+        const itemLocation = item.location || '';
+        const itemEvent = item.event || '';
+        
+        if (itemDate && isPast(itemDate)) {
             row.classList.add('past-event');
         } else if (index === nextShowIndex) {
             row.classList.add('next-show');
@@ -34,18 +38,18 @@ function initAgenda() {
         }
 
         const dateCell = document.createElement('td');
-        dateCell.textContent = item.date;
+        dateCell.textContent = itemDate;
         if (index === nextShowIndex) {
             dateCell.innerHTML += ' <span class="next-show-badge">Eerstvolgende</span>';
         }
         row.appendChild(dateCell);
         
         const locationCell = document.createElement('td');
-        locationCell.textContent = item.location;
+        locationCell.textContent = itemLocation;
         row.appendChild(locationCell);
         
         const eventCell = document.createElement('td');
-        eventCell.textContent = item.event;
+        eventCell.textContent = itemEvent;
         row.appendChild(eventCell);
         
         return row;

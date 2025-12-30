@@ -33,7 +33,9 @@ function initRepertoire() {
 
         // Filter data
         const visibleItems = repertoireData.filter(item => {
-            const text = (item.id + '. ' + item.title).toLowerCase();
+            const itemId = item.id || '';
+            const itemTitle = item.title || '';
+            const text = (itemId + '. ' + itemTitle).toLowerCase();
             const hasYoutube = !!item.youtube;
             
             const matchesSearch = text.includes(searchTerm);
@@ -56,13 +58,16 @@ function initRepertoire() {
             const tr = document.createElement('tr');
             const td = document.createElement('td');
             
+            const itemId = item.id || '';
+            const itemTitle = item.title || '';
+            
             // Build content
-            let content = `${item.id}. `;
+            let content = `${itemId}. `;
             
             if (item.youtube) {
-                content += `<a href="${item.youtube}" target="_blank" rel="noopener noreferrer">${item.title} <i class="icon brands fa-youtube" style="color: #cc181e;"></i></a>`;
+                content += `<a href="${item.youtube}" target="_blank" rel="noopener noreferrer">${itemTitle} <i class="icon brands fa-youtube" style="color: #cc181e;"></i></a>`;
             } else {
-                content += item.title;
+                content += itemTitle;
             }
             
             td.innerHTML = content;

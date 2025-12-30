@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentData = []; // Will hold filtered data
     let isLoading = false; // Prevent rapid-fire loading
     let scrollObserver = null; // IntersectionObserver instance
+    let resizeTimer = null; // Debounce timer for resize events
 
     function createPost(item) {
         const article = document.createElement('article');
@@ -16,8 +17,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         let imageHtml = '';
         if (item.image) {
+            const altText = item.title || 'Blog afbeelding';
             // Prevent upscaling low-res images (only apply if image is smaller than 600px)
-            imageHtml = `<span class="image fit"><img src="${item.image}" alt="" onload="if(this.naturalWidth < 600) { this.style.maxWidth = this.naturalWidth + 'px'; this.style.margin = '0 auto'; this.style.display = 'block'; }" /></span>`;
+            imageHtml = `<span class="image fit"><img src="${item.image}" alt="${altText}" onload="if(this.naturalWidth < 600) { this.style.maxWidth = this.naturalWidth + 'px'; this.style.margin = '0 auto'; this.style.display = 'block'; }" /></span>`;
         }
 
         let linkHtml = '';
@@ -29,10 +31,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Process content to make external links open in new tab
-        let processedContent = item.content;
-        if (item.content && item.content.includes('<a')) {
+        let processedContent = item.content || '';
+        if (processedContent && processedContent.includes('<a')) {
             const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = item.content;
+            tempDiv.innerHTML = processedContent;
             const contentLinks = tempDiv.querySelectorAll('a');
             contentLinks.forEach(link => {
                 if (link.hostname !== window.location.hostname) {
@@ -50,8 +52,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         article.innerHTML = `
             <header>
-                <span class="date">${item.date}</span>
-                <h2>${item.title}</h2>
+                <span class="date">${item.date || ''}</span>
+                <h2>${item.title || 'Zonder titel'}</h2>
             </header>
             ${imageHtml}
             <p>${processedContent}</p>
@@ -139,8 +141,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Re-run border detection on window resize (handles orientation change)
     window.addEventListener('resize', () => {
-        clearTimeout(window.resizeTimer);
-        window.resizeTimer = setTimeout(removeBottomBordersFromColumnEnds, 100);
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(removeBottomBordersFromColumnEnds, 100);
     });
 
     function filterPosts() {
@@ -148,8 +150,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const selectedYear = yearSelect.value;
 
         currentData = blogData.filter(item => {
-            const matchesSearch = item.title.toLowerCase().includes(searchTerm) || 
-                                  item.content.toLowerCase().includes(searchTerm);
+            const title = item.title || '';
+            const content = item.content || '';
+            const matchesSearch = title.toLowerCase().includes(searchTerm) || 
+                                  content.toLowerCase().includes(searchTerm);
             
             // Parse year robustly
             const itemDate = parseDate(item.date);
