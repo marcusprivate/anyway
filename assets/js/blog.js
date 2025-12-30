@@ -17,8 +17,8 @@ document.addEventListener('DOMContentLoaded', function() {
         let imageHtml = '';
         if (item.image) {
             const altText = item.title || 'Blog afbeelding';
-            // Prevent upscaling low-res images (only apply if image is smaller than 600px)
-            imageHtml = `<span class="image fit"><img src="${item.image}" alt="${altText}" onload="if(this.naturalWidth < 600) { this.style.maxWidth = this.naturalWidth + 'px'; this.style.margin = '0 auto'; this.style.display = 'block'; }" /></span>`;
+            // Add lazy loading and responsive image attributes for performance
+            imageHtml = `<span class="image fit"><img src="${item.image}" alt="${altText}" loading="lazy" width="100%" height="auto" onload="if(this.naturalWidth < 600) { this.style.maxWidth = this.naturalWidth + 'px'; this.style.margin = '0 auto'; this.style.display = 'block'; }" /></span>`;
         }
 
         let linkHtml = '';

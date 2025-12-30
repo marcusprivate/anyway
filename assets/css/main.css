@@ -147,25 +147,47 @@
 	outline-offset: 2px;
 }
 
-/* Focus styles for interactive elements */
+/* Focus styles for interactive elements - WCAG AA compliant (4.5:1 contrast) */
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 [tabindex]:focus-visible {
-	outline: 2px solid var(--color-primary);
+	outline: 3px solid var(--color-primary);
 	outline-offset: 2px;
 	border-radius: var(--radius-sm);
+	box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.8);
 }
 
-/* Special focus for buttons (ring effect) */
+/* Special focus for buttons (ring effect) - Enhanced contrast */
 .button:focus-visible,
 button:focus-visible,
 input[type="submit"]:focus-visible,
 input[type="button"]:focus-visible {
-	outline: none;
-	box-shadow: var(--focus-ring-offset);
+	outline: 3px solid var(--color-primary);
+	outline-offset: 2px;
+	box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.8), 0 0 0 8px var(--color-primary);
+}
+
+/* Focus for dark backgrounds (intro section) */
+#intro a:focus-visible,
+#intro button:focus-visible,
+#intro .button:focus-visible {
+	outline: 3px solid #ffffff;
+	outline-offset: 2px;
+	box-shadow: 0 0 0 4px rgba(201, 85, 61, 0.5);
+}
+
+/* Focus for form inputs - higher contrast */
+input[type="text"]:focus-visible,
+input[type="email"]:focus-visible,
+input[type="password"]:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+	outline: 3px solid var(--color-primary);
+	outline-offset: 0;
+	box-shadow: 0 0 0 3px rgba(201, 85, 61, 0.3) inset;
 }
 
 html, body, div, span, applet, object,
