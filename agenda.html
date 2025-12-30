@@ -33,6 +33,35 @@
 		<link rel="preload" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" as="style" />
 		<link rel="stylesheet" href="assets/css/main.css" />
 		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+		<style>
+			/* Mobile-specific fixes for pagination controls */
+			.pagination-controls {
+				display: flex !important;
+				flex-wrap: nowrap !important;
+				justify-content: center !important;
+				align-items: center !important;
+				gap: 0.5rem !important;
+			}
+			
+			@media screen and (max-width: 480px) {
+				.pagination-controls {
+					gap: 0.25rem !important;
+				}
+				
+				.pagination-controls .button.small {
+					font-size: 0.6rem !important;
+					padding: 0 0.75rem !important;
+					height: 2.25rem !important;
+					line-height: 2.25rem !important;
+					white-space: nowrap !important;
+				}
+				
+				.pagination-controls #page-info {
+					font-size: 0.75rem !important;
+					min-width: 8em !important;
+				}
+			}
+		</style>
 	</head>
 	<body class="is-preload">
 
@@ -73,14 +102,14 @@
 								</div>
 								
 								<!-- Pagination Controls -->
-								<div class="pagination-controls" style="text-align: center; margin-top: 2em;">
+								<div class="pagination-controls" style="text-align: center; margin-top: 2em; display: flex; justify-content: center; align-items: center; gap: 1em;">
 									<a id="prev-btn" class="button small disabled">Vorige</a>
-									<span id="page-info" style="margin: 0 1em; display: inline-block; min-width: 10em; text-align: center;">Pagina 1</span>
+									<span id="page-info" style="min-width: 10em; text-align: center;">Pagina 1</span>
 									<a id="next-btn" class="button small">Volgende</a>
 								</div>
 
 								<!-- Book Us CTA -->
-								<div style="text-align: center; margin-top: 2em;">
+								<div style="text-align: center; margin-top: 3em;">
 									<a href="mailto:anywaytexel@xs4all.nl" class="button primary icon solid fa-envelope">Boek Ons</a>
 								</div>
 							</section>
