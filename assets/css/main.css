@@ -4992,11 +4992,20 @@ input, select, textarea {
 	}
 /* Agenda Past Events */
 tr.past-event {
-    opacity: 0.8;
-    filter: grayscale(100%);
+    opacity: 0.55;
+    filter: grayscale(85%);
+    background-color: rgba(0, 0, 0, 0.02);
 }
+
 tr.past-event td {
-    color: #666;
+    color: #888;
+    font-size: 0.95rem;
+}
+
+tr.past-event:hover {
+    opacity: 0.7;
+    background-color: rgba(0, 0, 0, 0.04);
+    transition: opacity 0.2s, background-color 0.2s;
 }
 
 /* Agenda Next Show */
@@ -5012,13 +5021,15 @@ tr.next-show td {
     display: inline-block;
     background-color: var(--color-primary, #c9553d);
     color: white;
-    font-size: 0.7em;
-    padding: 2px 6px;
+    font-size: 0.65em;
+    padding: 3px 8px;
     border-radius: 4px;
     margin-left: 8px;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 1.2px;
     vertical-align: middle;
+    font-weight: 700;
+    box-shadow: 0 2px 4px rgba(201, 85, 61, 0.3);
 }
 
 /* Blog Mobile Fix */

@@ -61,7 +61,8 @@ function initAgenda() {
         const paginatedItems = agendaData.slice(start, end);
         
         paginatedItems.forEach((item, i) => {
-            tbody.appendChild(createRow(item, start + i));
+            const globalIndex = start + i;
+            tbody.appendChild(createRow(item, globalIndex));
         });
 
         // Update controls
