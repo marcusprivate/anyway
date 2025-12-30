@@ -71,3 +71,24 @@ function getLinkAttributes(url) {
     }
     return '';
 }
+
+// Debounce helper: delays function execution until after wait ms of inactivity
+function debounce(fn, wait) {
+    let timeoutId = null;
+    return function(...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => fn.apply(this, args), wait);
+    };
+}
+
+// Load and parse YAML data from a file path
+async function loadYamlData(path) {
+    const response = await fetch(path);
+    const text = await response.text();
+    return jsyaml.load(text);
+}
+
+// Safely get a property value with a default fallback
+function safeGet(obj, key, defaultValue = '') {
+    return (obj && obj[key] != null) ? obj[key] : defaultValue;
+}

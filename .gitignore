@@ -1,3 +1,5 @@
 anywaytexel_mirror/
 .DS_Store
 ** copy.jpg
+__pycache__/
+*.pyc

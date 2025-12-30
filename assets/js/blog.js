@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentData = []; // Will hold filtered data
     let isLoading = false; // Prevent rapid-fire loading
     let scrollObserver = null; // IntersectionObserver instance
-    let resizeTimer = null; // Debounce timer for resize events
 
     function createPost(item) {
         const article = document.createElement('article');
@@ -140,10 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Re-run border detection on window resize (handles orientation change)
-    window.addEventListener('resize', () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(removeBottomBordersFromColumnEnds, 100);
-    });
+    window.addEventListener('resize', debounce(removeBottomBordersFromColumnEnds, 100));
 
     function filterPosts() {
         const searchTerm = searchInput.value.toLowerCase();
@@ -171,9 +167,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to load and parse YAML data
     async function loadBlogData() {
         try {
-            const response = await fetch('content/blog.yaml');
-            const yamlText = await response.text();
-            blogData = jsyaml.load(yamlText);
+            blogData = await loadYamlData('content/blog.yaml');
             
             if (blogData && blogData.length > 0) {
                 initializeBlog();

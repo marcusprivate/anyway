@@ -2,9 +2,7 @@ let repertoireData = [];
 
 async function loadRepertoireData() {
     try {
-        const response = await fetch('content/repertoire.yaml');
-        const yamlText = await response.text();
-        repertoireData = jsyaml.load(yamlText);
+        repertoireData = await loadYamlData('content/repertoire.yaml');
         initRepertoire();
     } catch (error) {
         console.error('Error loading repertoire data:', error);
@@ -106,11 +104,7 @@ function initRepertoire() {
     searchInput.addEventListener('input', renderRepertoire);
     
     // Re-render on resize to switch between mobile/desktop striping
-    let resizeTimer;
-    window.addEventListener('resize', () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(renderRepertoire, 250);
-    });
+    window.addEventListener('resize', debounce(renderRepertoire, 250));
     
     filterAll.addEventListener('click', () => {
         showYoutubeOnly = false;

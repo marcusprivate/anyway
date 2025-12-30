@@ -2,9 +2,7 @@ let agendaData = [];
 
 async function loadAgendaData() {
     try {
-        const response = await fetch('content/agenda.yaml');
-        const yamlText = await response.text();
-        agendaData = jsyaml.load(yamlText);
+        agendaData = await loadYamlData('content/agenda.yaml');
         initAgenda();
     } catch (error) {
         console.error('Error loading agenda data:', error);
@@ -157,13 +155,7 @@ function initAgenda() {
         updateTableHeight();
 
         // Debounce resize event
-        let resizeTimer;
-        window.addEventListener('resize', function() {
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(function() {
-                updateTableHeight();
-            }, 250);
-        });
+        window.addEventListener('resize', debounce(updateTableHeight, 250));
 
         function changePage(delta) {
             const newPage = currentPage + delta;
