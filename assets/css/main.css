@@ -179,15 +179,15 @@ input[type="button"]:focus-visible {
 	box-shadow: 0 0 0 4px rgba(201, 85, 61, 0.5);
 }
 
-/* Focus for form inputs - higher contrast */
+/* Focus for form inputs - subtle but visible */
 input[type="text"]:focus-visible,
 input[type="email"]:focus-visible,
 input[type="password"]:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-	outline: 3px solid var(--color-primary);
+	outline: 2px solid var(--color-border-dark, #cbd5e1);
 	outline-offset: 0;
-	box-shadow: 0 0 0 3px rgba(201, 85, 61, 0.3) inset;
+	box-shadow: none;
 }
 
 html, body, div, span, applet, object,
@@ -2736,7 +2736,7 @@ input, select, textarea {
 		input[type="email"]:focus,
 		select:focus,
 		textarea:focus {
-			border-color: var(--color-primary, #c9553d);
+			border-color: var(--color-border-dark, #cbd5e1);
 		}
 
 	select {
