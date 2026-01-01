@@ -4206,7 +4206,7 @@ input, select, textarea {
 				display: inline-block;
 				width: 100%;
 				padding: 2rem;
-				margin-bottom: 2rem;
+				margin-bottom: 0;
 				border: none;
 				border-bottom: 3px solid #999999;
 				border-radius: 0;
@@ -4226,7 +4226,6 @@ input, select, textarea {
 
 				#main > .posts > article {
 					padding: 1.5rem;
-					margin-bottom: 1.5rem;
 				}
 
 			}
@@ -4239,12 +4238,11 @@ input, select, textarea {
 
 				#main > .posts > article {
 					padding: 1.5rem;
-					margin-bottom: 1.5rem;
-					border-bottom: 3px solid #999999 !important;
+					border-bottom: 3px solid #999999;
 				}
 
 				#main > .posts > article:last-child {
-					border-bottom: none !important;
+					border-bottom: none;
 				}
 
 				#main > .posts > article .image {

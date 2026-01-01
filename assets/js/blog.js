@@ -62,6 +62,31 @@ document.addEventListener('DOMContentLoaded', function() {
         return article;
     }
 
+    // Interleave items for correct reading order in 2-column CSS column layout
+    // Column layout fills top-to-bottom, so we reorder items to appear left-to-right
+    // With 6 items, columns show: Col1[0,1,2] Col2[3,4,5]
+    // We want visual order: Row1(1,2) Row2(3,4) Row3(5,6)
+    // So we need to output: [1,3,5,2,4,6] -> Col1 shows 1,3,5 and Col2 shows 2,4,6
+    function interleaveForColumns(items) {
+        if (window.innerWidth <= 736 || items.length <= 2) {
+            return items; // Single column on mobile, no reordering needed
+        }
+        
+        const half = Math.ceil(items.length / 2);
+        const col1 = []; // Items for left column (odd positions: 1st, 3rd, 5th...)
+        const col2 = []; // Items for right column (even positions: 2nd, 4th, 6th...)
+        
+        for (let i = 0; i < items.length; i++) {
+            if (i % 2 === 0) {
+                col1.push(items[i]); // 0, 2, 4 -> visual positions 1, 3, 5
+            } else {
+                col2.push(items[i]); // 1, 3, 5 -> visual positions 2, 4, 6
+            }
+        }
+        
+        return [...col1, ...col2];
+    }
+
     function renderBlog(append = false) {
         if (isLoading && append) return; // Only block append calls, not resets
         isLoading = true;
@@ -80,9 +105,25 @@ document.addEventListener('DOMContentLoaded', function() {
             loadMoreBtn.style.display = 'none';
             isLoading = false; // Reset loading flag
         } else {
-            itemsToShow.forEach(item => {
-                blogContainer.appendChild(createPost(item));
-            });
+            // For append mode with column layout, we need to re-render all items
+            // to maintain correct interleaved order
+            if (append) {
+                blogContainer.innerHTML = '';
+                const allItemsToShow = currentData.slice(0, end);
+                const interleaved = interleaveForColumns(allItemsToShow);
+                const fragment = document.createDocumentFragment();
+                interleaved.forEach(item => {
+                    fragment.appendChild(createPost(item));
+                });
+                blogContainer.appendChild(fragment);
+            } else {
+                const interleaved = interleaveForColumns(itemsToShow);
+                const fragment = document.createDocumentFragment();
+                interleaved.forEach(item => {
+                    fragment.appendChild(createPost(item));
+                });
+                blogContainer.appendChild(fragment);
+            }
             displayedCount = end;
             
             // Show/hide loading indicator
@@ -92,54 +133,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 loadMoreBtn.style.display = 'block';
             }
             
-            // Remove bottom border from articles that are at the bottom of their column
-            // Use setTimeout to ensure layout has finished rendering
-            setTimeout(() => {
-                removeBottomBordersFromColumnEnds();
-                isLoading = false; // Allow next load after render complete
-            }, 50);
+            isLoading = false;
         }
     }
 
-    function removeBottomBordersFromColumnEnds() {
-        const articles = blogContainer.querySelectorAll('article');
-        if (articles.length === 0) return;
 
-        // Reset all borders first (clear any inline styles)
-        articles.forEach(article => {
-            article.style.borderBottom = '';
-        });
-
-        // On mobile, CSS handles everything with !important - don't touch
-        if (window.innerWidth <= 736) {
-            return;
-        }
-
-        // Multi-column: find articles at the bottom of each column
-        // Group articles by their horizontal position (left offset)
-        const columns = {};
-        articles.forEach((article, index) => {
-            const left = article.offsetLeft;
-            if (!columns[left]) {
-                columns[left] = [];
-            }
-            columns[left].push({ article, index });
-        });
-
-        // For each column, find the last article (highest offsetTop)
-        Object.values(columns).forEach(columnArticles => {
-            let lastArticle = columnArticles[0];
-            columnArticles.forEach(item => {
-                if (item.article.offsetTop >= lastArticle.article.offsetTop) {
-                    lastArticle = item;
-                }
-            });
-            lastArticle.article.style.borderBottom = 'none';
-        });
-    }
-
-    // Re-run border detection on window resize (handles orientation change)
-    window.addEventListener('resize', debounce(removeBottomBordersFromColumnEnds, 100));
 
     function filterPosts() {
         const searchTerm = searchInput.value.toLowerCase();
