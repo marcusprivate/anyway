@@ -80,9 +80,12 @@ document.addEventListener('DOMContentLoaded', function() {
             loadMoreBtn.style.display = 'none';
             isLoading = false; // Reset loading flag
         } else {
+            // Use DocumentFragment to batch DOM insertions and minimize reflows
+            const fragment = document.createDocumentFragment();
             itemsToShow.forEach(item => {
-                blogContainer.appendChild(createPost(item));
+                fragment.appendChild(createPost(item));
             });
+            blogContainer.appendChild(fragment);
             displayedCount = end;
             
             // Show/hide loading indicator
@@ -93,11 +96,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             // Remove bottom border from articles that are at the bottom of their column
-            // Use setTimeout to ensure layout has finished rendering
-            setTimeout(() => {
-                removeBottomBordersFromColumnEnds();
-                isLoading = false; // Allow next load after render complete
-            }, 50);
+            // Run synchronously to avoid flicker - layout is already computed after appendChild
+            removeBottomBordersFromColumnEnds();
+            isLoading = false;
         }
     }
 
@@ -105,13 +106,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const articles = blogContainer.querySelectorAll('article');
         if (articles.length === 0) return;
 
-        // Reset all borders first (clear any inline styles)
-        articles.forEach(article => {
-            article.style.borderBottom = '';
-        });
-
         // On mobile, CSS handles everything with !important - don't touch
         if (window.innerWidth <= 736) {
+            // Reset any inline styles on mobile since CSS handles it
+            articles.forEach(article => {
+                if (article.style.borderBottom) {
+                    article.style.borderBottom = '';
+                }
+            });
             return;
         }
 
@@ -126,7 +128,8 @@ document.addEventListener('DOMContentLoaded', function() {
             columns[left].push({ article, index });
         });
 
-        // For each column, find the last article (highest offsetTop)
+        // Build a set of articles that should have no border
+        const bottomArticles = new Set();
         Object.values(columns).forEach(columnArticles => {
             let lastArticle = columnArticles[0];
             columnArticles.forEach(item => {
@@ -134,7 +137,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     lastArticle = item;
                 }
             });
-            lastArticle.article.style.borderBottom = 'none';
+            bottomArticles.add(lastArticle.article);
+        });
+
+        // Only update articles that need to change (avoid flickering)
+        articles.forEach(article => {
+            const shouldHideBorder = bottomArticles.has(article);
+            const currentlyHidden = article.style.borderBottom === 'none';
+            
+            if (shouldHideBorder && !currentlyHidden) {
+                article.style.borderBottom = 'none';
+            } else if (!shouldHideBorder && currentlyHidden) {
+                article.style.borderBottom = '';
+            }
         });
     }
 

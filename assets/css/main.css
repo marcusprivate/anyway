@@ -574,6 +574,11 @@ input, select, textarea {
 	margin: 0 0 1rem 0;
 }
 
+/* Prevent border transitions on blog articles to avoid flicker during infinite scroll */
+#blog-container article {
+	transition: none !important;
+}
+
 		.row > * {
 			box-sizing: border-box;
 		}
