@@ -12,7 +12,7 @@
 
 - id: 4
   title: Fly Me To The Moon
-  youtube: https://youtu.be/xvWVXkXi7dc
+  youtube:
 
 - id: 5
   title: Killing Me Softly
@@ -184,11 +184,11 @@
 
 - id: 47
   title: A Taste Of Honey
-  youtube:
+  youtube: https://www.youtube.com/watch?v=L9EJiRGS1F4
 
 - id: 48
   title: Use Somebody
-  youtube:
+  youtube: https://www.youtube.com/watch?v=FfX1Bf4f3hQ
 
 - id: 49
   title: Set Them Free
