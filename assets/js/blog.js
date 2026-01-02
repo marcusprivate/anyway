@@ -108,14 +108,33 @@ document.addEventListener('DOMContentLoaded', function() {
             // For append mode with column layout, we need to re-render all items
             // to maintain correct interleaved order
             if (append) {
-                blogContainer.innerHTML = '';
+                // Build new content off-DOM to prevent flickering
                 const allItemsToShow = currentData.slice(0, end);
                 const interleaved = interleaveForColumns(allItemsToShow);
                 const fragment = document.createDocumentFragment();
                 interleaved.forEach(item => {
                     fragment.appendChild(createPost(item));
                 });
-                blogContainer.appendChild(fragment);
+                
+                // Use requestAnimationFrame to batch DOM updates and prevent flicker
+                requestAnimationFrame(() => {
+                    // Preserve scroll position and container height to prevent layout shift
+                    const scrollY = window.scrollY;
+                    const containerRect = blogContainer.getBoundingClientRect();
+                    const minHeight = containerRect.height;
+                    blogContainer.style.minHeight = minHeight + 'px';
+                    
+                    // Replace content in a single operation
+                    blogContainer.innerHTML = '';
+                    blogContainer.appendChild(fragment);
+                    
+                    // Restore scroll and remove min-height after paint
+                    requestAnimationFrame(() => {
+                        window.scrollTo(0, scrollY);
+                        blogContainer.style.minHeight = '';
+                        isLoading = false;
+                    });
+                });
             } else {
                 const interleaved = interleaveForColumns(itemsToShow);
                 const fragment = document.createDocumentFragment();
@@ -123,6 +142,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     fragment.appendChild(createPost(item));
                 });
                 blogContainer.appendChild(fragment);
+                isLoading = false;
             }
             displayedCount = end;
             
@@ -133,7 +153,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 loadMoreBtn.style.display = 'block';
             }
             
-            isLoading = false;
+            // Only set isLoading = false here for non-append case
+            // For append, it's handled inside requestAnimationFrame
+            if (!append) {
+                // Already set above
+            }
         }
     }
 
@@ -209,9 +233,17 @@ document.addEventListener('DOMContentLoaded', function() {
         yearSelect.addEventListener('change', filterPosts);
 
         // Infinite scroll: load more when user scrolls near bottom
+        // Use debounced callback to prevent rapid-fire loading when scrolling fast
+        let scrollTimeout = null;
         scrollObserver = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting && displayedCount < currentData.length && !isLoading) {
-                renderBlog(true); // Append more items
+                // Debounce: wait for scroll to settle before loading
+                if (scrollTimeout) clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    if (!isLoading) {
+                        renderBlog(true); // Append more items
+                    }
+                }, 100);
             }
         }, { rootMargin: '200px' });
         
