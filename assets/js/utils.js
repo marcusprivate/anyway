@@ -84,6 +84,9 @@ function debounce(fn, wait) {
 // Load and parse YAML data from a file path
 async function loadYamlData(path) {
     const response = await fetch(path);
+    if (!response.ok) {
+        throw new Error(`Failed to load ${path}: ${response.status} ${response.statusText}`);
+    }
     const text = await response.text();
     return jsyaml.load(text);
 }
