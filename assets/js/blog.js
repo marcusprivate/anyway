@@ -9,13 +9,15 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentData = []; // Will hold filtered data
     let isLoading = false; // Prevent rapid-fire loading
     let scrollObserver = null; // IntersectionObserver instance
+    let masonryInstance = null; // Masonry layout instance
 
     function createPost(item) {
         const article = document.createElement('article');
         const linkAttributes = getLinkAttributes(item.link);
         
         let imageHtml = '';
-        if (item.image) {
+        // Only show image if path exists and points to an actual file (not just a directory)
+        if (item.image && item.image.trim() && !item.image.trim().endsWith('/')) {
             const altText = item.title || 'Blog afbeelding';
             // Add lazy loading and responsive image attributes for performance
             imageHtml = `<span class="image fit"><img src="${item.image}" alt="${altText}" loading="lazy" width="100%" height="auto" onload="if(this.naturalWidth < 600) { this.style.maxWidth = this.naturalWidth + 'px'; this.style.margin = '0 auto'; this.style.display = 'block'; }" /></span>`;
@@ -62,31 +64,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return article;
     }
 
-    // Interleave items for correct reading order in 2-column CSS column layout
-    // Column layout fills top-to-bottom, so we reorder items to appear left-to-right
-    // With 6 items, columns show: Col1[0,1,2] Col2[3,4,5]
-    // We want visual order: Row1(1,2) Row2(3,4) Row3(5,6)
-    // So we need to output: [1,3,5,2,4,6] -> Col1 shows 1,3,5 and Col2 shows 2,4,6
-    function interleaveForColumns(items) {
-        if (window.innerWidth <= 736 || items.length <= 2) {
-            return items; // Single column on mobile, no reordering needed
-        }
-        
-        const half = Math.ceil(items.length / 2);
-        const col1 = []; // Items for left column (odd positions: 1st, 3rd, 5th...)
-        const col2 = []; // Items for right column (even positions: 2nd, 4th, 6th...)
-        
-        for (let i = 0; i < items.length; i++) {
-            if (i % 2 === 0) {
-                col1.push(items[i]); // 0, 2, 4 -> visual positions 1, 3, 5
-            } else {
-                col2.push(items[i]); // 1, 3, 5 -> visual positions 2, 4, 6
-            }
-        }
-        
-        return [...col1, ...col2];
-    }
-
     function renderBlog(append = false) {
         if (isLoading && append) return; // Only block append calls, not resets
         isLoading = true;
@@ -103,47 +80,40 @@ document.addEventListener('DOMContentLoaded', function() {
         if (currentData.length === 0) {
             blogContainer.innerHTML = '<p style="text-align: center; width: 100%;">Geen resultaten gevonden.</p>';
             loadMoreBtn.style.display = 'none';
-            isLoading = false; // Reset loading flag
-        } else {
-            // For append mode with column layout, we need to re-render all items
-            // to maintain correct interleaved order
-            if (append) {
-                // Build new content off-DOM to prevent flickering
-                const allItemsToShow = currentData.slice(0, end);
-                const interleaved = interleaveForColumns(allItemsToShow);
-                const fragment = document.createDocumentFragment();
-                interleaved.forEach(item => {
-                    fragment.appendChild(createPost(item));
-                });
-                
-                // Use requestAnimationFrame to batch DOM updates and prevent flicker
-                requestAnimationFrame(() => {
-                    // Preserve scroll position and container height to prevent layout shift
-                    const scrollY = window.scrollY;
-                    const containerRect = blogContainer.getBoundingClientRect();
-                    const minHeight = containerRect.height;
-                    blogContainer.style.minHeight = minHeight + 'px';
-                    
-                    // Replace content in a single operation
-                    blogContainer.innerHTML = '';
-                    blogContainer.appendChild(fragment);
-                    
-                    // Restore scroll and remove min-height after paint
-                    requestAnimationFrame(() => {
-                        window.scrollTo(0, scrollY);
-                        blogContainer.style.minHeight = '';
-                        isLoading = false;
-                    });
-                });
-            } else {
-                const interleaved = interleaveForColumns(itemsToShow);
-                const fragment = document.createDocumentFragment();
-                interleaved.forEach(item => {
-                    fragment.appendChild(createPost(item));
-                });
-                blogContainer.appendChild(fragment);
-                isLoading = false;
+            isLoading = false;
+            if (masonryInstance) {
+                masonryInstance.destroy();
+                masonryInstance = null;
             }
+        } else {
+            // Create new items
+            const newItems = [];
+            itemsToShow.forEach(item => {
+                const post = createPost(item);
+                newItems.push(post);
+                blogContainer.appendChild(post);
+            });
+            
+            // Initialize or update Masonry
+            if (!masonryInstance) {
+                masonryInstance = new Masonry(blogContainer, {
+                    itemSelector: 'article',
+                    columnWidth: 'article',
+                    percentPosition: true,
+                    gutter: 32
+                });
+            } else if (append) {
+                masonryInstance.appended(newItems);
+            }
+            
+            // Re-layout after images load
+            imagesLoaded(blogContainer, function() {
+                if (masonryInstance) {
+                    masonryInstance.layout();
+                }
+                isLoading = false;
+            });
+            
             displayedCount = end;
             
             // Show/hide loading indicator
@@ -151,12 +121,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 loadMoreBtn.style.display = 'none';
             } else {
                 loadMoreBtn.style.display = 'block';
-            }
-            
-            // Only set isLoading = false here for non-append case
-            // For append, it's handled inside requestAnimationFrame
-            if (!append) {
-                // Already set above
             }
         }
     }

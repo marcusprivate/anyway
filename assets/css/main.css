@@ -4192,19 +4192,12 @@ input, select, textarea {
 			}
 
 		#main > .posts {
-			column-count: 2;
-			column-gap: 2rem;
-			text-align: center;
 			width: 100%;
 			padding: 0;
 		}
 
 			#main > .posts > article {
-				break-inside: avoid;
-				-webkit-column-break-inside: avoid;
-				page-break-inside: avoid;
-				display: inline-block;
-				width: 100%;
+				width: calc(50% - 1rem);
 				padding: 2rem;
 				margin-bottom: 0;
 				border: none;
@@ -4232,8 +4225,8 @@ input, select, textarea {
 
 			@media screen and (max-width: 736px) {
 
-				#main > .posts {
-					column-count: 1;
+				#main > .posts > article {
+					width: 100%;
 				}
 
 				#main > .posts > article {
