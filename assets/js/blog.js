@@ -69,6 +69,11 @@ document.addEventListener('DOMContentLoaded', function() {
         isLoading = true;
         
         if (!append) {
+            // Destroy existing Masonry instance before clearing container
+            if (masonryInstance) {
+                masonryInstance.destroy();
+                masonryInstance = null;
+            }
             blogContainer.innerHTML = '';
             displayedCount = 0;
         }
@@ -81,10 +86,6 @@ document.addEventListener('DOMContentLoaded', function() {
             blogContainer.innerHTML = '<p style="text-align: center; width: 100%;">Geen resultaten gevonden.</p>';
             loadMoreBtn.style.display = 'none';
             isLoading = false;
-            if (masonryInstance) {
-                masonryInstance.destroy();
-                masonryInstance = null;
-            }
         } else {
             // Create new items
             const newItems = [];
