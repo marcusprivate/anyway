@@ -2841,6 +2841,8 @@ input, select, textarea {
 
 		.image img {
 			display: block;
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+			border-radius: var(--radius-lg);
 		}
 
 		.image.left, .image.right {
@@ -2867,6 +2869,7 @@ input, select, textarea {
 			display: block;
 			margin: 2.5rem 0;
 			width: 100%;
+			text-align: center;
 		}
 
 			.image.fit:first-child {
@@ -2874,9 +2877,11 @@ input, select, textarea {
 			}
 
 			.image.fit img {
-				width: 100%;
+				width: auto;
+				max-width: 100%;
 				max-height: 50vh;
 				object-fit: contain;
+				display: inline-block;
 			}
 
 		.image.main {
