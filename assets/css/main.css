@@ -485,6 +485,11 @@ input, select, textarea {
 			color: var(--color-primary, #c9553d) !important;
 		}
 
+/* Custom: Smooth Masonry transitions for blog */
+#blog-container article {
+    transition: transform 0.2s ease-out;
+}
+
 /* Custom: Homepage Magazine Layout */
 .features-row {
 	display: flex;

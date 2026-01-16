@@ -103,17 +103,34 @@ document.addEventListener('DOMContentLoaded', function() {
                     percentPosition: true,
                     gutter: 32
                 });
+                
+                // Full layout only on initial render
+                imagesLoaded(blogContainer, function() {
+                    if (masonryInstance) {
+                        masonryInstance.layout();
+                    }
+                    isLoading = false;
+                });
             } else if (append) {
+                // Append items and only check NEW items for image loading
                 masonryInstance.appended(newItems);
+                
+                // Wait for new images only, then do a single layout pass
+                imagesLoaded(newItems, function() {
+                    if (masonryInstance) {
+                        masonryInstance.layout();
+                    }
+                    isLoading = false;
+                });
+            } else {
+                // Filter/reset case - reload items and layout
+                imagesLoaded(blogContainer, function() {
+                    if (masonryInstance) {
+                        masonryInstance.layout();
+                    }
+                    isLoading = false;
+                });
             }
-            
-            // Re-layout after images load
-            imagesLoaded(blogContainer, function() {
-                if (masonryInstance) {
-                    masonryInstance.layout();
-                }
-                isLoading = false;
-            });
             
             displayedCount = end;
             
@@ -210,7 +227,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }, 100);
             }
-        }, { rootMargin: '200px' });
+        }, { rootMargin: '500px' });
         
         scrollObserver.observe(loadMoreBtn);
     }
