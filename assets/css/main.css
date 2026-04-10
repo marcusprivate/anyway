@@ -5073,7 +5073,7 @@ input, select, textarea {
 
 .agenda-section-title {
     margin: 0;
-    font-size: 1.15rem;
+    font-size: 1.3rem;
     letter-spacing: 0.05em;
     line-height: 1.25;
 }
@@ -5228,7 +5228,7 @@ input, select, textarea {
     }
 
     .agenda-section-title {
-        font-size: 1.02rem;
+        font-size: 1.15rem;
     }
 
     .agenda-entry {
