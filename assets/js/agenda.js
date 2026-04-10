@@ -24,11 +24,12 @@ function initAgenda() {
     function createRow(item, index) {
         const row = document.createElement('tr');
         
-        const itemDate = item.date || '';
+        const rawItemDate = item.date || '';
+        const itemDate = formatDateDisplay(rawItemDate);
         const itemLocation = item.location || '';
         const itemEvent = item.event || '';
         
-        if (itemDate && isPast(itemDate)) {
+        if (rawItemDate && isPast(rawItemDate)) {
             row.classList.add('past-event');
         } else if (index === nextShowIndex) {
             row.classList.add('next-show');

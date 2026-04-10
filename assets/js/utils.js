@@ -2,19 +2,53 @@
  * Shared utility functions for Anyway website
  */
 
-// Helper to parse dates robustly (handles Dutch months, DD-MM-YYYY, etc.)
+function extractMultiDayDateParts(dateStr) {
+    if (!dateStr) return null;
+
+    const match = dateStr.trim().match(/^(\d{1,2}(?:\s*,\s*\d{1,2})*)(?:\s+en\s+(\d{1,2}))?\s+([^\d\s]+)\s+(\d{4})$/i);
+    if (!match) return null;
+
+    const days = match[1]
+        .split(/\s*,\s*/)
+        .map(day => day.trim())
+        .filter(Boolean);
+
+    if (match[2]) {
+        days.push(match[2].trim());
+    }
+
+    if (days.length < 2) return null;
+
+    return {
+        days,
+        month: match[3],
+        year: match[4]
+    };
+}
+
+function formatDateDisplay(dateStr) {
+    if (!dateStr) return '';
+
+    const multiDayParts = extractMultiDayDateParts(dateStr);
+    if (!multiDayParts) return dateStr;
+
+    const { days, month, year } = multiDayParts;
+    const formattedDays = days.length === 2
+        ? `${days[0]} en ${days[1]}`
+        : `${days.slice(0, -1).join(', ')} en ${days[days.length - 1]}`;
+
+    return `${formattedDays} ${month} ${year}`;
+}
+
+// Helper to parse dates robustly (handles Dutch months, multi-day dates, DD-MM-YYYY, etc.)
 function parseDate(dateStr) {
     if (!dateStr) return new Date(0);
     
-    // Normalize
-    let str = dateStr.trim().toLowerCase();
-
-    // Handle multi-day formats like "17, 18 mei 2024" or "3, 4, 5 juni 2022"
-    // Extract the first day and the month/year
-    const multiDayMatch = str.match(/^(\d{1,2})(?:,\s*\d{1,2})+\s+(\w+)\s+(\d{4})$/);
-    if (multiDayMatch) {
-        str = `${multiDayMatch[1]} ${multiDayMatch[2]} ${multiDayMatch[3]}`;
-    }
+    const multiDayParts = extractMultiDayDateParts(dateStr);
+    let str = (multiDayParts
+        ? `${multiDayParts.days[0]} ${multiDayParts.month} ${multiDayParts.year}`
+        : dateStr.trim()
+    ).toLowerCase();
 
     // Map Dutch months to English
     const months = {
@@ -38,9 +72,7 @@ function parseDate(dateStr) {
     const dmy = str.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})$/);
     if (dmy) return new Date(dmy[3], dmy[2] - 1, dmy[1]);
 
-    // Try extracting a date pattern (e.g. "17 en 18 may 2024" -> "18 may 2024")
-    // This finds the last number followed by a month and year
-    // Improved regex to handle optional dot after month and case insensitivity
+    // Fallback: extract a day + month + year sequence from a more complex string
     const complexDate = str.match(/(\d{1,2})\s+([a-z]+)\.?\s+(\d{4})/i);
     if (complexDate) {
         const extractedDate = new Date(`${complexDate[1]} ${complexDate[2]} ${complexDate[3]}`);

@@ -485,9 +485,43 @@ input, select, textarea {
 			color: var(--color-primary, #c9553d) !important;
 		}
 
-/* Custom: Smooth Masonry transitions for blog */
+/* Keep blog cards stable during infinite scroll. */
 #blog-container article {
-    transition: transform 0.2s ease-out;
+    transition: none;
+}
+
+#blog-container article.is-pending-layout {
+	visibility: hidden;
+}
+
+#blog-container {
+	--blog-gap: 2rem;
+	display: block;
+	position: relative;
+}
+
+#main > #blog-container.posts > article {
+	position: absolute;
+	width: calc((100% - var(--blog-gap)) / 2);
+	min-width: 0;
+}
+
+#blog-container .image.fit img {
+	height: auto;
+}
+
+@media screen and (max-width: 736px) {
+	#blog-container {
+		--blog-gap: 0px;
+		position: static;
+		height: auto !important;
+	}
+
+	#main > #blog-container.posts > article {
+		position: static;
+		width: 100%;
+		transform: none !important;
+	}
 }
 
 /* Custom: Homepage Magazine Layout */

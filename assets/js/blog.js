@@ -4,23 +4,122 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('blog-search');
     const yearSelect = document.getElementById('blog-year');
     
-    const itemsPerBatch = 6; // 6 items per batch for grid layout
+    const itemsPerBatch = 8; // Larger batches reduce how often the layout shifts during long scrolls
+    const mobileBreakpoint = 736;
     let displayedCount = 0;
     let currentData = []; // Will hold filtered data
     let isLoading = false; // Prevent rapid-fire loading
     let scrollObserver = null; // IntersectionObserver instance
-    let masonryInstance = null; // Masonry layout instance
+    let renderVersion = 0; // Discard stale async renders
+    const imageMetadataCache = new Map();
+    let resizeTimeout = null;
+
+    function getImageSource(item) {
+        if (!item.image || !item.image.trim() || item.image.trim().endsWith('/')) {
+            return null;
+        }
+
+        return item.image.trim();
+    }
+
+    function preloadImageMetadata(src) {
+        if (!src) {
+            return Promise.resolve(null);
+        }
+
+        if (imageMetadataCache.has(src)) {
+            return imageMetadataCache.get(src);
+        }
+
+        const metadataPromise = new Promise(resolve => {
+            const img = new Image();
+
+            img.decoding = 'async';
+            img.onload = function() {
+                resolve({
+                    width: img.naturalWidth || 1,
+                    height: img.naturalHeight || 1
+                });
+            };
+            img.onerror = function() {
+                resolve(null);
+            };
+            img.src = src;
+        });
+
+        imageMetadataCache.set(src, metadataPromise);
+        return metadataPromise;
+    }
+
+    async function prepareItems(items) {
+        return Promise.all(items.map(async item => {
+            const imageSrc = getImageSource(item);
+            const imageMeta = await preloadImageMetadata(imageSrc);
+
+            return {
+                ...item,
+                _imageSrc: imageSrc,
+                _imageMeta: imageMeta
+            };
+        }));
+    }
+
+    function waitForNextFrame() {
+        return new Promise(resolve => requestAnimationFrame(resolve));
+    }
+
+    function layoutBlogPosts() {
+        const articles = Array.from(blogContainer.querySelectorAll('article'));
+        if (articles.length === 0) {
+            blogContainer.style.height = '';
+            return;
+        }
+
+        if (window.innerWidth <= mobileBreakpoint) {
+            blogContainer.style.height = '';
+            articles.forEach(article => {
+                article.style.transform = '';
+            });
+            return;
+        }
+
+        const gap = parseFloat(getComputedStyle(blogContainer).getPropertyValue('--blog-gap')) || 0;
+        const columnWidth = articles[0].getBoundingClientRect().width;
+        const columnHeights = [0, 0];
+
+        articles.forEach((article, index) => {
+            const columnIndex = index < 2 ? index : (columnHeights[0] <= columnHeights[1] ? 0 : 1);
+            const x = columnIndex * (columnWidth + gap);
+            const y = columnHeights[columnIndex];
+
+            article.style.transform = `translate(${x}px, ${y}px)`;
+            columnHeights[columnIndex] += article.offsetHeight + gap;
+        });
+
+        blogContainer.style.height = `${Math.max(...columnHeights) - gap}px`;
+    }
 
     function createPost(item) {
         const article = document.createElement('article');
         const linkAttributes = getLinkAttributes(item.link);
+        const displayDate = formatDateDisplay(item.date || '');
+
+        article.classList.add('is-pending-layout');
         
         let imageHtml = '';
-        // Only show image if path exists and points to an actual file (not just a directory)
-        if (item.image && item.image.trim() && !item.image.trim().endsWith('/')) {
+        const imageSrc = item._imageSrc || getImageSource(item);
+        const imageMeta = item._imageMeta || null;
+        // Reserve image space before inserting the card to keep scroll position stable.
+        if (imageSrc) {
             const altText = item.title || 'Blog afbeelding';
-            // Add lazy loading and responsive image attributes for performance
-            imageHtml = `<span class="image fit"><img src="${item.image}" alt="${altText}" loading="lazy" width="100%" height="auto" onload="if(this.naturalWidth < 600) { this.style.maxWidth = this.naturalWidth + 'px'; this.style.margin = '0 auto'; this.style.display = 'block'; }" /></span>`;
+            const sizeAttributes = imageMeta
+                ? ` width="${imageMeta.width}" height="${imageMeta.height}"`
+                : '';
+            const smallImageStyle = imageMeta && imageMeta.width < 600
+                ? ` style="max-width: min(100%, ${imageMeta.width}px); margin: 0 auto; display: block;"`
+                : '';
+
+            imageHtml = `<span class="image fit"><img src="${imageSrc}" alt="${altText}" loading="lazy" decoding="async"${sizeAttributes}${smallImageStyle} /></span>`;
         }
 
         let linkHtml = '';
@@ -53,7 +152,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         article.innerHTML = `
             <header>
-                <span class="date">${item.date || ''}</span>
+                <span class="date">${displayDate}</span>
                 <h2>${item.title || 'Zonder titel'}</h2>
             </header>
             ${imageHtml}
@@ -64,81 +163,69 @@ document.addEventListener('DOMContentLoaded', function() {
         return article;
     }
 
-    function renderBlog(append = false) {
+    async function renderBlog(append = false) {
         if (isLoading && append) return; // Only block append calls, not resets
+        const currentRenderVersion = ++renderVersion;
         isLoading = true;
+        blogContainer.setAttribute('aria-busy', 'true');
         
-        if (!append) {
-            // Destroy existing Masonry instance before clearing container
-            if (masonryInstance) {
-                masonryInstance.destroy();
-                masonryInstance = null;
+        try {
+            if (!append) {
+                blogContainer.innerHTML = '';
+                displayedCount = 0;
             }
-            blogContainer.innerHTML = '';
-            displayedCount = 0;
-        }
-        
-        const start = displayedCount;
-        const end = Math.min(displayedCount + itemsPerBatch, currentData.length);
-        const itemsToShow = currentData.slice(start, end);
-        
-        if (currentData.length === 0) {
-            blogContainer.innerHTML = '<p style="text-align: center; width: 100%;">Geen resultaten gevonden.</p>';
-            loadMoreBtn.style.display = 'none';
-            isLoading = false;
-        } else {
-            // Create new items
-            const newItems = [];
-            itemsToShow.forEach(item => {
+
+            const start = displayedCount;
+            const end = Math.min(displayedCount + itemsPerBatch, currentData.length);
+            const itemsToShow = currentData.slice(start, end);
+
+            if (currentData.length === 0) {
+                blogContainer.style.height = '';
+                blogContainer.innerHTML = '<p style="text-align: center; width: 100%;">Geen resultaten gevonden.</p>';
+                loadMoreBtn.style.display = 'none';
+                return;
+            }
+
+            const preparedItems = await prepareItems(itemsToShow);
+            if (currentRenderVersion !== renderVersion) {
+                return;
+            }
+
+            const fragment = document.createDocumentFragment();
+            const newItems = preparedItems.map(item => {
                 const post = createPost(item);
-                newItems.push(post);
-                blogContainer.appendChild(post);
+                fragment.appendChild(post);
+                return post;
             });
-            
-            // Initialize or update Masonry
-            if (!masonryInstance) {
-                masonryInstance = new Masonry(blogContainer, {
-                    itemSelector: 'article',
-                    columnWidth: 'article',
-                    percentPosition: true,
-                    gutter: 32
-                });
-                
-                // Full layout only on initial render
-                imagesLoaded(blogContainer, function() {
-                    if (masonryInstance) {
-                        masonryInstance.layout();
-                    }
-                    isLoading = false;
-                });
-            } else if (append) {
-                // Append items and only check NEW items for image loading
-                masonryInstance.appended(newItems);
-                
-                // Wait for new images only, then do a single layout pass
-                imagesLoaded(newItems, function() {
-                    if (masonryInstance) {
-                        masonryInstance.layout();
-                    }
-                    isLoading = false;
-                });
-            } else {
-                // Filter/reset case - reload items and layout
-                imagesLoaded(blogContainer, function() {
-                    if (masonryInstance) {
-                        masonryInstance.layout();
-                    }
-                    isLoading = false;
-                });
+            blogContainer.appendChild(fragment);
+
+            await waitForNextFrame();
+
+            if (currentRenderVersion !== renderVersion) {
+                return;
             }
-            
+
+            layoutBlogPosts();
+            await waitForNextFrame();
+
+            if (currentRenderVersion !== renderVersion) {
+                return;
+            }
+
+            newItems.forEach(item => item.classList.remove('is-pending-layout'));
+
             displayedCount = end;
-            
+
             // Show/hide loading indicator
             if (displayedCount >= currentData.length) {
                 loadMoreBtn.style.display = 'none';
             } else {
                 loadMoreBtn.style.display = 'block';
+            }
+        } finally {
+            if (currentRenderVersion === renderVersion) {
+                isLoading = false;
+                blogContainer.removeAttribute('aria-busy');
             }
         }
     }
@@ -185,6 +272,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function showNoData() {
+        blogContainer.style.height = '';
         blogContainer.innerHTML = '<p>Geen blog items gevonden.</p>';
         loadMoreBtn.style.display = 'none';
     }
@@ -210,6 +298,16 @@ document.addEventListener('DOMContentLoaded', function() {
         // Initial render
         renderBlog(false);
 
+        window.addEventListener('resize', () => {
+            if (resizeTimeout) {
+                clearTimeout(resizeTimeout);
+            }
+
+            resizeTimeout = setTimeout(() => {
+                layoutBlogPosts();
+            }, 100);
+        });
+
         // Event listeners
         searchInput.addEventListener('input', filterPosts);
         yearSelect.addEventListener('change', filterPosts);
@@ -225,9 +323,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (!isLoading) {
                         renderBlog(true); // Append more items
                     }
-                }, 100);
+                }, 75);
             }
-        }, { rootMargin: '500px' });
+        }, { rootMargin: '1800px 0px' });
         
         scrollObserver.observe(loadMoreBtn);
     }
