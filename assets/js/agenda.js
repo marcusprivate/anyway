@@ -6,268 +6,313 @@ async function loadAgendaData() {
         initAgenda();
     } catch (error) {
         console.error('Error loading agenda data:', error);
+        renderAgendaError();
     }
 }
 
 function initAgenda() {
-    const tbody = document.getElementById('agenda-body');
+    const searchInput = document.getElementById('agenda-search');
+    const featureSection = document.getElementById('agenda-feature-section');
+    const featureContainer = document.getElementById('agenda-feature');
+    const upcomingCount = document.getElementById('agenda-upcoming-count');
+    const archiveCount = document.getElementById('agenda-archive-count');
+    const upcomingList = document.getElementById('agenda-upcoming-list');
+    const archiveList = document.getElementById('agenda-archive-list');
+    const pagination = document.getElementById('agenda-pagination');
     const prevBtn = document.getElementById('prev-btn');
     const nextBtn = document.getElementById('next-btn');
     const pageInfo = document.getElementById('page-info');
-    const tableWrapper = document.querySelector('.table-wrapper');
-    const table = tableWrapper.querySelector('table');
-    
-    const itemsPerPage = 10;
+    const upcomingSection = upcomingList ? upcomingList.closest('section') : null;
+    const archiveItemsPerPage = 10;
     let currentPage = 1;
-    let nextShowIndex = -1;
-    
-    function createRow(item, index) {
-        const row = document.createElement('tr');
-        
-        const rawItemDate = item.date || '';
-        const itemDate = formatDateDisplay(rawItemDate);
-        const itemLocation = item.location || '';
-        const itemEvent = item.event || '';
-        
-        if (rawItemDate && isPast(rawItemDate)) {
-            row.classList.add('past-event');
-        } else if (index === nextShowIndex) {
-            row.classList.add('next-show');
-            // Add a "Next Show" badge or label if desired, or just rely on styling
-        }
 
-        const dateCell = document.createElement('td');
-        dateCell.textContent = itemDate;
-        if (index === nextShowIndex) {
-            dateCell.innerHTML += ' <span class="next-show-badge">Eerstvolgende</span>';
-        }
-        row.appendChild(dateCell);
-        
-        const locationCell = document.createElement('td');
-        locationCell.textContent = itemLocation;
-        row.appendChild(locationCell);
-        
-        const eventCell = document.createElement('td');
-        eventCell.textContent = itemEvent;
-        row.appendChild(eventCell);
-        
-        return row;
+    if (!searchInput || !featureSection || !featureContainer || !upcomingCount || !archiveCount || !upcomingList || !archiveList || !pagination || !prevBtn || !nextBtn || !pageInfo || !upcomingSection) {
+        return;
     }
 
-    function renderTable(page) {
-        tbody.innerHTML = '';
-        
-        const start = (page - 1) * itemsPerPage;
-        const end = start + itemsPerPage;
-        const paginatedItems = agendaData.slice(start, end);
-        
-        paginatedItems.forEach((item, i) => {
-            const globalIndex = start + i;
-            tbody.appendChild(createRow(item, globalIndex));
+    const today = getToday();
+    const agendaItems = agendaData.map(item => createAgendaItemViewModel(item, today));
+
+    function createAgendaItemViewModel(item, comparisonDate) {
+        const rawDate = item.date || '';
+        const location = item.location || '';
+        const event = item.event || '';
+        const { startDate, endDate } = getDateRange(rawDate);
+        const displayDate = formatDateDisplay(rawDate);
+        const statusText = `${location} ${event}`;
+        const isPrivate = /\b(besloten|priv[eé])\b/i.test(statusText);
+        const isCancelled = /\b(geannuleerd|afgelast)\b/i.test(statusText);
+        const isArchived = endDate < comparisonDate;
+        const isUpcoming = !isArchived;
+        const isFeatureable = isUpcoming && !isCancelled;
+        const searchText = [rawDate, displayDate, location, event].join(' ').toLowerCase();
+
+        return {
+            ...item,
+            rawDate,
+            location,
+            event,
+            displayDate,
+            startDate,
+            endDate,
+            isUpcoming,
+            isArchived,
+            isPrivate,
+            isCancelled,
+            isFeatureable,
+            searchText
+        };
+    }
+
+    function getAgendaViewState() {
+        const searchValue = searchInput.value.trim();
+        const searchTerm = searchValue.toLowerCase();
+        const filteredItems = agendaItems.filter(item => item.searchText.includes(searchTerm));
+        const upcomingItems = filteredItems
+            .filter(item => item.isUpcoming)
+            .sort(compareUpcomingItems);
+        const archiveItems = filteredItems
+            .filter(item => item.isArchived)
+            .sort(compareArchivedItems);
+        const totalPages = Math.max(1, Math.ceil(archiveItems.length / archiveItemsPerPage));
+
+        currentPage = Math.min(Math.max(currentPage, 1), totalPages);
+
+        return {
+            searchValue,
+            searchTerm,
+            upcomingItems,
+            archiveItems,
+            paginatedArchiveItems: archiveItems.slice((currentPage - 1) * archiveItemsPerPage, currentPage * archiveItemsPerPage),
+            featuredItem: upcomingItems.find(item => item.isFeatureable) || null,
+            totalPages
+        };
+    }
+
+    function renderAgenda() {
+        const state = getAgendaViewState();
+        const isFirstPage = currentPage === 1;
+
+        renderFeaturedItem(isFirstPage ? state.featuredItem : null);
+
+        upcomingSection.hidden = !isFirstPage;
+        if (isFirstPage) {
+            renderAgendaSection(upcomingList, state.upcomingItems, {
+                emptyState: state.searchTerm
+                    ? `Geen komende optredens gevonden voor "${state.searchValue}".`
+                    : 'Er staan op dit moment geen komende optredens in de agenda.'
+            });
+        } else {
+            upcomingList.innerHTML = '';
+        }
+
+        renderAgendaSection(archiveList, state.paginatedArchiveItems, {
+            emptyState: state.searchTerm
+                ? `Geen archiefoptredens gevonden voor "${state.searchValue}".`
+                : 'Er zijn nog geen archiefoptredens om te tonen.'
         });
 
-        // Update controls
-        pageInfo.textContent = `Pagina ${currentPage} van ${Math.ceil(agendaData.length / itemsPerPage)}`;
-        
-        if (currentPage === 1) {
-            prevBtn.classList.add('disabled');
-        } else {
-            prevBtn.classList.remove('disabled');
-        }
-        
-        if (end >= agendaData.length) {
-            nextBtn.classList.add('disabled');
-        } else {
-            nextBtn.classList.remove('disabled');
-        }
+        upcomingCount.textContent = formatCountLabel(state.upcomingItems.length, 'optreden');
+        archiveCount.textContent = formatCountLabel(state.archiveItems.length, 'optreden');
+        renderPagination(state.archiveItems.length, state.totalPages);
     }
 
-    if (agendaData.length > 0) {
-        // Sort agendaData by date descending (Newest/Future first)
-        agendaData.sort((a, b) => parseDate(b.date) - parseDate(a.date));
+    function renderFeaturedItem(item) {
+        featureContainer.innerHTML = '';
 
-        // Calculate next show index (assuming descending order: Future -> Past)
-        for (let i = 0; i < agendaData.length; i++) {
-            if (isPast(agendaData[i].date)) {
-                if (i > 0) {
-                    nextShowIndex = i - 1;
-                }
-                break;
-            }
-        }
-        // Edge case: All future
-        if (nextShowIndex === -1 && agendaData.length > 0 && !isPast(agendaData[agendaData.length-1].date)) {
-            nextShowIndex = agendaData.length - 1;
+        if (!item) {
+            featureSection.hidden = true;
+            return;
         }
 
-        // If the next show is on a later page, maybe we should jump to that page?
-        // For now, let's just start at page 1. If the next show is far in the future (top of list), it will be on page 1.
-        // If the next show is the *last* future event, it might be on page 2 or 3 if there are many future events.
-        // But usually "Next Show" is the one closest to today.
-        // If the list is descending (2026, 2025...), the closest to today is the *last* one before the past ones.
-        // So it could be deep in the list.
-        
-        // Let's calculate which page the next show is on and start there.
-        if (nextShowIndex !== -1) {
-            currentPage = Math.floor(nextShowIndex / itemsPerPage) + 1;
+        featureSection.hidden = false;
+        featureContainer.appendChild(createAgendaCard(item, true));
+    }
+
+    function renderAgendaSection(container, items, options) {
+        container.innerHTML = '';
+
+        if (items.length === 0) {
+            container.appendChild(createEmptyState(options.emptyState));
+            return;
         }
 
+        const fragment = document.createDocumentFragment();
+        items.forEach(item => fragment.appendChild(createAgendaCard(item)));
+        container.appendChild(fragment);
+    }
 
-        // Function to calculate and set max table height
-        function updateTableHeight() {
-            // Save current content to restore later
-            const savedContent = tbody.innerHTML;
-            
-            let maxTableHeight = 0;
-            const totalPages = Math.ceil(agendaData.length / itemsPerPage);
-            
-            // Temporarily remove height constraint to measure correctly
-            tableWrapper.style.height = 'auto';
-            tableWrapper.style.overflowY = 'visible';
+    function renderPagination(totalArchiveItems, totalPages) {
+        const showPagination = totalArchiveItems > archiveItemsPerPage;
 
-            if (totalPages === 0) {
-                tbody.innerHTML = '';
-                maxTableHeight = table.offsetHeight;
-            } else {
-                // Render each page to find the tallest one
-                for (let i = 1; i <= totalPages; i++) {
-                    tbody.innerHTML = '';
-                    const start = (i - 1) * itemsPerPage;
-                    const end = start + itemsPerPage;
-                    const items = agendaData.slice(start, end);
-                    items.forEach((item, idx) => tbody.appendChild(createRow(item, start + idx)));
-                    
-                    const height = table.offsetHeight;
-                    if (height > maxTableHeight) {
-                        maxTableHeight = height;
-                    }
-                }
-            }
-            
-            // Set fixed height on wrapper to prevent jumping
-            // Add a buffer to prevent vertical scrollbars due to sub-pixel rendering
-            tableWrapper.style.height = (maxTableHeight + 20) + 'px';
-            tableWrapper.style.overflowY = 'hidden';
-            
-            // Restore content (or re-render current page)
-            renderTable(currentPage);
+        pagination.hidden = !showPagination;
+        pageInfo.textContent = `Pagina ${currentPage} van ${totalPages}`;
+        prevBtn.disabled = currentPage === 1;
+        nextBtn.disabled = currentPage === totalPages;
+        prevBtn.classList.toggle('disabled', prevBtn.disabled);
+        nextBtn.classList.toggle('disabled', nextBtn.disabled);
+    }
+
+    function changePage(delta) {
+        const { totalPages } = getAgendaViewState();
+        const nextPage = Math.min(Math.max(currentPage + delta, 1), totalPages);
+
+        if (nextPage === currentPage) {
+            return;
         }
 
-        // Initial calculation
-        updateTableHeight();
+        currentPage = nextPage;
+        renderAgenda();
+    }
 
-        // Debounce resize event
-        window.addEventListener('resize', debounce(updateTableHeight, 250));
+    searchInput.addEventListener('input', () => {
+        currentPage = 1;
+        renderAgenda();
+    });
+    prevBtn.addEventListener('click', () => changePage(-1));
+    nextBtn.addEventListener('click', () => changePage(1));
 
-        function changePage(delta) {
-            const newPage = currentPage + delta;
-            const totalPages = Math.ceil(agendaData.length / itemsPerPage);
-            if (newPage >= 1 && newPage <= totalPages) {
-                currentPage = newPage;
-                renderTable(currentPage);
-            }
-        }
+    renderAgenda();
+}
 
-        function addNavButtonListener(btn, delta) {
-            let lastTouchTime = 0;
+function getToday() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return today;
+}
 
-            const handleAction = (e) => {
-                if (e.cancelable) e.preventDefault();
-                e.stopPropagation();
-                
-                // CRITICAL: Remove focus from the button immediately.
-                // This prevents "sticky focus" where subsequent swipes might trigger the focused element.
-                btn.blur();
-                
-                changePage(delta);
-            };
+function compareUpcomingItems(a, b) {
+    return (
+        a.startDate - b.startDate ||
+        a.endDate - b.endDate ||
+        a.location.localeCompare(b.location, 'nl') ||
+        a.event.localeCompare(b.event, 'nl')
+    );
+}
 
-            // Handle touch events
-            btn.addEventListener('touchend', (e) => {
-                lastTouchTime = new Date().getTime();
-                handleAction(e);
-            });
+function compareArchivedItems(a, b) {
+    return (
+        b.endDate - a.endDate ||
+        b.startDate - a.startDate ||
+        a.location.localeCompare(b.location, 'nl') ||
+        a.event.localeCompare(b.event, 'nl')
+    );
+}
 
-            // Handle click events (for mouse/desktop or if touch event falls through)
-            btn.addEventListener('click', (e) => {
-                const now = new Date().getTime();
-                // Ignore click if it happened shortly after touchend (ghost click prevention)
-                if (now - lastTouchTime < 500) return;
-                handleAction(e);
-            });
-        }
+function formatCountLabel(count, noun) {
+    return `${count} ${noun}${count === 1 ? '' : 'en'}`;
+}
 
-        addNavButtonListener(prevBtn, -1);
-        addNavButtonListener(nextBtn, 1);
+function createAgendaCard(item, isFeatured = false) {
+    const article = document.createElement('article');
+    article.className = isFeatured ? 'agenda-entry agenda-entry-featured' : 'agenda-entry';
 
-        // Swipe functionality
-        let touchStartX = 0;
-        let touchStartY = 0;
-        let touchEndX = 0;
-        let touchEndY = 0;
-        const minSwipeDistance = 30;
+    const dateColumn = document.createElement('div');
+    dateColumn.className = 'agenda-entry-date';
 
-        tableWrapper.addEventListener('touchstart', (e) => {
-            if (e.touches.length > 1) return; // Ignore multi-touch
-            touchStartX = e.changedTouches[0].screenX;
-            touchStartY = e.changedTouches[0].screenY;
-        }, {passive: true});
+    const dateLabel = document.createElement('span');
+    dateLabel.className = 'agenda-entry-date-label';
+    dateLabel.textContent = isFeatured ? 'Datum' : 'Speeldatum';
+    dateColumn.appendChild(dateLabel);
 
-        tableWrapper.addEventListener('touchmove', (e) => {
-            const currentX = e.changedTouches[0].screenX;
-            const currentY = e.changedTouches[0].screenY;
-            const diffX = Math.abs(currentX - touchStartX);
-            const diffY = Math.abs(currentY - touchStartY);
+    const dateValue = document.createElement('strong');
+    dateValue.className = 'agenda-entry-date-value';
+    dateValue.textContent = item.displayDate;
+    dateColumn.appendChild(dateValue);
 
-            // If horizontal movement is dominant, prevent vertical scrolling
-            if (diffX > diffY && diffX > 5) {
-                e.preventDefault();
-            }
-        }, {passive: false});
+    const content = document.createElement('div');
+    content.className = 'agenda-entry-content';
 
-        tableWrapper.addEventListener('touchend', (e) => {
-            touchEndX = e.changedTouches[0].screenX;
-            touchEndY = e.changedTouches[0].screenY;
-            handleSwipe();
-        }, {passive: true});
-        
-        tableWrapper.addEventListener('touchcancel', (e) => {
-            touchStartX = 0;
-            touchStartY = 0;
-            touchEndX = 0;
-            touchEndY = 0;
-        }, {passive: true});
+    const meta = document.createElement('div');
+    meta.className = 'agenda-entry-meta';
 
-        function handleSwipe() {
-            // Ensure we have valid start coordinates
-            if (touchStartX === 0 && touchStartY === 0) return;
+    const location = document.createElement('p');
+    location.className = 'agenda-entry-location';
+    location.textContent = item.location;
+    meta.appendChild(location);
 
-            const distanceX = touchEndX - touchStartX;
-            const distanceY = touchEndY - touchStartY;
-            
-            // Check if horizontal swipe is dominant and long enough
-            if (Math.abs(distanceX) > Math.abs(distanceY) && Math.abs(distanceX) > minSwipeDistance) {
-                if (distanceX > 0) {
-                    // Swiped Right -> Previous Page
-                    changePage(-1);
-                } else {
-                    // Swiped Left -> Next Page
-                    changePage(1);
-                }
-            }
-            
-            // Reset coordinates
-            touchStartX = 0;
-            touchStartY = 0;
-            touchEndX = 0;
-            touchEndY = 0;
-        }
+    const badges = createAgendaBadges(item);
+    if (badges.childElementCount > 0) {
+        meta.appendChild(badges);
+    }
 
-    } else {
-        tbody.innerHTML = '<tr><td colspan="3" style="text-align: center;">Geen agenda items gevonden.</td></tr>';
-        pageInfo.style.display = 'none';
-        prevBtn.style.display = 'none';
-        nextBtn.style.display = 'none';
+    const title = document.createElement(isFeatured ? 'h3' : 'h4');
+    title.className = 'agenda-entry-title';
+    title.textContent = item.event;
+
+    content.appendChild(meta);
+    content.appendChild(title);
+
+    article.appendChild(dateColumn);
+    article.appendChild(content);
+
+    return article;
+}
+
+function createAgendaBadges(item) {
+    const badgeRow = document.createElement('div');
+    badgeRow.className = 'agenda-entry-badges';
+
+    if (item.isCancelled) {
+        const cancelledBadge = document.createElement('span');
+        cancelledBadge.className = 'agenda-badge agenda-badge-cancelled';
+        cancelledBadge.textContent = 'Geannuleerd';
+        badgeRow.appendChild(cancelledBadge);
+    }
+
+    if (item.isPrivate) {
+        const privateBadge = document.createElement('span');
+        privateBadge.className = 'agenda-badge agenda-badge-private';
+        privateBadge.textContent = 'Besloten';
+        badgeRow.appendChild(privateBadge);
+    }
+
+    return badgeRow;
+}
+
+function createEmptyState(message) {
+    const emptyState = document.createElement('div');
+    emptyState.className = 'agenda-empty-state';
+    emptyState.textContent = message;
+    return emptyState;
+}
+
+function renderAgendaError() {
+    const featureSection = document.getElementById('agenda-feature-section');
+    const upcomingSection = document.getElementById('agenda-upcoming-list')?.closest('section');
+    const upcomingList = document.getElementById('agenda-upcoming-list');
+    const archiveList = document.getElementById('agenda-archive-list');
+    const upcomingCount = document.getElementById('agenda-upcoming-count');
+    const archiveCount = document.getElementById('agenda-archive-count');
+    const pagination = document.getElementById('agenda-pagination');
+
+    if (featureSection) {
+        featureSection.hidden = true;
+    }
+
+    if (upcomingSection) {
+        upcomingSection.hidden = false;
+    }
+
+    if (upcomingCount) {
+        upcomingCount.textContent = '';
+    }
+
+    if (archiveCount) {
+        archiveCount.textContent = '';
+    }
+
+    if (upcomingList) {
+        upcomingList.innerHTML = '';
+        upcomingList.appendChild(createEmptyState('De agenda kon niet geladen worden. Probeer het later opnieuw.'));
+    }
+
+    if (archiveList) {
+        archiveList.innerHTML = '';
+    }
+
+    if (pagination) {
+        pagination.hidden = true;
     }
 }
 

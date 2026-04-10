@@ -33,35 +33,6 @@
 		<link rel="preload" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" as="style" />
 		<link rel="stylesheet" href="assets/css/main.css" />
 		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
-		<style>
-			/* Mobile-specific fixes for pagination controls */
-			.pagination-controls {
-				display: flex !important;
-				flex-wrap: nowrap !important;
-				justify-content: center !important;
-				align-items: center !important;
-				gap: 0.5rem !important;
-			}
-			
-			@media screen and (max-width: 480px) {
-				.pagination-controls {
-					gap: 0.25rem !important;
-				}
-				
-				.pagination-controls .button.small {
-					font-size: 0.6rem !important;
-					padding: 0 0.75rem !important;
-					height: 2.25rem !important;
-					line-height: 2.25rem !important;
-					white-space: nowrap !important;
-				}
-				
-				.pagination-controls #page-info {
-					font-size: 0.75rem !important;
-					min-width: 8em !important;
-				}
-			}
-		</style>
 	</head>
 	<body class="is-preload">
 
@@ -83,30 +54,53 @@
 
 						<!-- Post -->
 							<section class="post">
-								<header class="major">
-									<h1>Agenda</h1>
+								<header class="major" style="margin-bottom: 0;">
+									<h1 style="margin-bottom: 0;">Agenda</h1>
 								</header>
-																<div class="table-wrapper">
-									<table class="agenda-table">
-										<thead>
-											<tr>
-												<th>Datum</th>
-												<th>Locatie</th>
-												<th>Evenement</th>
-											</tr>
-										</thead>
-										<tbody id="agenda-body">
-											<!-- Agenda items will be loaded here dynamically -->
-										</tbody>
-									</table>
+
+								<div class="row gtr-uniform" style="margin-top: 1rem; margin-bottom: 2rem; justify-content: center;">
+									<div class="col-6 col-12-xsmall">
+										<input type="text" id="agenda-search" value="" placeholder="Zoek in agenda..." aria-label="Zoek in agenda" />
+									</div>
 								</div>
-								
-								<!-- Pagination Controls -->
-								<div class="pagination-controls" style="text-align: center; margin-top: 2em; display: flex; justify-content: center; align-items: center; gap: 1em;">
-									<button type="button" id="prev-btn" class="button small disabled" aria-label="Vorige pagina">Vorige</button>
-									<span id="page-info" style="min-width: 10em; text-align: center;">Pagina 1</span>
-									<button type="button" id="next-btn" class="button small" aria-label="Volgende pagina">Volgende</button>
-								</div>
+
+								<section id="agenda-feature-section" class="agenda-feature-block" hidden>
+									<header class="agenda-section-header agenda-section-header-featured">
+										<div>
+											<h2 class="agenda-section-title agenda-section-title-featured">Eerstvolgende optreden</h2>
+										</div>
+									</header>
+									<div id="agenda-feature"></div>
+								</section>
+
+								<section class="agenda-list-section">
+									<header class="agenda-section-header">
+										<div>
+											<h2 class="agenda-section-title">Komende optredens</h2>
+											<p class="agenda-section-count" id="agenda-upcoming-count"></p>
+										</div>
+									</header>
+									<div id="agenda-upcoming-list" class="agenda-entry-list" aria-live="polite">
+										<!-- Upcoming agenda items will be loaded here dynamically -->
+									</div>
+								</section>
+
+								<section class="agenda-list-section agenda-archive-section">
+									<header class="agenda-section-header">
+										<div>
+											<h2 class="agenda-section-title">Archief</h2>
+											<p class="agenda-section-count" id="agenda-archive-count"></p>
+										</div>
+									</header>
+									<div id="agenda-archive-list" class="agenda-entry-list" aria-live="polite">
+										<!-- Archived agenda items will be loaded here dynamically -->
+									</div>
+									<div id="agenda-pagination" class="agenda-pagination" hidden>
+										<button type="button" id="prev-btn" class="button small disabled" aria-label="Vorige pagina">Vorige</button>
+										<span id="page-info" class="agenda-page-info">Pagina 1 van 1</span>
+										<button type="button" id="next-btn" class="button small" aria-label="Volgende pagina">Volgende</button>
+									</div>
+								</section>
 
 								<!-- Book Us CTA -->
 								<div style="text-align: center; margin-top: 3em;">
