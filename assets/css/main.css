@@ -5078,10 +5078,6 @@ input, select, textarea {
     line-height: 1.25;
 }
 
-.agenda-section-title-featured {
-    font-size: 1.45rem;
-}
-
 .agenda-section-count {
     margin: 0.2rem 0 0 0;
     color: var(--color-text-muted, #64748b);
@@ -5233,10 +5229,6 @@ input, select, textarea {
 
     .agenda-section-title {
         font-size: 1.02rem;
-    }
-
-    .agenda-section-title-featured {
-        font-size: 1.28rem;
     }
 
     .agenda-entry {
