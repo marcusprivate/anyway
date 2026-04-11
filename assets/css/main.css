@@ -5154,14 +5154,11 @@ input, select, textarea {
 .agenda-entry-title {
     margin: 0;
     color: var(--color-dark, #1e252d);
+    font-size: 1rem;
     letter-spacing: 0.02em;
     line-height: 1.35;
     text-align: left;
     text-transform: none;
-}
-
-.agenda-entry-featured .agenda-entry-title {
-    font-size: 1.6rem;
 }
 
 .agenda-entry-badges {
@@ -5242,10 +5239,6 @@ input, select, textarea {
         padding-bottom: 1rem;
         border-right: 0;
         border-bottom: 1px solid var(--color-border, #e2e8f0);
-    }
-
-    .agenda-entry-featured .agenda-entry-title {
-        font-size: 1.3rem;
     }
 
     .agenda-pagination {
