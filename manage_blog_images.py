@@ -337,12 +337,20 @@ def main():
             else:
                 continue
         
-        print(f"RENAME: {current_filename}")
-        print(f"    TO: {expected_filename}")
-        
-        # Also find sibling files with same stem but different extensions
+        # Prefer an existing WebP sibling for the YAML target. This avoids
+        # renaming JPEG bytes to a .webp filename when the current YAML still
+        # points at a source image.
         current_stem = old_path.stem
         expected_stem = new_path.stem
+        if new_path.suffix.lower() == '.webp' and old_path.suffix.lower() != '.webp':
+            webp_sibling = IMAGES_DIR / (current_stem + '.webp')
+            if webp_sibling.exists():
+                old_path = webp_sibling
+
+        print(f"RENAME: {old_path.name}")
+        print(f"    TO: {expected_filename}")
+
+        # Also find sibling files with same stem but different extensions
         sibling_renames = []
         for ext in ['.webp', '.jpg', '.jpeg', '.png']:
             sibling = IMAGES_DIR / (current_stem + ext)
@@ -505,6 +513,8 @@ def main():
                 if compliant and non_compliant:
                     if dry_run:
                         print(f"    (Can delete {len(non_compliant)} non-compliant file(s) with --apply)")
+                    elif not sys.stdin.isatty():
+                        print("    (Skipping delete prompt in non-interactive mode)")
                     else:
                         answer = input(f"  Delete {len(non_compliant)} non-compliant file(s)? [Y/n]: ").strip().lower()
                         if answer != 'n':
@@ -532,4 +542,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
