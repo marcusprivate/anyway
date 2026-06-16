@@ -1,0 +1,4 @@
+interface:
+  display_name: "Blog Cleanup"
+  short_description: "Clean and validate Anyway blog entries"
+  default_prompt: "Use $blog-cleanup to clean recent Anyway blog YAML entries and images."

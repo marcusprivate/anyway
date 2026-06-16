@@ -14,7 +14,9 @@ to identify and clean up unused source files after conversion.
 
 Usage:
     python resize_images.py
+    python resize_images.py --dry-run
 """
+import sys
 from pathlib import Path
 from PIL import Image, ImageOps
 
@@ -52,6 +54,8 @@ def update_yaml_references(old_path: Path, new_path: Path) -> int:
 
 
 def main() -> int:
+    dry_run = "--dry-run" in sys.argv
+
     if not INPUT_DIR.is_dir():
         print(f"Missing folder: {INPUT_DIR.resolve()}")
         return 2
@@ -79,6 +83,7 @@ def main() -> int:
                 continue
 
             try:
+                action = "Would convert" if dry_run else "Converted"
                 with Image.open(src) as im:
                     im = ImageOps.exif_transpose(im)  # fix orientation
                     w, h = im.size
@@ -97,13 +102,15 @@ def main() -> int:
                     elif im.mode not in ("RGB", "RGBA"):
                         im = im.convert("RGB")
 
-                    im.save(dst, "WEBP", quality=QUALITY, method=METHOD)
+                    if not dry_run:
+                        im.save(dst, "WEBP", quality=QUALITY, method=METHOD)
 
                 converted += 1
-                print(f"Converted: {src.name} → {dst.name}")
+                print(f"{action}: {src.name} → {dst.name}")
                 
                 # Update YAML files to reference the new webp file
-                yaml_updates += update_yaml_references(src, dst)
+                if not dry_run:
+                    yaml_updates += update_yaml_references(src, dst)
 
             except Exception as e:
                 errors += 1
@@ -136,10 +143,12 @@ def main() -> int:
                         im = im.convert("RGB")
                     
                     # Save back to same file (overwrite)
-                    im.save(src, "WEBP", quality=QUALITY, method=METHOD)
+                    if not dry_run:
+                        im.save(src, "WEBP", quality=QUALITY, method=METHOD)
                     
                     resized += 1
-                    print(f"Resized: {src.name} ({w}x{h} → {new_w}x{new_h})")
+                    action = "Would resize" if dry_run else "Resized"
+                    print(f"{action}: {src.name} ({w}x{h} → {new_w}x{new_h})")
                 
             except Exception as e:
                 errors += 1
@@ -150,4 +159,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
