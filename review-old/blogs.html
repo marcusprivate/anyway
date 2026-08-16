@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="nl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow, noarchive">
+    <meta name="description" content="Interne reviewpagina voor oude Anyway-blogberichten.">
+    <title>Oude blogs beoordelen — Anyway</title>
+    <link rel="stylesheet" href="blogs.css">
+</head>
+<body>
+    <header class="page-header">
+        <div class="header-inner">
+            <div>
+                <a class="brand" href="../index.html" aria-label="Terug naar Anyway">Anyway</a>
+                <p class="eyebrow">Interne blogreview</p>
+                <h1>Oude verhalen, opnieuw bekeken</h1>
+                <p class="intro">Beoordeel de 41 berichten uit het oude Typepad-archief. Je voortgang wordt alleen in deze browser bewaard.</p>
+            </div>
+            <button class="export-button" id="export-button" type="button" disabled>
+                Reviewpakket downloaden (.zip)
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <section class="dashboard" aria-labelledby="progress-title">
+            <div class="progress-heading">
+                <div>
+                    <p class="eyebrow">Voortgang</p>
+                    <h2 id="progress-title"><span id="reviewed-count">0</span> van <span id="total-count">41</span> beoordeeld</h2>
+                </div>
+                <span id="progress-percent" class="progress-percent">0%</span>
+            </div>
+            <div class="progress-track" aria-hidden="true">
+                <span id="progress-bar"></span>
+            </div>
+
+            <div class="summary-grid" aria-live="polite">
+                <div class="summary-card pending"><strong id="count-pending">41</strong><span>Openstaand</span></div>
+                <div class="summary-card approved"><strong id="count-approved">0</strong><span>Goedgekeurd</span></div>
+                <div class="summary-card rejected"><strong id="count-rejected">0</strong><span>Afgekeurd</span></div>
+                <div class="summary-card modified"><strong id="count-modified">0</strong><span>Aangepast</span></div>
+            </div>
+        </section>
+
+        <section class="review-mode" aria-label="Manier van beoordelen">
+            <div>
+                <p class="eyebrow">Werkruimte</p>
+                <h2>Beoordeel stap voor stap</h2>
+                <p>Controleer tekst, gegevens en afbeeldingen voordat je een beslissing neemt.</p>
+            </div>
+            <div class="review-mode-actions" role="group" aria-label="Weergave kiezen">
+                <button id="guided-mode-button" class="action-button primary" type="button" aria-pressed="true">Volgend open bericht beoordelen</button>
+                <button id="overview-mode-button" class="action-button" type="button" aria-pressed="false">Overzicht van alle berichten</button>
+            </div>
+        </section>
+
+        <p id="progress-notice" class="progress-notice" role="status"></p>
+
+        <section id="guided-review" class="guided-review" aria-label="Stapsgewijze blogreview"></section>
+
+        <section id="overview-section" hidden>
+        <section class="controls" aria-label="Berichten filteren">
+            <label class="search-field">
+                <span>Zoeken</span>
+                <input id="search-input" type="search" placeholder="Zoek op titel, datum, locatie of tekst…" autocomplete="off">
+            </label>
+            <div class="filter-group" id="filter-group" aria-label="Filter op beoordeling">
+                <button type="button" class="filter-button active" data-filter="all" aria-pressed="true">Alles <span>41</span></button>
+                <button type="button" class="filter-button" data-filter="pending" aria-pressed="false">Open <span>41</span></button>
+                <button type="button" class="filter-button" data-filter="approved" aria-pressed="false">Goedgekeurd <span>0</span></button>
+                <button type="button" class="filter-button" data-filter="rejected" aria-pressed="false">Afgekeurd <span>0</span></button>
+                <button type="button" class="filter-button" data-filter="modified" aria-pressed="false">Aangepast <span>0</span></button>
+            </div>
+        </section>
+
+        <p id="status-message" class="status-message" role="status" aria-live="polite"></p>
+        <section id="posts-container" class="posts" aria-label="Oude blogberichten" aria-busy="true"></section>
+        <div id="empty-state" class="empty-state" hidden>Geen berichten gevonden met dit filter.</div>
+        </section>
+        <div id="error-state" class="error-state" role="alert" hidden>
+            De blogberichten konden niet worden geladen. Probeer de pagina opnieuw te openen.
+        </div>
+    </main>
+
+    <footer>
+        <p>Deze pagina staat niet in de openbare navigatie. Download het reviewpakket (.zip) wanneer je klaar bent.</p>
+    </footer>
+
+    <script type="module" src="blogs.js"></script>
+</body>
+</html>

@@ -641,9 +641,6 @@ URL:
   - src: 6a01116849e4a9970c0134838d3940970c-320pi.jpg
  
 
-DATE: 8 juni 2010
-Erg genoten en heerlijk gegeten! Een aanwinst voor Texel!
-
 -----
 
 TITLE: Broadway Den Hoorn 
@@ -800,12 +797,6 @@ URL:
 URL:
   - href: http://anywaytexel.typepad.com/uitnodiging%20expositie%20Guus%20Scholten%20%281%29%20%282%29.doc
   - link text: uitnodiging expositie
-DATE: 15 mei 2011
-Dank jullie wel voor een half uur puur genot in Oudesluis op 15-05-2011.
-
-URL: http://www.darkrosie.nl
-DATE: 26 september 2012
-Iedereen is van de wereld, en de wereld is van iedereen. Mooie samenzang, Ruthie! Nooit geweten dat ik zo'n pittige tandarts had! Groetjes, Miranda.
 
 -----
 
@@ -937,10 +928,6 @@ lees
 URL:
   - href: http://anywaytexel.typepad.com/carre.pdf
   - link text: krantenartikel
-
-URL: http://profile.typekey.com/1233844586s3136/
-DATE: 15 februari 2009
-Het was heel bijzonder om mee te maken
 
 
 -----
@@ -1087,8 +1074,7 @@ DATE: 28 mei 2004
 BODY:
 
  
-<h1>Broadway opnieuw bijzonder festival</h1>
-<small></small>
+Broadway opnieuw bijzonder festival
 
 Zoveel artiesten, zoveel verhalen. Misschien gold voor Broadway 2004 zelfs wel dat het aantal verhalen gelijk stond aan het aantal voorstellingen. Zeker is in ieder geval dat iedere bezoeker het vierde huiskamerfestival in Den Hoorn daardoor op een eigen manier beleefde. Wat overheerste, waren de enthousiaste geluiden en de complimenten aan het adres van Klif 12-eigenaar Cor van Heerwaarden en zijn medewerkers, die er opnieuw in geslaagd zijn een evenement van bijzondere allure te organiseren. Met louter uitverkochte avonden kregen zij een mooie beloning voor hun vele werk.
 
