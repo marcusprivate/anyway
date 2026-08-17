@@ -5,6 +5,7 @@ import {
     activeImages,
     addUploads,
     buildExportPayload,
+    buildCheckpoint,
     buildStoragePayload,
     createRecord,
     decidedRecord,
@@ -13,6 +14,7 @@ import {
     hydrateRecords,
     isoDateToDutch,
     modifiedRecord,
+    mergeCheckpointRecords,
     moveImage,
     removeImage,
     replaceImage,
@@ -20,11 +22,49 @@ import {
     restoreImage,
     reviewedDiffers,
     selectReviewedText,
-    summarize
+    summarize,
+    restoreCheckpoint
 } from './blog-review-core.mjs';
+import { changeSummary, compareParagraphs, comparisonRows, comparisonSummary, diffTokens, meaningfulChanges } from './text-diff.mjs';
 
 const fixture = JSON.parse(await readFile(new URL('./blogs-data.json', import.meta.url), 'utf8'));
 const posts = fixture.posts;
+
+test('paragraph-aware diff isolates an early edit instead of marking the rest of the text', () => {
+    const segments = diffTokens('Een verkeerde zin blijft daarna gelijk.', 'Een verbeterde zin blijft daarna gelijk.');
+    assert.deepEqual(segments.map(({ type, text }) => [type, text]), [
+        ['same', 'Een '], ['remove', 'verkeerde'], ['add', 'verbeterde'], ['same', ' zin blijft daarna gelijk.']
+    ]);
+});
+
+test('paragraph comparison aligns changed paragraphs and keeps surrounding context', () => {
+    const before = 'Eerste alinea.\n\nEen fout.. hier.\n\nLaatste alinea.';
+    const after = 'Eerste alinea.\n\nEen fout. hier.\n\nLaatste alinea.';
+    const rows = compareParagraphs(before, after);
+    assert.equal(rows.length, 3);
+    assert.deepEqual(rows.map(row => row.changed), [false, true, false]);
+    assert.equal(comparisonRows(before, after).length, 3);
+    assert.deepEqual(comparisonSummary(rows), { paragraphs: 1, edits: 1 });
+});
+
+test('meaningful changes group token operations into human-readable suggestions', () => {
+    const rows = compareParagraphs('Dit is een huiskamer concert.\n\nHaar knie...maar goed.', 'Dit is een huiskamerconcert.\n\nHaar knie. Maar goed.');
+    const changes = meaningfulChanges(rows);
+    assert.equal(changes.length, 2);
+    assert.deepEqual(changes.map(change => change.label), ['Spatiëring', 'Leesteken en hoofdletter']);
+    assert.equal(changes[0].originalPhrase, 'een huiskamer concert.');
+    assert.equal(changes[0].improvedPhrase, 'een huiskamerconcert.');
+    assert.equal(changes[1].originalContext, 'Haar knie...maar goed.');
+    assert.deepEqual(changeSummary(rows).paragraphs, 2);
+});
+
+test('meaningful changes cover additions and removals without creating unchanged cards', () => {
+    const rows = compareParagraphs('Vaste tekst.', 'Vaste tekst.\n\nExtra alinea.');
+    const changes = meaningfulChanges(rows);
+    assert.equal(changes.length, 1);
+    assert.equal(changes[0].label, 'Toegevoegd');
+    assert.equal(changes[0].originalPhrase, '');
+});
 
 test('frozen review data has the verified size and unique IDs', () => {
     assert.equal(fixture.schemaVersion, 3);
@@ -67,18 +107,23 @@ test('Dutch dates round-trip through the date editor format', () => {
 
 test('stored state is hydrated safely and ignores unknown records', () => {
     const first = posts[0];
+    const reviewed = modifiedRecord({
+        title: 'Nieuwe titel',
+        date: first.date,
+        content: 'Nieuwe tekst'
+    });
     const stored = buildStoragePayload({
-        [first.sourceId]: modifiedRecord({
-            title: 'Nieuwe titel',
-            date: first.date,
-            content: 'Nieuwe tekst'
-        }),
+        [first.sourceId]: {
+            ...reviewed,
+            checklist: { title: true, date: true, location: true, text: true, images: false }
+        },
         unknown: { decision: 'approved', reviewed: {} }
     });
     const records = hydrateRecords(posts, stored);
     assert.equal(Object.keys(records).length, 41);
     assert.equal(records[first.sourceId].decision, 'modified');
     assert.equal(records[first.sourceId].reviewed.title, 'Nieuwe titel');
+    assert.deepEqual(records[first.sourceId].checklist, { title: true, date: true, location: true, text: true, images: false });
     assert.equal(records[posts[1].sourceId].decision, 'pending');
 });
 
@@ -355,7 +400,7 @@ test('decision summary and export preserve original and reviewed text', () => {
     });
 
     const exported = buildExportPayload(posts, records, '2026-08-16T12:00:00.000Z');
-    assert.equal(exported.schemaVersion, 5);
+    assert.equal(exported.schemaVersion, 6);
     assert.equal(exported.kind, 'anyway-old-blog-review');
     assert.equal(exported.posts.length, 41);
     assert.equal(exported.posts[0].original.sourceTitle, first.sourceTitle);
@@ -371,6 +416,53 @@ test('decision summary and export preserve original and reviewed text', () => {
     assert.equal('customContent' in exported.posts[0].reviewed, false);
     assert.deepEqual(exported.posts[0].reviewed.images.order, createRecord(first).reviewed.images.order);
     assert.equal(exported.summary.modified, 1);
+});
+
+test('checkpoint restoration preserves pending edits and a valid resume target', () => {
+    const first = posts[0];
+    const second = posts[1];
+    const records = Object.fromEntries(posts.map(post => [post.sourceId, createRecord(post)]));
+    records[first.sourceId] = {
+        decision: 'pending',
+        reviewed: { ...records[first.sourceId].reviewed, content: 'Nog niet afgeronde eigen tekst.', textSelection: 'custom', customContent: 'Nog niet afgeronde eigen tekst.' }
+    };
+    records[second.sourceId] = decidedRecord(records[second.sourceId].reviewed, 'approved');
+    const restored = restoreCheckpoint(posts, buildCheckpoint(posts, records, first.sourceId));
+    assert.deepEqual(restored.records, records);
+    assert.equal(restored.focusedPostId, first.sourceId);
+});
+
+test('checkpoint restoration rejects incomplete or invalid saved records', () => {
+    const records = Object.fromEntries(posts.map(post => [post.sourceId, createRecord(post)]));
+    const checkpoint = buildCheckpoint(posts, records);
+    checkpoint.state.records[posts[0].sourceId].decision = 'unknown';
+    assert.throws(() => restoreCheckpoint(posts, checkpoint), /ongeldig/);
+});
+
+test('checkpoint restoration rejects malformed uploaded-image state', () => {
+    const records = Object.fromEntries(posts.map(post => [post.sourceId, createRecord(post)]));
+    const checkpoint = buildCheckpoint(posts, records);
+    checkpoint.state.records[posts[0].sourceId].reviewed.images.uploads = [{}];
+    assert.throws(() => restoreCheckpoint(posts, checkpoint), /ongeldig/);
+});
+
+test('checkpoint merge auto-combines one-sided work and reports genuine conflicts', () => {
+    const first = posts[0];
+    const second = posts[1];
+    const local = Object.fromEntries(posts.map(post => [post.sourceId, createRecord(post)]));
+    const imported = structuredClone(local);
+    local[first.sourceId] = decidedRecord(local[first.sourceId].reviewed, 'approved');
+    imported[second.sourceId] = decidedRecord(imported[second.sourceId].reviewed, 'rejected');
+    let merged = mergeCheckpointRecords(posts, local, imported);
+    assert.equal(merged.conflicts.length, 0);
+    assert.equal(merged.records[first.sourceId].decision, 'approved');
+    assert.equal(merged.records[second.sourceId].decision, 'rejected');
+
+    imported[first.sourceId] = decidedRecord(imported[first.sourceId].reviewed, 'rejected');
+    merged = mergeCheckpointRecords(posts, local, imported);
+    assert.equal(merged.conflicts.length, 1);
+    assert.equal(merged.conflicts[0].sourceId, first.sourceId);
+    assert.equal(merged.records[first.sourceId].decision, 'approved');
 });
 
 test('approval preserves the current reviewed content and gallery choices', () => {

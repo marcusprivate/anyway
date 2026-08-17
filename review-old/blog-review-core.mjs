@@ -3,6 +3,7 @@ export const EXPORT_KIND = 'anyway-old-blog-review';
 export const DECISIONS = Object.freeze(['pending', 'approved', 'rejected', 'modified']);
 export const IMAGE_DECISIONS = Object.freeze(['keep', 'remove']);
 export const TEXT_SELECTIONS = Object.freeze(['original', 'improved', 'custom']);
+export const CHECKLIST_KEYS = Object.freeze(['title', 'date', 'location', 'text', 'images']);
 
 const DUTCH_MONTHS = Object.freeze([
     'januari',
@@ -72,6 +73,11 @@ export function createRecord(post) {
         decision: 'pending',
         reviewed: originalReviewed(post)
     };
+}
+
+function normalizeChecklist(candidate) {
+    if (!candidate || typeof candidate !== 'object') return undefined;
+    return Object.fromEntries(CHECKLIST_KEYS.map(key => [key, candidate?.[key] === true]));
 }
 
 export function formatTitle(title, location = '') {
@@ -225,13 +231,15 @@ export function hydrateRecords(posts, storedPayload) {
     return Object.fromEntries(posts.map(post => {
         const fallback = originalReviewed(post);
         const stored = storedRecords[post.sourceId];
+        const checklist = normalizeChecklist(stored?.checklist);
         return [post.sourceId, {
             decision: storedSchemaVersion < 6
                 ? 'pending'
                 : stored && DECISIONS.includes(stored.decision)
                     ? stored.decision
                     : 'pending',
-            reviewed: validReviewed(stored?.reviewed, fallback, post, storedSchemaVersion)
+            reviewed: validReviewed(stored?.reviewed, fallback, post, storedSchemaVersion),
+            ...(checklist ? { checklist } : {})
         }];
     }));
 }
@@ -391,9 +399,96 @@ export function buildStoragePayload(records) {
     };
 }
 
+export function buildCheckpoint(posts, records, focusedPostId = null) {
+    return {
+        schemaVersion: 1,
+        sourceIds: posts.map(post => post.sourceId),
+        state: buildStoragePayload(records),
+        focusedPostId: posts.some(post => post.sourceId === focusedPostId) ? focusedPostId : null
+    };
+}
+
+function validCheckpointImages(images, post) {
+    const original = originalImages(post).existing;
+    if (!images || !Array.isArray(images.order) || !Array.isArray(images.existing) || !Array.isArray(images.uploads)
+        || images.existing.length !== original.length) return false;
+    if (!images.existing.every((image, index) => image && image.id === original[index].id
+        && image.sourceRef === original[index].sourceRef && image.path === original[index].path
+        && image.alt === original[index].alt && IMAGE_DECISIONS.includes(image.decision))) return false;
+    if (!images.uploads.every(upload => upload && isNonEmptyString(upload.id) && isNonEmptyString(upload.originalFilename)
+        && isNonEmptyString(upload.mimeType) && Number.isFinite(upload.size) && upload.size >= 0
+        && isNonEmptyString(upload.sha256) && isNonEmptyString(upload.packagePath) && typeof upload.alt === 'string')) return false;
+    const activeIds = new Set([
+        ...images.existing.filter(image => image.decision === 'keep').map(image => image.id),
+        ...images.uploads.map(upload => upload.id)
+    ]);
+    return images.order.length === activeIds.size
+        && images.order.every((id, index) => typeof id === 'string' && activeIds.has(id) && images.order.indexOf(id) === index);
+}
+
+export function restoreCheckpoint(posts, checkpoint) {
+    if (!checkpoint || checkpoint.schemaVersion !== 1 || !Array.isArray(checkpoint.sourceIds)
+        || !checkpoint.state || typeof checkpoint.state !== 'object') {
+        throw new Error('Dit reviewpakket bevat geen geldig hervatpunt.');
+    }
+    const expectedIds = posts.map(post => post.sourceId);
+    if (checkpoint.sourceIds.length !== expectedIds.length
+        || checkpoint.sourceIds.some((sourceId, index) => sourceId !== expectedIds[index])) {
+        throw new Error('Dit reviewpakket hoort bij een andere set blogberichten.');
+    }
+    if (checkpoint.state.schemaVersion !== STORAGE_SCHEMA_VERSION
+        || !checkpoint.state.records || typeof checkpoint.state.records !== 'object') {
+        throw new Error('De opgeslagen reviewstatus heeft een ongeldige versie.');
+    }
+    if (Object.keys(checkpoint.state.records).length !== expectedIds.length
+        || expectedIds.some(sourceId => !Object.hasOwn(checkpoint.state.records, sourceId))) {
+        throw new Error('De opgeslagen reviewstatus is onvolledig.');
+    }
+    const invalidRecord = expectedIds.find(sourceId => {
+        const record = checkpoint.state.records[sourceId];
+        const reviewed = record?.reviewed;
+        return !record || !DECISIONS.includes(record.decision)
+            || !reviewed || !isNonEmptyString(reviewed.title) || !isNonEmptyString(reviewed.date)
+            || !isNonEmptyString(reviewed.content) || typeof reviewed.location !== 'string'
+            || !TEXT_SELECTIONS.includes(reviewed.textSelection) || typeof reviewed.customContent !== 'string'
+            || !validCheckpointImages(reviewed.images, posts.find(post => post.sourceId === sourceId));
+    });
+    if (invalidRecord) throw new Error(`De reviewstatus voor ${invalidRecord} is ongeldig.`);
+    return {
+        records: hydrateRecords(posts, checkpoint.state),
+        focusedPostId: expectedIds.includes(checkpoint.focusedPostId) ? checkpoint.focusedPostId : null
+    };
+}
+
+function recordsEqual(left, right) {
+    return JSON.stringify(left) === JSON.stringify(right);
+}
+
+export function mergeCheckpointRecords(posts, localRecords, importedRecords) {
+    const records = {};
+    const conflicts = [];
+    posts.forEach(post => {
+        const sourceId = post.sourceId;
+        const baseline = createRecord(post);
+        const local = localRecords[sourceId] || baseline;
+        const imported = importedRecords[sourceId] || baseline;
+        const localChanged = !recordsEqual(local, baseline);
+        const importedChanged = !recordsEqual(imported, baseline);
+        if (!localChanged || recordsEqual(local, imported)) {
+            records[sourceId] = imported;
+        } else if (!importedChanged) {
+            records[sourceId] = local;
+        } else {
+            records[sourceId] = local;
+            conflicts.push({ sourceId, local, imported });
+        }
+    });
+    return { records, conflicts };
+}
+
 export function buildExportPayload(posts, records, exportedAt = new Date().toISOString()) {
     return {
-        schemaVersion: 5,
+        schemaVersion: 6,
         kind: EXPORT_KIND,
         exportedAt,
         source: {

@@ -15,11 +15,13 @@
                 <a class="brand" href="../index.html" aria-label="Terug naar Anyway">Anyway</a>
                 <p class="eyebrow">Interne blogreview</p>
                 <h1>Oude verhalen, opnieuw bekeken</h1>
-                <p class="intro">Beoordeel de 41 berichten uit het oude Typepad-archief. Je voortgang wordt alleen in deze browser bewaard.</p>
+                <p class="intro">Beoordeel de 41 berichten uit het oude Typepad-archief. Je voortgang wordt in deze browser bewaard; download tussendoor een reviewpakket als veilig hervatpunt.</p>
             </div>
-            <button class="export-button" id="export-button" type="button" disabled>
-                Reviewpakket downloaden (.zip)
-            </button>
+            <div class="package-actions">
+                <button class="export-button" id="import-button" type="button" disabled>Reviewpakket importeren</button>
+                <button class="export-button" id="export-button" type="button" disabled>Reviewpakket downloaden (.zip)</button>
+                <input id="import-input" type="file" accept=".zip,application/zip" hidden>
+            </div>
         </div>
     </header>
 
@@ -85,9 +87,9 @@
     </main>
 
     <footer>
-        <p>Deze pagina staat niet in de openbare navigatie. Download het reviewpakket (.zip) wanneer je klaar bent.</p>
+        <p>Deze pagina staat niet in de openbare navigatie. Je kunt op elk moment een reviewpakket (.zip) downloaden en later weer importeren.</p>
     </footer>
 
-    <script type="module" src="blogs.js"></script>
+    <script type="module" src="blogs.js?version=6"></script>
 </body>
 </html>

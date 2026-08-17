@@ -2,6 +2,7 @@ import {
     activeImages,
     addUploads,
     buildExportPayload,
+    buildCheckpoint,
     buildStoragePayload,
     createRecord,
     decidedRecord,
@@ -10,6 +11,7 @@ import {
     hydrateRecords,
     isoDateToDutch,
     modifiedRecord,
+    mergeCheckpointRecords,
     moveImage,
     removeImage,
     replaceImage,
@@ -17,8 +19,9 @@ import {
     restoreImage,
     reviewedDiffers,
     selectReviewedText,
-    summarize
-} from './blog-review-core.mjs';
+    summarize,
+    restoreCheckpoint
+} from './blog-review-core.mjs?version=6';
 import {
     deleteUpload,
     deleteUploads,
@@ -30,9 +33,13 @@ import {
 import {
     createUploadDescriptor,
     formatBytes,
-    MAX_TOTAL_UPLOAD_BYTES
+    MAX_TOTAL_UPLOAD_BYTES,
+    ALLOWED_IMAGE_TYPES,
+    sha256Hex
 } from './upload-utils.mjs';
 import { buildZip } from './zip-export.mjs';
+import { readCheckpointZip } from './zip-import.mjs';
+import { compareParagraphs, comparisonRows } from './text-diff.mjs';
 
 const STORAGE_KEY = 'anyway-old-blog-review:v1';
 const STATUS_LABELS = {
@@ -48,6 +55,8 @@ const elements = {
     empty: document.getElementById('empty-state'),
     error: document.getElementById('error-state'),
     exportButton: document.getElementById('export-button'),
+    importButton: document.getElementById('import-button'),
+    importInput: document.getElementById('import-input'),
     search: document.getElementById('search-input'),
     filterGroup: document.getElementById('filter-group'),
     status: document.getElementById('status-message'),
@@ -70,7 +79,7 @@ let posts = [];
 let records = {};
 let activeFilter = 'all';
 let editingId = null;
-let comparingId = null;
+const fullComparisonIds = new Set();
 let reviewMode = 'guided';
 let focusedPostId = null;
 let statusTimer = null;
@@ -117,9 +126,9 @@ function updateSummary() {
     elements.countRejected.textContent = summary.rejected;
     elements.countModified.textContent = summary.modified;
     if (summary.pending === 0) {
-        elements.progressNotice.textContent = 'Alle berichten hebben een beslissing. Download nu het reviewpakket om je werk buiten deze browser te bewaren.';
+        elements.progressNotice.textContent = 'Alle berichten hebben een beslissing. Download een reviewpakket om dit resultaat buiten deze browser te bewaren.';
     } else if (summary.total - summary.pending > 0) {
-        elements.progressNotice.textContent = 'Je voortgang staat alleen in deze browser. Download het reviewpakket zodra je klaar bent.';
+        elements.progressNotice.textContent = 'Je voortgang staat in deze browser. Je kunt nu al een reviewpakket downloaden als hervatpunt.';
     } else {
         elements.progressNotice.textContent = 'Begin met één bericht tegelijk. Ontbrekende locatie of afbeeldingen geven een waarschuwing, maar blokkeren je keuze niet.';
     }
@@ -210,9 +219,71 @@ function actionButton(label, className, handler) {
     return button;
 }
 
-function confirmDiscard(post, record) {
+function openEditor(post) {
+    editingId = post.sourceId;
+    render();
+    requestAnimationFrame(() => {
+        const editor = document.getElementById(`editor-${post.sourceId}`);
+        if (!editor) return;
+        editor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        editor.querySelector('textarea')?.focus({ preventScroll: true });
+    });
+}
+
+function requestConfirmation({ title, message, confirmLabel, confirmClass = 'primary', trigger = document.activeElement }) {
+    return new Promise(resolve => {
+        const dialog = document.createElement('dialog');
+        dialog.className = 'confirmation-dialog';
+        const titleId = `confirmation-title-${crypto.randomUUID()}`;
+        dialog.setAttribute('aria-labelledby', titleId);
+
+        const content = document.createElement('div');
+        content.className = 'confirmation-dialog-content';
+        const heading = textElement('h2', '', title);
+        heading.id = titleId;
+        const description = textElement('p', 'confirmation-message', message);
+        const actions = document.createElement('div');
+        actions.className = 'confirmation-actions';
+        const cancelButton = actionButton('Annuleren', '', () => dialog.close('cancel'));
+        const confirmButton = actionButton(confirmLabel, confirmClass, () => dialog.close('confirm'));
+        actions.append(cancelButton, confirmButton);
+        content.append(heading, description, actions);
+        dialog.appendChild(content);
+
+        dialog.addEventListener('click', event => {
+            if (event.target === dialog) dialog.close('cancel');
+        });
+        dialog.addEventListener('cancel', event => {
+            event.preventDefault();
+            dialog.close('cancel');
+        });
+        dialog.addEventListener('keydown', event => {
+            if (event.key !== 'Escape' || !dialog.open) return;
+            event.preventDefault();
+            dialog.close('cancel');
+        });
+        dialog.addEventListener('close', () => {
+            const confirmed = dialog.returnValue === 'confirm';
+            dialog.remove();
+            if (trigger instanceof HTMLElement && trigger.isConnected) trigger.focus();
+            resolve(confirmed);
+        }, { once: true });
+
+        document.body.appendChild(dialog);
+        dialog.showModal();
+        requestAnimationFrame(() => cancelButton.focus());
+    });
+}
+
+async function confirmDiscard(post, record, trigger) {
     if (!reviewedDiffers(post, record.reviewed)) return true;
-    return window.confirm('Hiermee worden je wijzigingen aan tekst en afbeeldingen verwijderd. Doorgaan?');
+    return requestConfirmation({
+        title: 'Wijzigingen verwijderen?',
+        message: 'Hiermee worden je wijzigingen aan tekst en afbeeldingen verwijderd. Doorgaan?',
+        confirmLabel: 'Verwijderen',
+        confirmClass: 'reject',
+        trigger
+    });
 }
 
 async function discardRecordUploads(record) {
@@ -222,7 +293,7 @@ async function discardRecordUploads(record) {
 
 async function rejectPost(post) {
     const current = records[post.sourceId];
-    if (!confirmDiscard(post, current)) return;
+    if (!await confirmDiscard(post, current, document.activeElement)) return;
     try {
         await discardRecordUploads(current);
         records[post.sourceId] = resetRecord(post, 'rejected');
@@ -238,11 +309,14 @@ async function rejectPost(post) {
 
 function approvePost(post, options = {}) {
     const current = records[post.sourceId];
-    records[post.sourceId] = decidedRecord({
+    records[post.sourceId] = {
+        ...decidedRecord({
         ...current.reviewed,
         location: String(options.location ?? current.reviewed.location).trim(),
         images: options.images || current.reviewed.images
-    }, 'approved');
+        }, 'approved'),
+        ...(current.checklist ? { checklist: current.checklist } : {})
+    };
     moveGuidedQueueAfterDecision(post.sourceId);
     editingId = null;
     persist();
@@ -252,6 +326,11 @@ function approvePost(post, options = {}) {
 
 function requestApproval(post) {
     const record = records[post.sourceId] || createRecord(post);
+    if (!checklistComplete(record)) {
+        announce('Vink eerst alle controlepunten af voordat je dit bericht goedkeurt.');
+        if (reviewMode !== 'guided') showGuidedReview(post.sourceId);
+        return;
+    }
     const missingLocation = !record.reviewed.location.trim();
     const missingImages = activeImages(record.reviewed.images).length === 0;
     if (!missingLocation && !missingImages) {
@@ -489,7 +568,7 @@ function requestApproval(post) {
 
 async function resetDecision(post) {
     const current = records[post.sourceId];
-    if (!confirmDiscard(post, current)) return;
+    if (!await confirmDiscard(post, current, document.activeElement)) return;
     try {
         await discardRecordUploads(current);
         records[post.sourceId] = resetRecord(post);
@@ -520,7 +599,10 @@ function validateImageDecode(file) {
 
 function saveGallery(post, images, message) {
     const current = records[post.sourceId] || createRecord(post);
-    records[post.sourceId] = modifiedRecord({ ...current.reviewed, images });
+    records[post.sourceId] = {
+        ...modifiedRecord({ ...current.reviewed, images }),
+        ...(current.checklist ? { checklist: current.checklist } : {})
+    };
     persist();
     render();
     announce(message);
@@ -780,6 +862,7 @@ function createGallery(post, record, compact = false) {
 function createEditor(post, record) {
     const editor = document.createElement('form');
     editor.className = 'editor';
+    editor.id = `editor-${post.sourceId}`;
     editor.noValidate = true;
 
     const grid = document.createElement('div');
@@ -824,10 +907,17 @@ function createEditor(post, record) {
     let selectedBase = record.reviewed.textSelection === 'custom' ? 'improved' : record.reviewed.textSelection;
     ['improved', 'original'].forEach(selection => {
         const label = selection === 'improved' ? 'Verbeterd met AI' : 'Origineel';
-        const button = actionButton(label, '', () => {
+        const button = actionButton(label, '', async () => {
             if (selection === selectedBase) return;
-            if (contentInput.value.trim() !== record.reviewed.content.trim()
-                && !window.confirm('De tekst in de editor wordt vervangen door de gekozen basisversie. Doorgaan?')) return;
+            if (contentInput.value.trim() !== record.reviewed.content.trim()) {
+                const confirmed = await requestConfirmation({
+                    title: 'Basistekst vervangen?',
+                    message: 'De tekst in de editor wordt vervangen door de gekozen basisversie. Doorgaan?',
+                    confirmLabel: 'Vervangen',
+                    trigger: button
+                });
+                if (!confirmed) return;
+            }
             selectedBase = selection;
             contentInput.value = selection === 'original' ? post.content : post.improvedContent;
             baseChoices.querySelectorAll('button').forEach(candidate => candidate.classList.toggle('active', candidate.dataset.selection === selection));
@@ -885,14 +975,13 @@ function createEditor(post, record) {
             return;
         }
 
-        records[post.sourceId] = savedRecord;
+        records[post.sourceId] = { ...savedRecord, ...(record.checklist ? { checklist: record.checklist } : {}) };
         editingId = null;
         persist();
         render();
         announce('Aangepaste blogtekst opgeslagen.');
     });
 
-    requestAnimationFrame(() => titleInput.focus());
     return editor;
 }
 
@@ -900,20 +989,14 @@ function textVersionLabel(selection) {
     return ({ improved: 'Verbeterd met AI', original: 'Origineel', custom: 'Eigen aanpassing' })[selection] || 'Verbeterd met AI';
 }
 
-function diffFragment(before, after) {
-    const fragment = document.createDocumentFragment();
-    const a = before.match(/\S+\s*/g) || [];
-    const b = after.match(/\S+\s*/g) || [];
-    let prefix = 0;
-    while (prefix < a.length && prefix < b.length && a[prefix] === b[prefix]) prefix += 1;
-    let suffix = 0;
-    while (suffix < a.length - prefix && suffix < b.length - prefix
-        && a[a.length - 1 - suffix] === b[b.length - 1 - suffix]) suffix += 1;
-    fragment.append(document.createTextNode(a.slice(0, prefix).join('')));
-    if (a.length - prefix - suffix) fragment.appendChild(textElement('del', 'diff-remove', a.slice(prefix, a.length - suffix).join('')));
-    if (b.length - prefix - suffix) fragment.appendChild(textElement('ins', 'diff-add', b.slice(prefix, b.length - suffix).join('')));
-    fragment.append(document.createTextNode(a.slice(a.length - suffix).join('')));
-    return fragment;
+function appendDiffSegments(target, segments, side) {
+    segments.forEach(segment => {
+        if (segment.type === 'same') target.appendChild(document.createTextNode(segment.text));
+        else if (segment.type === 'remove' && side === 'original') target.appendChild(textElement('del', 'diff-remove', segment.text));
+        else if (segment.type === 'add' && side === 'improved') target.appendChild(textElement('ins', 'diff-add', segment.text));
+        else if (segment.type === 'remove' && side === 'improved') return;
+        else if (segment.type === 'add' && side === 'original') return;
+    });
 }
 
 function createTextControls(post, record) {
@@ -924,9 +1007,10 @@ function createTextControls(post, record) {
     ['improved', 'original', ...(record.reviewed.customContent ? ['custom'] : [])].forEach(selection => {
         const button = actionButton(textVersionLabel(selection), '', () => {
             const nextReviewed = selectReviewedText(post, record.reviewed, selection);
-            records[post.sourceId] = record.decision === 'pending'
+            const nextRecord = record.decision === 'pending'
                 ? { decision: 'pending', reviewed: nextReviewed }
                 : modifiedRecord(nextReviewed);
+            records[post.sourceId] = { ...nextRecord, ...(record.checklist ? { checklist: record.checklist } : {}) };
             persist();
             render();
         });
@@ -934,60 +1018,124 @@ function createTextControls(post, record) {
         button.setAttribute('aria-pressed', String(record.reviewed.textSelection === selection));
         selector.appendChild(button);
     });
-    const compare = actionButton(comparingId === post.sourceId ? 'Vergelijking sluiten' : 'Teksten vergelijken', 'compare', () => {
-        comparingId = comparingId === post.sourceId ? null : post.sourceId;
-        render();
-    });
-    wrapper.append(selector, compare);
+    wrapper.appendChild(selector);
     return wrapper;
 }
 
 function createComparison(post) {
     const section = document.createElement('section');
     section.className = 'text-comparison';
-    section.appendChild(textElement('p', 'diff-legend', 'Rood = verwijderd uit origineel · groen = toegevoegd in de AI-versie'));
-    const columns = document.createElement('div');
-    columns.className = 'comparison-columns';
-    const original = document.createElement('div');
-    original.appendChild(textElement('h4', '', 'Origineel'));
-    original.appendChild(textElement('div', 'comparison-copy', post.content));
-    const improved = document.createElement('div');
-    improved.appendChild(textElement('h4', '', 'Verbeterd met AI'));
-    const diff = document.createElement('div');
-    diff.className = 'comparison-copy diff-copy';
-    diff.appendChild(diffFragment(post.content, post.improvedContent));
-    improved.appendChild(diff);
-    columns.append(original, improved);
-    section.appendChild(columns);
+    const allRows = compareParagraphs(post.content, post.improvedContent);
+    const showFull = fullComparisonIds.has(post.sourceId);
+    const rows = comparisonRows(post.content, post.improvedContent, showFull);
+    const header = document.createElement('div');
+    header.className = 'comparison-header';
+    const legend = document.createElement('p');
+    legend.className = 'diff-legend';
+    legend.append(
+        document.createTextNode(showFull ? 'Volledige tekstvergelijking · ' : 'Tekstverschillen · '),
+        textElement('span', 'diff-key remove', '− oorspronkelijk'),
+        document.createTextNode(' '),
+        textElement('span', 'diff-key add', '+ verbeterd')
+    );
+    header.appendChild(legend);
+    const toggle = actionButton(showFull ? 'Alleen wijzigingen tonen' : 'Toon volledige tekst', 'compare', () => {
+        if (showFull) fullComparisonIds.delete(post.sourceId);
+        else fullComparisonIds.add(post.sourceId);
+        render();
+    });
+    header.appendChild(toggle);
+    const scroll = document.createElement('div');
+    scroll.className = 'comparison-scroll unified-diff';
+    rows.forEach(row => {
+        const line = (kind, prefix, side) => {
+            const rowElement = document.createElement('div');
+            rowElement.className = `diff-line ${kind}`;
+            rowElement.appendChild(textElement('span', 'diff-gutter', prefix));
+            const copy = document.createElement('span');
+            copy.className = 'diff-line-copy';
+            appendDiffSegments(copy, row.segments, side);
+            rowElement.appendChild(copy);
+            return rowElement;
+        };
+        if (row.changed) {
+            if (row.original) scroll.appendChild(line('remove', '−', 'original'));
+            if (row.improved) scroll.appendChild(line('add', '+', 'improved'));
+        } else {
+            const context = document.createElement('div');
+            context.className = 'diff-line context';
+            context.append(textElement('span', 'diff-gutter', ' '), textElement('span', 'diff-line-copy', row.original));
+            scroll.appendChild(context);
+        }
+    });
+    section.append(header, scroll);
     return section;
 }
 
-function readinessItems(post, record) {
-    const original = createRecord(post).reviewed;
-    const images = record.reviewed.images;
-    const active = activeImages(images).length;
-    const removed = images.existing.filter(image => image.decision === 'remove').length;
-    const uploads = images.uploads.length;
-    return [
-        { tone: record.reviewed.title.trim() ? 'ready' : 'warning', label: record.reviewed.title.trim() ? 'Titel gecontroleerd' : 'Titel ontbreekt' },
-        { tone: record.reviewed.location.trim() ? 'ready' : 'warning', label: record.reviewed.location.trim() ? 'Locatie ingevuld' : 'Locatie ontbreekt — mag bewust leeg blijven' },
-        { tone: record.reviewed.textSelection === 'improved' ? 'ready' : 'attention', label: record.reviewed.textSelection === 'improved' ? 'Aanbevolen AI-tekst geselecteerd' : `Tekstversie: ${textVersionLabel(record.reviewed.textSelection)}` },
-        { tone: active ? 'ready' : 'warning', label: active ? `${active} actieve afbeelding${active === 1 ? '' : 'en'}` : 'Geen actieve afbeelding' },
-        { tone: removed || uploads ? 'attention' : 'ready', label: removed || uploads ? `${removed ? `${removed} verwijderd` : ''}${removed && uploads ? ' · ' : ''}${uploads ? `${uploads} toegevoegd` : ''}` : 'Oorspronkelijke afbeeldingen behouden' },
-        { tone: record.reviewed.title !== original.title || record.reviewed.date !== original.date ? 'attention' : 'ready', label: record.reviewed.title !== original.title || record.reviewed.date !== original.date ? 'Titel of datum aangepast' : 'Titel en datum ongewijzigd' }
-    ];
+const CHECKLIST_ITEMS = Object.freeze([
+    ['title', 'Titel'],
+    ['date', 'Datum'],
+    ['location', 'Locatie'],
+    ['text', 'Tekst'],
+    ['images', 'Afbeeldingen']
+]);
+
+function checklistComplete(record) {
+    return CHECKLIST_ITEMS.every(([key]) => record.checklist?.[key] === true);
+}
+
+function setChecklistItem(post, key, checked) {
+    const current = records[post.sourceId] || createRecord(post);
+    records[post.sourceId] = {
+        ...current,
+        checklist: { ...current.checklist, [key]: checked }
+    };
+    persist();
+    render();
 }
 
 function createReadinessChecklist(post, record) {
     const section = document.createElement('section');
     section.className = 'readiness-checklist';
-    section.appendChild(textElement('h4', '', 'Controleer voordat je beslist'));
+    section.appendChild(textElement('h4', '', 'Controlelijst'));
+    section.appendChild(textElement('p', 'checklist-intro', 'Werk van boven naar beneden. Goedkeuren kan pas als alles is afgevinkt.'));
     const list = document.createElement('ul');
-    readinessItems(post, record).forEach(item => {
-        list.appendChild(textElement('li', item.tone, item.label));
+    CHECKLIST_ITEMS.forEach(([key, label]) => {
+        const item = document.createElement('li');
+        const labelElement = document.createElement('label');
+        labelElement.className = 'checklist-item';
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = record.checklist?.[key] === true;
+        checkbox.addEventListener('change', () => setChecklistItem(post, key, checkbox.checked));
+        labelElement.append(checkbox, document.createTextNode(label));
+        item.appendChild(labelElement);
+        list.appendChild(item);
     });
     section.appendChild(list);
+    const complete = checklistComplete(record);
+    const markAll = actionButton(complete ? 'Alles afgevinkt' : 'Alles afvinken', 'checklist-complete', () => {
+        const current = records[post.sourceId] || createRecord(post);
+        records[post.sourceId] = {
+            ...current,
+            checklist: Object.fromEntries(CHECKLIST_ITEMS.map(([key]) => [key, true]))
+        };
+        persist();
+        render();
+        announce('Alle controlepunten zijn afgevinkt.');
+    });
+    markAll.disabled = complete;
+    section.appendChild(markAll);
     return section;
+}
+
+function approvalButton(post, className) {
+    const record = records[post.sourceId] || createRecord(post);
+    const complete = checklistComplete(record);
+    const button = actionButton('Goedkeuren', className, () => requestApproval(post));
+    button.disabled = !complete;
+    if (!complete) button.title = 'Vink eerst alle controlepunten af in de reviewmodus.';
+    return button;
 }
 
 function createGuidedCard(post) {
@@ -1006,7 +1154,7 @@ function createGuidedCard(post) {
     const main = document.createElement('div');
     main.appendChild(createTextControls(post, record));
     main.appendChild(textElement('div', 'post-copy', record.reviewed.content));
-    if (comparingId === post.sourceId) main.appendChild(createComparison(post));
+    main.appendChild(createComparison(post));
     const aside = document.createElement('aside');
     aside.append(createReadinessChecklist(post, record), createGallery(post, record, true));
     layout.append(main, aside);
@@ -1016,10 +1164,10 @@ function createGuidedCard(post) {
     actions.className = 'guided-actions';
     actions.append(
         actionButton('Afkeuren', 'reject', () => rejectPost(post)),
-        actionButton('Aanpassen', 'modify', () => { editingId = post.sourceId; render(); }),
+        actionButton('Aanpassen', 'modify', () => openEditor(post)),
         actionButton('Overslaan', '', showNextOpenPost),
         actionButton('Volgende', '', showNextOpenPost),
-        actionButton('Goedkeuren', 'approve primary-approve', () => requestApproval(post))
+        approvalButton(post, 'approve primary-approve')
     );
     card.appendChild(actions);
     if (editingId === post.sourceId) card.appendChild(createEditor(post, record));
@@ -1048,17 +1196,14 @@ function createPostCard(post) {
     content.appendChild(textElement('h3', '', formatTitle(record.reviewed.title, record.reviewed.location)));
     content.appendChild(createTextControls(post, record));
     content.appendChild(textElement('div', 'post-copy', record.reviewed.content));
-    if (comparingId === post.sourceId) content.appendChild(createComparison(post));
+    content.appendChild(createComparison(post));
 
     const actions = document.createElement('div');
     actions.className = 'card-actions';
     actions.append(
-        actionButton('Goedkeuren', 'approve', () => requestApproval(post)),
+        approvalButton(post, 'approve'),
         actionButton('Afkeuren', 'reject', () => rejectPost(post)),
-        actionButton(record.decision === 'modified' ? 'Aanpassing bewerken' : 'Tekst aanpassen', 'modify', () => {
-            editingId = post.sourceId;
-            render();
-        }),
+        actionButton(record.decision === 'modified' ? 'Aanpassing bewerken' : 'Tekst aanpassen', 'modify', () => openEditor(post)),
         actionButton('Terugzetten', 'reset', () => resetDecision(post)),
         actionButton('In reviewmodus openen', '', () => showGuidedReview(post.sourceId))
     );
@@ -1110,6 +1255,7 @@ async function downloadReview() {
     elements.exportButton.textContent = 'Pakket maken…';
     try {
         const payload = buildExportPayload(posts, records);
+        payload.checkpoint = buildCheckpoint(posts, records, focusedPostId);
         const uploadDescriptors = new Map();
         Object.values(records).forEach(record => {
             (record.reviewed.images?.uploads || []).forEach(upload => uploadDescriptors.set(upload.id, upload));
@@ -1150,6 +1296,117 @@ async function downloadReview() {
     }
 }
 
+function importedUploadDescriptors(importedRecords) {
+    const uploads = new Map();
+    Object.entries(importedRecords).forEach(([sourceId, record]) => {
+        (record.reviewed.images?.uploads || []).forEach(upload => {
+            if (!upload || typeof upload.id !== 'string' || typeof upload.originalFilename !== 'string'
+                || !ALLOWED_IMAGE_TYPES.includes(upload.mimeType) || !Number.isFinite(upload.size) || upload.size < 0
+                || !/^[a-f0-9]{64}$/.test(upload.sha256) || typeof upload.packagePath !== 'string'
+                || !upload.packagePath.startsWith(`uploaded-images/${sourceId}/`) || upload.packagePath.includes('..')) {
+                throw new Error('Het reviewpakket bevat ongeldige afbeeldingsgegevens.');
+            }
+            const previous = uploads.get(upload.id);
+            if (previous && JSON.stringify(previous) !== JSON.stringify(upload)) {
+                throw new Error('Het reviewpakket bevat botsende afbeeldingsgegevens.');
+            }
+            uploads.set(upload.id, upload);
+        });
+    });
+    return uploads;
+}
+
+async function validateImportedUploads(files, importedRecords) {
+    const descriptors = importedUploadDescriptors(importedRecords);
+    const totalBytes = [...descriptors.values()].reduce((total, upload) => total + upload.size, 0);
+    if (totalBytes > MAX_TOTAL_UPLOAD_BYTES) throw new Error('De geïmporteerde afbeeldingen zijn samen te groot.');
+    const expectedPaths = new Set(['review.json', ...[...descriptors.values()].map(upload => upload.packagePath)]);
+    if ([...files.keys()].some(path => !expectedPaths.has(path))) {
+        throw new Error('Het reviewpakket bevat onverwachte bestanden.');
+    }
+    const uploads = [];
+    for (const descriptor of descriptors.values()) {
+        const bytes = files.get(descriptor.packagePath);
+        if (!bytes) throw new Error(`Afbeelding ontbreekt: ${descriptor.originalFilename}.`);
+        if (bytes.length !== descriptor.size) throw new Error(`Afbeelding heeft een verkeerde grootte: ${descriptor.originalFilename}.`);
+        const blob = new Blob([bytes], { type: descriptor.mimeType });
+        if (await sha256Hex(blob) !== descriptor.sha256) throw new Error(`Afbeelding is beschadigd: ${descriptor.originalFilename}.`);
+        const existing = await getUpload(descriptor.id);
+        if (existing && (existing.sha256 !== descriptor.sha256 || existing.size !== descriptor.size || existing.mimeType !== descriptor.mimeType)) {
+            throw new Error(`Afbeeldings-ID botst met bestaande opslag: ${descriptor.originalFilename}.`);
+        }
+        uploads.push({ ...descriptor, blob });
+    }
+    return uploads;
+}
+
+async function resolveImportConflicts(conflicts) {
+    const resolved = new Map();
+    for (const conflict of conflicts) {
+        const post = posts.find(candidate => candidate.sourceId === conflict.sourceId);
+        const keepImported = await requestConfirmation({
+            title: 'Conflict in reviewpakket',
+            message: `Gebruik de versie uit het geïmporteerde reviewpakket voor “${formatTitle(post.title, post.location)}”? Kies Annuleren om de versie in deze browser te behouden.`,
+            confirmLabel: 'Geïmporteerde versie gebruiken',
+            trigger: document.activeElement
+        });
+        resolved.set(conflict.sourceId, keepImported ? conflict.imported : conflict.local);
+    }
+    return resolved;
+}
+
+async function removeOrphanedUploads() {
+    const referencedUploadIds = new Set(
+        Object.values(records).flatMap(record => record.reviewed.images?.uploads?.map(upload => upload.id) || [])
+    );
+    const storedUploads = await getAllUploads();
+    await deleteUploads(storedUploads.filter(upload => !referencedUploadIds.has(upload.id)).map(upload => upload.id));
+}
+
+async function importReview(file) {
+    elements.importButton.disabled = true;
+    elements.importButton.textContent = 'Pakket lezen…';
+    try {
+        if (!file || file.size === 0) throw new Error('Kies een reviewpakket (.zip).');
+        const files = readCheckpointZip(new Uint8Array(await file.arrayBuffer()));
+        let payload;
+        try {
+            payload = JSON.parse(new TextDecoder().decode(files.get('review.json')));
+        } catch {
+            throw new Error('review.json bevat geen geldige JSON.');
+        }
+        if (payload?.kind !== 'anyway-old-blog-review' || payload.schemaVersion !== 6) {
+            throw new Error('Dit is geen compatibel reviewpakket.');
+        }
+        const imported = restoreCheckpoint(posts, payload.checkpoint);
+        const uploads = await validateImportedUploads(files, imported.records);
+        const merged = mergeCheckpointRecords(posts, records, imported.records);
+        const choices = await resolveImportConflicts(merged.conflicts);
+        choices.forEach((record, sourceId) => { merged.records[sourceId] = record; });
+
+        for (const upload of uploads) await putUpload(upload);
+        records = merged.records;
+        focusedPostId = records[imported.focusedPostId]?.decision === 'pending'
+            ? imported.focusedPostId
+            : pendingPosts()[0]?.sourceId || posts[0]?.sourceId || null;
+        reviewMode = 'guided';
+        editingId = null;
+        await removeOrphanedUploads();
+        persist();
+        render();
+        announce(merged.conflicts.length
+            ? `Reviewpakket geïmporteerd; ${merged.conflicts.length} conflict(en) opgelost.`
+            : 'Reviewpakket geïmporteerd. Je kunt verdergaan waar je was gebleven.');
+    } catch (error) {
+        console.error('Reviewpakket kon niet worden geïmporteerd.', error);
+        announce(error.message || 'Reviewpakket kon niet worden geïmporteerd.');
+    } finally {
+        elements.importInput.value = '';
+        elements.importButton.disabled = false;
+        elements.importButton.textContent = 'Reviewpakket importeren';
+    }
+}
+
 function bindControls() {
     elements.search.addEventListener('input', render);
     elements.filterGroup.addEventListener('click', event => {
@@ -1165,6 +1422,8 @@ function bindControls() {
         render();
     });
     elements.exportButton.addEventListener('click', downloadReview);
+    elements.importButton.addEventListener('click', () => elements.importInput.click());
+    elements.importInput.addEventListener('change', () => importReview(elements.importInput.files[0]));
     elements.guidedModeButton.addEventListener('click', () => showGuidedReview());
     elements.overviewModeButton.addEventListener('click', showOverview);
     window.addEventListener('beforeunload', event => {
@@ -1187,14 +1446,11 @@ async function initialize() {
 
         posts = payload.posts;
         records = hydrateRecords(posts, loadStoredPayload());
-        const referencedUploadIds = new Set(
-            Object.values(records).flatMap(record => record.reviewed.images?.uploads?.map(upload => upload.id) || [])
-        );
-        const storedUploads = await getAllUploads();
-        await deleteUploads(storedUploads.filter(upload => !referencedUploadIds.has(upload.id)).map(upload => upload.id));
+        await removeOrphanedUploads();
         persist();
         bindControls();
         elements.exportButton.disabled = false;
+        elements.importButton.disabled = false;
         render();
     } catch (error) {
         console.error('Reviewgegevens konden niet worden geladen.', error);
