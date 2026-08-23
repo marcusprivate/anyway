@@ -80,9 +80,8 @@ export function compareParagraphs(before, after) {
     return rows;
 }
 
-export function comparisonRows(before, after, showFull = false) {
+export function comparisonRows(before, after) {
     const rows = compareParagraphs(before, after);
-    if (showFull) return rows;
     return rows.filter((row, index) => row.changed || rows[index - 1]?.changed || rows[index + 1]?.changed);
 }
 

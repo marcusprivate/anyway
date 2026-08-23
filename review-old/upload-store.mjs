@@ -64,6 +64,10 @@ export async function deleteUploads(uploadIds) {
     });
 }
 
+export function clearUploads() {
+    return withStore('readwrite', store => requestResult(store.clear()));
+}
+
 export function getAllUploads() {
     return withStore('readonly', store => requestResult(store.getAll()));
 }

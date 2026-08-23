@@ -71,7 +71,10 @@ Visitor comment."""
         posts = generate_data.parse_posts()
         post = next(post for post in posts if post["sourceId"] == "2001-11-04-acapabel-jubileumconcert")
 
-        self.assertIn("Aris van Zeijlen. Zowel voor ons als het publiek", post["improvedContent"])
+        self.assertRegex(
+            post["improvedContent"],
+            r"Aris van Zeijlen\.\s+Zowel voor ons als het publiek",
+        )
         self.assertNotIn("voor ons als\n\nhet publiek", post["improvedContent"])
 
     def test_improved_copy_repairs_known_missing_sentence_spaces(self):

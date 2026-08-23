@@ -37,13 +37,14 @@ test('paragraph-aware diff isolates an early edit instead of marking the rest of
     ]);
 });
 
-test('paragraph comparison aligns changed paragraphs and keeps surrounding context', () => {
-    const before = 'Eerste alinea.\n\nEen fout.. hier.\n\nLaatste alinea.';
-    const after = 'Eerste alinea.\n\nEen fout. hier.\n\nLaatste alinea.';
+test('compact paragraph comparison keeps only a changed paragraph and its direct context', () => {
+    const before = 'Ver weg.\n\nEerste alinea.\n\nEen fout.. hier.\n\nLaatste alinea.\n\nOok ver weg.';
+    const after = 'Ver weg.\n\nEerste alinea.\n\nEen fout. hier.\n\nLaatste alinea.\n\nOok ver weg.';
     const rows = compareParagraphs(before, after);
-    assert.equal(rows.length, 3);
-    assert.deepEqual(rows.map(row => row.changed), [false, true, false]);
+    assert.equal(rows.length, 5);
+    assert.deepEqual(rows.map(row => row.changed), [false, false, true, false, false]);
     assert.equal(comparisonRows(before, after).length, 3);
+    assert.deepEqual(comparisonRows(before, after).map(row => row.original), ['Eerste alinea.', 'Een fout.. hier.', 'Laatste alinea.']);
     assert.deepEqual(comparisonSummary(rows), { paragraphs: 1, edits: 1 });
 });
 
@@ -125,6 +126,25 @@ test('stored state is hydrated safely and ignores unknown records', () => {
     assert.equal(records[first.sourceId].reviewed.title, 'Nieuwe titel');
     assert.deepEqual(records[first.sourceId].checklist, { title: true, date: true, location: true, text: true, images: false });
     assert.equal(records[posts[1].sourceId].decision, 'pending');
+});
+
+test('fresh hydration resets every post to an open, original record', () => {
+    const first = posts[0];
+    const stored = buildStoragePayload({
+        [first.sourceId]: decidedRecord({ ...createRecord(first).reviewed, location: 'Gewijzigde locatie' }, 'approved'),
+        [posts[1].sourceId]: modifiedRecord({
+            ...createRecord(posts[1]).reviewed,
+            content: 'Aangepaste inhoud'
+        })
+    });
+
+    const reset = hydrateRecords(posts, null);
+    const summary = summarize(posts, reset);
+
+    assert.deepEqual(summary, { total: 41, pending: 41, approved: 0, rejected: 0, modified: 0 });
+    assert.deepEqual(reset[first.sourceId], createRecord(first));
+    assert.deepEqual(reset[posts[1].sourceId], createRecord(posts[1]));
+    assert.ok(stored.records[first.sourceId]);
 });
 
 test('version 1 stored reviews reset decisions and select improved text', () => {

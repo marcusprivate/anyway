@@ -25,6 +25,7 @@ import {
 import {
     deleteUpload,
     deleteUploads,
+    clearUploads,
     getAllUploads,
     getUpload,
     openUploadStore,
@@ -39,7 +40,7 @@ import {
 } from './upload-utils.mjs';
 import { buildZip } from './zip-export.mjs';
 import { readCheckpointZip } from './zip-import.mjs';
-import { compareParagraphs, comparisonRows } from './text-diff.mjs';
+import { comparisonRows } from './text-diff.mjs';
 
 const STORAGE_KEY = 'anyway-old-blog-review:v1';
 const STATUS_LABELS = {
@@ -56,6 +57,7 @@ const elements = {
     error: document.getElementById('error-state'),
     exportButton: document.getElementById('export-button'),
     importButton: document.getElementById('import-button'),
+    resetProgressButton: document.getElementById('reset-progress-button'),
     importInput: document.getElementById('import-input'),
     search: document.getElementById('search-input'),
     filterGroup: document.getElementById('filter-group'),
@@ -79,9 +81,9 @@ let posts = [];
 let records = {};
 let activeFilter = 'all';
 let editingId = null;
-const fullComparisonIds = new Set();
 let reviewMode = 'guided';
 let focusedPostId = null;
+let checklistWarningPostId = null;
 let statusTimer = null;
 let lightboxElements = null;
 let lightboxObjectUrl = null;
@@ -101,6 +103,15 @@ function persist() {
     } catch (error) {
         console.warn('Reviewstatus kon niet lokaal worden opgeslagen.', error);
         announce('Let op: je voortgang kon niet in deze browser worden opgeslagen.');
+    }
+}
+
+function clearStoredPayload() {
+    try {
+        localStorage.removeItem(STORAGE_KEY);
+    } catch (error) {
+        console.warn('Reviewstatus kon niet lokaal worden verwijderd.', error);
+        throw new Error('De voortgang kon niet volledig uit deze browser worden verwijderd.');
     }
 }
 
@@ -327,10 +338,11 @@ function approvePost(post, options = {}) {
 function requestApproval(post) {
     const record = records[post.sourceId] || createRecord(post);
     if (!checklistComplete(record)) {
-        announce('Vink eerst alle controlepunten af voordat je dit bericht goedkeurt.');
-        if (reviewMode !== 'guided') showGuidedReview(post.sourceId);
+        checklistWarningPostId = post.sourceId;
+        showGuidedReview(post.sourceId);
         return;
     }
+    checklistWarningPostId = null;
     const missingLocation = !record.reviewed.location.trim();
     const missingImages = activeImages(record.reviewed.images).length === 0;
     if (!missingLocation && !missingImages) {
@@ -578,6 +590,45 @@ async function resetDecision(post) {
         announce('Beoordeling teruggezet naar openstaand.');
     } catch (error) {
         announce('De opgeslagen uploads konden niet worden verwijderd. Probeer het opnieuw.');
+    }
+}
+
+async function resetProgress() {
+    const button = elements.resetProgressButton;
+    const confirmed = await requestConfirmation({
+        title: 'Voortgang opnieuw starten?',
+        message: 'Alle beslissingen, tekstwijzigingen en lokaal toegevoegde afbeeldingen worden permanent uit deze browser verwijderd. Gedownloade reviewpakketten blijven behouden.',
+        confirmLabel: 'Voortgang resetten',
+        confirmClass: 'reject',
+        trigger: button
+    });
+    if (!confirmed) return;
+
+    button.disabled = true;
+    button.textContent = 'Voortgang wissen…';
+    try {
+        await clearUploads();
+        clearStoredPayload();
+        records = hydrateRecords(posts, null);
+        activeFilter = 'all';
+        elements.search.value = '';
+        elements.filterGroup.querySelectorAll('[data-filter]').forEach(candidate => {
+            const active = candidate.dataset.filter === activeFilter;
+            candidate.classList.toggle('active', active);
+            candidate.setAttribute('aria-pressed', String(active));
+        });
+        reviewMode = 'guided';
+        focusedPostId = posts[0]?.sourceId || null;
+        editingId = null;
+        checklistWarningPostId = null;
+        render();
+        announce('De voortgang is gereset. Je kunt opnieuw beginnen bij het eerste bericht.');
+    } catch (error) {
+        console.error('Voortgang kon niet worden gereset.', error);
+        announce(error.message || 'De voortgang kon niet worden gereset. Probeer het opnieuw.');
+    } finally {
+        button.disabled = false;
+        button.textContent = 'Voortgang resetten';
     }
 }
 
@@ -864,6 +915,8 @@ function createEditor(post, record) {
     editor.className = 'editor';
     editor.id = `editor-${post.sourceId}`;
     editor.noValidate = true;
+    const initialRecord = structuredClone(records[post.sourceId] || createRecord(post));
+    let autoSaveTimer = null;
 
     const grid = document.createElement('div');
     grid.className = 'editor-grid';
@@ -921,6 +974,7 @@ function createEditor(post, record) {
             selectedBase = selection;
             contentInput.value = selection === 'original' ? post.content : post.improvedContent;
             baseChoices.querySelectorAll('button').forEach(candidate => candidate.classList.toggle('active', candidate.dataset.selection === selection));
+            saveChanges({ announceSave: true });
         });
         button.dataset.selection = selection;
         button.classList.toggle('active', selection === selectedBase);
@@ -934,20 +988,7 @@ function createEditor(post, record) {
     error.setAttribute('role', 'alert');
     editor.appendChild(error);
 
-    const actions = document.createElement('div');
-    actions.className = 'editor-actions';
-    actions.appendChild(actionButton('Annuleren', '', () => {
-        editingId = null;
-        render();
-    }));
-
-    const saveButton = actionButton('Wijzigingen opslaan', 'primary', () => {});
-    saveButton.type = 'submit';
-    actions.appendChild(saveButton);
-    editor.appendChild(actions);
-
-    editor.addEventListener('submit', event => {
-        event.preventDefault();
+    const saveChanges = ({ announceSave = false } = {}) => {
         const title = titleInput.value.trim();
         const content = contentInput.value.trim();
         const date = isoDateToDutch(dateInput.value);
@@ -955,31 +996,61 @@ function createEditor(post, record) {
 
         if (!title || !content || !date) {
             error.textContent = 'Vul een geldige titel, datum en blogtekst in.';
-            return;
+            return false;
         }
 
+        const currentRecord = records[post.sourceId] || createRecord(post);
         const reviewed = {
             title, date, location, content,
             textSelection: 'custom',
             customContent: content === (selectedBase === 'original' ? post.content : post.improvedContent)
-                ? record.reviewed.customContent
+                ? currentRecord.reviewed.customContent
                 : content,
             baseSelection: selectedBase,
             baseContent: selectedBase === 'original' ? post.content : post.improvedContent,
-            preserveCustomDraft: Boolean(record.reviewed.customContent),
-            images: record.reviewed.images
+            preserveCustomDraft: Boolean(currentRecord.reviewed.customContent),
+            images: currentRecord.reviewed.images
         };
         const savedRecord = modifiedRecord(reviewed);
-        if (!reviewedDiffers(post, savedRecord.reviewed)) {
-            error.textContent = 'Er zijn nog geen wijzigingen ten opzichte van het origineel.';
-            return;
-        }
+        const nextRecord = reviewedDiffers(post, savedRecord.reviewed)
+            ? savedRecord
+            : resetRecord(post);
 
-        records[post.sourceId] = { ...savedRecord, ...(record.checklist ? { checklist: record.checklist } : {}) };
+        records[post.sourceId] = {
+            ...nextRecord,
+            ...(currentRecord.checklist ? { checklist: currentRecord.checklist } : {})
+        };
+        error.textContent = '';
+        persist();
+        if (announceSave) announce('Wijzigingen automatisch opgeslagen.');
+        return true;
+    };
+
+    const queueAutoSave = () => {
+        window.clearTimeout(autoSaveTimer);
+        autoSaveTimer = window.setTimeout(() => saveChanges({ announceSave: true }), 400);
+    };
+
+    const actions = document.createElement('div');
+    actions.className = 'editor-actions';
+    actions.appendChild(actionButton('Annuleren', '', () => {
+        window.clearTimeout(autoSaveTimer);
+        records[post.sourceId] = initialRecord;
         editingId = null;
         persist();
         render();
-        announce('Aangepaste blogtekst opgeslagen.');
+        announce('Wijzigingen geannuleerd.');
+    }));
+    editor.appendChild(actions);
+
+    editor.addEventListener('submit', event => {
+        event.preventDefault();
+        saveChanges({ announceSave: true });
+    });
+
+    [titleInput, dateInput, locationInput, contentInput].forEach(input => {
+        input.addEventListener('input', queueAutoSave);
+        input.addEventListener('change', queueAutoSave);
     });
 
     return editor;
@@ -1025,26 +1096,18 @@ function createTextControls(post, record) {
 function createComparison(post) {
     const section = document.createElement('section');
     section.className = 'text-comparison';
-    const allRows = compareParagraphs(post.content, post.improvedContent);
-    const showFull = fullComparisonIds.has(post.sourceId);
-    const rows = comparisonRows(post.content, post.improvedContent, showFull);
+    const rows = comparisonRows(post.content, post.improvedContent);
     const header = document.createElement('div');
     header.className = 'comparison-header';
     const legend = document.createElement('p');
     legend.className = 'diff-legend';
     legend.append(
-        document.createTextNode(showFull ? 'Volledige tekstvergelijking · ' : 'Tekstverschillen · '),
+        document.createTextNode('Tekstverschillen · '),
         textElement('span', 'diff-key remove', '− oorspronkelijk'),
         document.createTextNode(' '),
         textElement('span', 'diff-key add', '+ verbeterd')
     );
     header.appendChild(legend);
-    const toggle = actionButton(showFull ? 'Alleen wijzigingen tonen' : 'Toon volledige tekst', 'compare', () => {
-        if (showFull) fullComparisonIds.delete(post.sourceId);
-        else fullComparisonIds.add(post.sourceId);
-        render();
-    });
-    header.appendChild(toggle);
     const scroll = document.createElement('div');
     scroll.className = 'comparison-scroll unified-diff';
     rows.forEach(row => {
@@ -1084,12 +1147,19 @@ function checklistComplete(record) {
     return CHECKLIST_ITEMS.every(([key]) => record.checklist?.[key] === true);
 }
 
+function missingChecklistLabels(record) {
+    return CHECKLIST_ITEMS
+        .filter(([key]) => record.checklist?.[key] !== true)
+        .map(([, label]) => label);
+}
+
 function setChecklistItem(post, key, checked) {
     const current = records[post.sourceId] || createRecord(post);
     records[post.sourceId] = {
         ...current,
         checklist: { ...current.checklist, [key]: checked }
     };
+    checklistWarningPostId = null;
     persist();
     render();
 }
@@ -1113,6 +1183,12 @@ function createReadinessChecklist(post, record) {
         list.appendChild(item);
     });
     section.appendChild(list);
+    if (checklistWarningPostId === post.sourceId) {
+        const missingLabels = missingChecklistLabels(record);
+        const warning = textElement('p', 'checklist-warning', `Voer eerst deze controles uit: ${missingLabels.join(', ')}.`);
+        warning.setAttribute('role', 'alert');
+        section.appendChild(warning);
+    }
     const complete = checklistComplete(record);
     const markAll = actionButton(complete ? 'Alles afgevinkt' : 'Alles afvinken', 'checklist-complete', () => {
         const current = records[post.sourceId] || createRecord(post);
@@ -1120,6 +1196,7 @@ function createReadinessChecklist(post, record) {
             ...current,
             checklist: Object.fromEntries(CHECKLIST_ITEMS.map(([key]) => [key, true]))
         };
+        checklistWarningPostId = null;
         persist();
         render();
         announce('Alle controlepunten zijn afgevinkt.');
@@ -1133,7 +1210,6 @@ function approvalButton(post, className) {
     const record = records[post.sourceId] || createRecord(post);
     const complete = checklistComplete(record);
     const button = actionButton('Goedkeuren', className, () => requestApproval(post));
-    button.disabled = !complete;
     if (!complete) button.title = 'Vink eerst alle controlepunten af in de reviewmodus.';
     return button;
 }
@@ -1423,6 +1499,7 @@ function bindControls() {
     });
     elements.exportButton.addEventListener('click', downloadReview);
     elements.importButton.addEventListener('click', () => elements.importInput.click());
+    elements.resetProgressButton.addEventListener('click', resetProgress);
     elements.importInput.addEventListener('change', () => importReview(elements.importInput.files[0]));
     elements.guidedModeButton.addEventListener('click', () => showGuidedReview());
     elements.overviewModeButton.addEventListener('click', showOverview);
@@ -1451,6 +1528,7 @@ async function initialize() {
         bindControls();
         elements.exportButton.disabled = false;
         elements.importButton.disabled = false;
+        elements.resetProgressButton.disabled = false;
         render();
     } catch (error) {
         console.error('Reviewgegevens konden niet worden geladen.', error);
