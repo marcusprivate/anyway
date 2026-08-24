@@ -1,5 +1,5 @@
 import { formatContentParagraphs } from './blog-content-core.mjs?v=20260824-blog-design-12';
-import { carouselIndex, normalizeImages, swipeOffset } from './blog-gallery-core.mjs?v=20260824-blog-design-12';
+import { carouselIndex, gestureDirection, normalizeImages, swipeOffset } from './blog-gallery-core.mjs?v=20260824-blog-design-13';
 
 document.addEventListener('DOMContentLoaded', function() {
     const blogContainer = document.getElementById('blog-container');
@@ -183,6 +183,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const next = gallery.querySelector('.blog-gallery-next');
         const frame = gallery.querySelector('.blog-gallery-frame');
         let touchStart = null;
+        let touchDirection = 'undecided';
         const show = index => {
             current = index;
             const selected = images[current];
@@ -204,13 +205,32 @@ document.addEventListener('DOMContentLoaded', function() {
         frame.addEventListener('touchstart', event => {
             const touch = event.touches[0];
             touchStart = touch ? { x: touch.clientX, y: touch.clientY } : null;
+            touchDirection = 'undecided';
         }, { passive: true });
+        frame.addEventListener('touchmove', event => {
+            const touch = event.touches[0];
+            if (!touchStart || !touch) return;
+
+            if (touchDirection === 'undecided') {
+                touchDirection = gestureDirection(touchStart, { x: touch.clientX, y: touch.clientY });
+            }
+
+            if (touchDirection === 'horizontal') {
+                event.preventDefault();
+            }
+        }, { passive: false });
         frame.addEventListener('touchend', event => {
             const touch = event.changedTouches[0];
-            if (!touchStart || !touch) return;
-            const offset = swipeOffset(touchStart, { x: touch.clientX, y: touch.clientY });
+            const start = touchStart;
             touchStart = null;
+            touchDirection = 'undecided';
+            if (!start || !touch) return;
+            const offset = swipeOffset(start, { x: touch.clientX, y: touch.clientY });
             if (offset) show(carouselIndex(current, offset, images.length));
+        }, { passive: true });
+        frame.addEventListener('touchcancel', () => {
+            touchStart = null;
+            touchDirection = 'undecided';
         }, { passive: true });
     }
 

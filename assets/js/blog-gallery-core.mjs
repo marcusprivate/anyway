@@ -20,6 +20,19 @@ export function carouselIndex(current, offset, total) {
     return (current + offset + total) % total;
 }
 
+export function gestureDirection(start, current, slop = 8) {
+    const horizontalDistance = current.x - start.x;
+    const verticalDistance = current.y - start.y;
+    const horizontalMovement = Math.abs(horizontalDistance);
+    const verticalMovement = Math.abs(verticalDistance);
+
+    if (Math.max(horizontalMovement, verticalMovement) < slop) {
+        return 'undecided';
+    }
+
+    return horizontalMovement > verticalMovement ? 'horizontal' : 'vertical';
+}
+
 export function swipeOffset(start, end, threshold = 40) {
     const horizontalDistance = end.x - start.x;
     const verticalDistance = end.y - start.y;

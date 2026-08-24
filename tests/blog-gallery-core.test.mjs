@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { carouselIndex, normalizeImages, swipeOffset } from '../assets/js/blog-gallery-core.mjs';
+import { carouselIndex, gestureDirection, normalizeImages, swipeOffset } from '../assets/js/blog-gallery-core.mjs';
 
 test('gallery normalization supports canonical galleries and legacy images', () => {
     assert.deepEqual(normalizeImages({ title: 'Legacy', image: 'content/images/legacy.webp' }), [
@@ -19,6 +19,13 @@ test('carousel index wraps safely at both ends', () => {
     assert.equal(carouselIndex(1, -1, 3), 0);
     assert.equal(carouselIndex(1, 1, 3), 2);
     assert.equal(carouselIndex(0, 1, 0), 0);
+});
+
+test('gesture direction locks only after deliberate movement', () => {
+    assert.equal(gestureDirection({ x: 100, y: 100 }, { x: 105, y: 103 }), 'undecided');
+    assert.equal(gestureDirection({ x: 100, y: 100 }, { x: 120, y: 105 }), 'horizontal');
+    assert.equal(gestureDirection({ x: 100, y: 100 }, { x: 105, y: 120 }), 'vertical');
+    assert.equal(gestureDirection({ x: 100, y: 100 }, { x: 112, y: 112 }), 'vertical');
 });
 
 test('swipes navigate only on deliberate horizontal movement', () => {

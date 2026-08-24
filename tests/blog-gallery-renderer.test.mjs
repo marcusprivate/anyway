@@ -21,7 +21,10 @@ test('gallery renderer places controls below the image and does not relayout on 
     assert.doesNotMatch(source, /image fit blog-gallery-image/);
     assert.match(source, /<\/div>\s*<div class="blog-gallery-controls" aria-label="Galerijbediening">/);
     assert.match(source, /touchstart/);
+    assert.match(source, /touchmove[\s\S]*?\{ passive: false \}/);
     assert.match(source, /touchend/);
+    assert.match(source, /touchcancel/);
+    assert.match(source, /touchDirection === 'horizontal'[\s\S]*?event\.preventDefault\(\)/);
     const showFunction = source.slice(source.indexOf('const show ='), source.indexOf("previous.addEventListener"));
     assert.doesNotMatch(showFunction, /layoutBlogPosts/);
     assert.doesNotMatch(showFunction, /image\.(width|height)\s*=/);
