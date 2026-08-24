@@ -21,3 +21,12 @@ test('blog content is exposed as the page main landmark', async () => {
 
     assert.match(html, /<main\s+id=["']main["']>/i);
 });
+
+test('blog page exposes scoped design hooks without inline toolbar spacing', async () => {
+    const html = await readFile(new URL('../blog.html', import.meta.url), 'utf8');
+
+    assert.match(html, /<body\s+class="is-preload blog-page">/);
+    assert.match(html, /<section\s+class="post blog-tools">/);
+    assert.match(html, /class="row gtr-uniform blog-tools-grid"/);
+    assert.doesNotMatch(html, /<section\s+class="post"\s+style=/);
+});

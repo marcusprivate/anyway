@@ -1,3 +1,6 @@
+import { formatContentParagraphs } from './blog-content-core.mjs?v=20260824-blog-design-12';
+import { carouselIndex, normalizeImages, swipeOffset } from './blog-gallery-core.mjs?v=20260824-blog-design-12';
+
 document.addEventListener('DOMContentLoaded', function() {
     const blogContainer = document.getElementById('blog-container');
     const loadMoreBtn = document.getElementById('load-more-btn');
@@ -13,14 +16,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let renderVersion = 0; // Discard stale async renders
     const imageMetadataCache = new Map();
     let resizeTimeout = null;
-
-    function getImageSource(item) {
-        if (!item.image || !item.image.trim() || item.image.trim().endsWith('/')) {
-            return null;
-        }
-
-        return item.image.trim();
-    }
 
     function preloadImageMetadata(src) {
         if (!src) {
@@ -53,11 +48,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function prepareItems(items) {
         return Promise.all(items.map(async item => {
-            const imageSrc = getImageSource(item);
+            const images = normalizeImages(item);
+            const imageSrc = images[0]?.src || null;
             const imageMeta = await preloadImageMetadata(imageSrc);
 
             return {
                 ...item,
+                _images: images,
                 _imageSrc: imageSrc,
                 _imageMeta: imageMeta
             };
@@ -107,11 +104,12 @@ document.addEventListener('DOMContentLoaded', function() {
         article.classList.add('is-pending-layout');
         
         let imageHtml = '';
-        const imageSrc = item._imageSrc || getImageSource(item);
+        const images = item._images || normalizeImages(item);
+        const imageSrc = item._imageSrc || images[0]?.src || null;
         const imageMeta = item._imageMeta || null;
         // Reserve image space before inserting the card to keep scroll position stable.
         if (imageSrc) {
-            const altText = item.title || 'Blog afbeelding';
+            const altText = images[0]?.alt || item.title || 'Blog afbeelding';
             const sizeAttributes = imageMeta
                 ? ` width="${imageMeta.width}" height="${imageMeta.height}"`
                 : '';
@@ -119,7 +117,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 ? ` style="max-width: min(100%, ${imageMeta.width}px); margin: 0 auto; display: block;"`
                 : '';
 
-            imageHtml = `<span class="image fit"><img src="${imageSrc}" alt="${altText}" loading="lazy" decoding="async"${sizeAttributes}${smallImageStyle} /></span>`;
+            if (images.length === 1) {
+                imageHtml = `<span class="image fit blog-single-image"><img src="${imageSrc}" alt="${altText}" loading="lazy" decoding="async"${sizeAttributes}${smallImageStyle} /></span>`;
+            } else {
+                imageHtml = `<div class="blog-gallery" role="group" aria-label="Afbeeldingengalerij: ${item.title || 'blogbericht'}" tabindex="0">
+                    <div class="blog-gallery-frame">
+                        <span class="blog-gallery-image"><img src="${imageSrc}" alt="${altText}" loading="lazy" decoding="async"${sizeAttributes} /></span>
+                    </div>
+                    <div class="blog-gallery-controls" aria-label="Galerijbediening">
+                        <button type="button" class="blog-gallery-previous" aria-label="Vorige afbeelding"><span aria-hidden="true">‹</span></button>
+                        <span class="blog-gallery-status" aria-live="polite">1 van ${images.length}</span>
+                        <button type="button" class="blog-gallery-next" aria-label="Volgende afbeelding"><span aria-hidden="true">›</span></button>
+                    </div>
+                </div>`;
+            }
         }
 
         let linkHtml = '';
@@ -145,10 +156,7 @@ document.addEventListener('DOMContentLoaded', function() {
             processedContent = tempDiv.innerHTML;
         }
 
-        // Convert newlines to <br> for display
-        if (processedContent) {
-            processedContent = processedContent.replace(/\n/g, '<br>');
-        }
+        const contentHtml = formatContentParagraphs(processedContent);
 
         article.innerHTML = `
             <header>
@@ -156,11 +164,54 @@ document.addEventListener('DOMContentLoaded', function() {
                 <h2>${item.title || 'Zonder titel'}</h2>
             </header>
             ${imageHtml}
-            <p>${processedContent}</p>
+            ${contentHtml}
             ${linkHtml}
         `;
         
+        if (images.length > 1) {
+            initializeGallery(article, images);
+        }
         return article;
+    }
+
+    function initializeGallery(article, images) {
+        let current = 0;
+        const gallery = article.querySelector('.blog-gallery');
+        const image = gallery.querySelector('img');
+        const status = gallery.querySelector('.blog-gallery-status');
+        const previous = gallery.querySelector('.blog-gallery-previous');
+        const next = gallery.querySelector('.blog-gallery-next');
+        const frame = gallery.querySelector('.blog-gallery-frame');
+        let touchStart = null;
+        const show = index => {
+            current = index;
+            const selected = images[current];
+            image.src = selected.src;
+            image.alt = selected.alt;
+            status.textContent = `${current + 1} van ${images.length}`;
+        };
+        previous.addEventListener('click', () => show(carouselIndex(current, -1, images.length)));
+        next.addEventListener('click', () => show(carouselIndex(current, 1, images.length)));
+        gallery.addEventListener('keydown', event => {
+            if (event.key === 'ArrowLeft') {
+                event.preventDefault();
+                show(carouselIndex(current, -1, images.length));
+            } else if (event.key === 'ArrowRight') {
+                event.preventDefault();
+                show(carouselIndex(current, 1, images.length));
+            }
+        });
+        frame.addEventListener('touchstart', event => {
+            const touch = event.touches[0];
+            touchStart = touch ? { x: touch.clientX, y: touch.clientY } : null;
+        }, { passive: true });
+        frame.addEventListener('touchend', event => {
+            const touch = event.changedTouches[0];
+            if (!touchStart || !touch) return;
+            const offset = swipeOffset(touchStart, { x: touch.clientX, y: touch.clientY });
+            touchStart = null;
+            if (offset) show(carouselIndex(current, offset, images.length));
+        }, { passive: true });
     }
 
     async function renderBlog(append = false) {

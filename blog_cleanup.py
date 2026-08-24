@@ -104,23 +104,28 @@ def validate_images() -> bool:
 
     for entry in entries:
         title = entry.get("title", "")
-        image = entry.get("image", "").strip()
-        if not image or image == "content/images/":
-            continue
+        image_paths = ([entry.get("image", "")] if entry.get("image") else []) + entry.get("images", [])
+        for index, image in enumerate(image_paths, start=1):
+            image = image.strip()
+            if not image or image == "content/images/":
+                continue
 
-        image_path = REPO_ROOT / image
-        if not image_path.exists():
-            missing.append((title, image))
+            image_path = REPO_ROOT / image
+            if not image_path.exists():
+                missing.append((title, image))
 
-        if re.search(r"\s", image):
-            spaces.append((title, image))
+            if re.search(r"\s", image):
+                spaces.append((title, image))
 
-        if "github.com/" in image or image.startswith("http"):
-            github_urls.append((title, image))
+            if "github.com/" in image or image.startswith("http"):
+                github_urls.append((title, image))
 
-        expected = get_expected_filename(entry.get("title", ""), entry.get("date", ""))
-        if expected and not is_correctly_named(image, expected):
-            naming.append((title, image, f"content/images/{expected}"))
+            expected = get_expected_filename(entry.get("title", ""), entry.get("date", ""))
+            if expected and index > 1:
+                stem, extension = expected.rsplit(".", 1)
+                expected = f"{stem}_{index:02d}.{extension}"
+            if expected and not is_correctly_named(image, expected):
+                naming.append((title, image, f"content/images/{expected}"))
 
     if missing:
         ok = False

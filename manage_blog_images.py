@@ -99,18 +99,37 @@ def parse_blog_yaml(yaml_path):
     """Parse blog.yaml and extract entries with title, date, and image."""
     entries = []
     current_entry = {}
+    in_images = False
+
+    def scalar(value):
+        value = value.strip()
+        if value.startswith('"'):
+            try:
+                import json
+                return json.loads(value)
+            except Exception:
+                pass
+        return value
     
     with open(yaml_path, 'r', encoding='utf-8') as f:
         for line in f:
             if line.startswith('- title:'):
                 if current_entry and 'title' in current_entry:
                     entries.append(current_entry)
-                current_entry = {'title': line.split(':', 1)[1].strip()}
+                current_entry = {'title': scalar(line.split(':', 1)[1]), 'images': []}
+                in_images = False
             elif line.strip().startswith('date:') and 'title' in current_entry:
-                current_entry['date'] = line.split(':', 1)[1].strip()
+                current_entry['date'] = scalar(line.split(':', 1)[1])
             elif line.strip().startswith('image:') and not line.strip().startswith('#') and 'title' in current_entry:
-                image_path = line.split(':', 1)[1].strip()
+                image_path = scalar(line.split(':', 1)[1])
                 current_entry['image'] = image_path
+                in_images = False
+            elif line.strip() == 'images:' and 'title' in current_entry:
+                in_images = True
+            elif in_images and line.startswith('    - src:'):
+                current_entry['images'].append(scalar(line.split(':', 1)[1]))
+            elif line.startswith('  ') and line.strip() and not line.startswith('    '):
+                in_images = False
     
     if current_entry and 'title' in current_entry:
         entries.append(current_entry)
@@ -173,12 +192,12 @@ def find_unused_images(images_dir, entries):
     used_stems = set()
     
     for entry in entries:
-        image = entry.get('image', '')
-        if image and image != 'content/images/':
-            # Extract filename and decode URL encoding
+        image_paths = ([entry.get('image', '')] if entry.get('image') else []) + entry.get('images', [])
+        for image in image_paths:
+            if not image or image == 'content/images/':
+                continue
             filename = unquote(image.split('/')[-1])
             used_filenames.add(filename)
-            # Also track the stem (without extension) for .webp/.jpg pair matching
             used_stems.add(Path(filename).stem)
     
     # Get all image files in the directory
@@ -370,6 +389,38 @@ def main():
                 'new': f"content/images/{expected_filename}"
             }
         })
+
+    # Galleries use the same naming convention as a primary image, with an
+    # ordinal suffix after the first image.  They are stored separately from
+    # the legacy scalar ``image`` field, so include them in rename operations.
+    for entry in entries:
+        title = entry.get('title', '')
+        date = entry.get('date', '')
+        base_filename = get_expected_filename(title, date)
+        if not base_filename:
+            continue
+        for index, image in enumerate(entry.get('images', []), start=1):
+            stem, extension = base_filename.rsplit('.', 1)
+            expected_filename = base_filename if index == 1 else f"{stem}_{index:02d}.{extension}"
+            if not image or image == 'content/images/' or is_correctly_named(image, expected_filename):
+                continue
+            current_filename = unquote(image.split('/')[-1])
+            old_path = IMAGES_DIR / current_filename
+            new_path = IMAGES_DIR / expected_filename
+            if not old_path.exists():
+                print(f"WARNING: File not found: {current_filename}")
+                continue
+            print(f"RENAME: {old_path.name}")
+            print(f"    TO: {expected_filename}\n")
+            renames.append({
+                'old': old_path,
+                'new': new_path,
+                'siblings': [],
+                'yaml_update': {
+                    'old': image,
+                    'new': f"content/images/{expected_filename}"
+                }
+            })
     
     if not renames:
         print("No files need renaming.\n")
@@ -482,8 +533,10 @@ def main():
     # Build set of used filenames for display
     used_filenames = set()
     for entry in entries:
-        image = entry.get('image', '')
-        if image and image != 'content/images/':
+        image_paths = ([entry.get('image', '')] if entry.get('image') else []) + entry.get('images', [])
+        for image in image_paths:
+            if not image or image == 'content/images/':
+                continue
             filename = unquote(image.split('/')[-1])
             used_filenames.add(filename)
     

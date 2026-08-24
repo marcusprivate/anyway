@@ -41,7 +41,7 @@
   link: ""
   content: |
     We hadden nog nooit in Friesland opgetreden en aangezien Anneke hier opgegroeid is waren we blij dat we tijdens het Vocalink Korenfestival in Schouwburg De Lawei in Drachten mee konden doen.
-    
+
     Er waren 2 theaterzalen waar de hele dag door allerlei koren van groot naar klein optraden. Ook was er een jury aanwezig die het optreden dan beoordeelde. Dat blijft altijd weer spannend maar ook stimulerend om te lezen wat er goed was en waar nog aan gewerkt kan worden! We kregen hele mooie complimenten en zeker ook omdat we natuurlijk altijd het kleinste 'koor' zijn en in onze optredens ook altijd nog een theaterelement toegevoegd is. Dit maakt het voor het publiek vaak heel verrassend.
 
 - title: The Big Sing Haarlem - Hofjes concerten
@@ -57,7 +57,7 @@
   link: ""
   content: |
     Wat een eer om uitgenodigd te worden door het fantastische koor Vokaal Kabaal uit Castricum! Zij vierden op Texel een prachtig jubileum! Wij traden samen op in de prachtige 600 jaar oude kerk in Den Hoorn! Mede door de prachtige geluidsinstallatie was de zang prachtig te horen! En wat was het een geweldige combinatie! Wij met zijn drieën, a capella, en daarna het grote koor van 60 mannen en vrouwen en een geweldige band! En hierin moeten we uiteraard de geweldige dirigent Rolien Eikelenboom ook niet vergeten! Chapeau!!
-  
+
 - title: Buitengewoon Texel
   date: 29 mei 2025
   image: content/images/20250529_buitengewoon_texel.webp
@@ -85,15 +85,22 @@
   link: ""
   content: |
     Elke 2 jaar is het Balk TOP Festival in de Doelen in Rotterdam. Altijd een heel groot festival waar allemaal a capella groepen vanuit heel Nederland optreden. Om uitgenodigd te worden om mee te doen bepaalt een jury n.a.v. een filmpje of je geselecteerd wordt. En we mochten dit jaar ook weer meedoen! Het blijft altijd een super locatie en in elke ruimte bruist het van de muziek! Het was weer een feest!
-  
+
 - title: 25-jarig jubileum - De Toegift - Texel
   date: 13 oktober 2024
-  image: content/images/20241013_25_jarig_jubileum_de_toegift_texel.webp
-  #image: content/images/131025%20met%20Elisaband%20IMG-20241013-WA0008.webp #TODO
   link: ""
+  images:
+    - src: "content/images/20241013_25_jarig_jubileum_de_toegift_texel.webp"
+      alt: "25-jarig jubileum - De Toegift - Texel"
+      width: 924
+      height: 2000
+    - src: "content/images/20251013 met Elisaband IMG-20241013-WA0008.webp"
+      alt: "Anyway met de Elisaband tijdens het 25-jarig jubileum"
+      width: 1600
+      height: 1200
   content: |
     Je gelooft het niet maar we zingen al 25 jaar met elkaar! Hoognodig om dit een keer met elkaar te vieren. Dit hebben we gedaan door een middagoptreden in Theater De Toegift in Den Hoorn.
-    
+
     Tevens heeft ook een nieuwe band op Texel, de Elisaband, opgetreden en hebben we ook een aantal nummers samen gezongen. Het was een feestje om dit samen met de volle zaal zo te mogen vieren! Op naar de volgende 25 jaar!
 
 - title: Optreden tijdens lezing Maarten Oversier - Texel
@@ -108,8 +115,8 @@
   image: content/images/20240908_muziektuinen_festival_castricum.webp
   link: ""
   content: |
-    Vandaag weer onze show vier keer in de buitenlucht mogen spelen! Altijd spannend want je weet nooit hoeveel mensen je kunt verwachten! Maar wat hebben we genoten en het publiek ook. Soms even overstemd door voetbalfans of een vliegtuig maar dat mocht de pret niet drukken.  
-   
+    Vandaag weer onze show vier keer in de buitenlucht mogen spelen! Altijd spannend want je weet nooit hoeveel mensen je kunt verwachten! Maar wat hebben we genoten en het publiek ook. Soms even overstemd door voetbalfans of een vliegtuig maar dat mocht de pret niet drukken.
+
 - title: Huiskamerfestival Broadway 2024 - Texel
   date: 17, 18 mei 2024
   image: content/images/20240517_huiskamerfestival_broadway_2024_texel.webp
@@ -118,14 +125,14 @@
     Wow! Na zoveel oefenen, nieuwe nummers, nieuw thema, nieuwe teksten, nieuwe attributen etc. etc. is het gelukt om een mooie nieuwe show neer te zetten! Dit is altijd een lang en soms moeizaam proces waar we bijna 2 jaar aan hebben gewerkt om voor elkaar te krijgen. Dit is gelukt met de hulp van diverse arrangeurs die de nummers voor ons schrijven en ook onze regisseur en zangjuf die ons helpt om het programma te maken en om ook daarna de puntjes op de I te zetten waardoor het een goedlopende en logische show wordt.
 
     We hebben deze show nu 8 keer mogen spelen tijdens dit festival! Wij hebben dan 4 optredens per avond verzorgd, met elke keer weer nieuw publiek! Het was een groot feest!!
-   
+
 - title: Huiskamerconcert - Heemstede
   date: 23 september 2023
   image: content/images/20230923_huiskamerconcert_heemstede.webp
   link: ""
   content: |
     Elk jaar geeft de familie Collins de gelegenheid voor eenieder die dat wil om op te treden in hun huiskamer. Iedereen neemt dan ook wat te eten mee, wat gedurende de avond dan gezellig met elkaar opgegeten wordt, dit afgewisseld met meerdere optredens. Wij waren hiervoor uitgenodigd en hebben 2 kleine optredens verzorgd. We zijn super gastvrij ontvangen en de reacties waren laaiend enthousiast!
-   
+
 - title: Gastoptreden bij Katholieke Vrouwen Gilde - Castricum
   date: 14 september 2023
   image: content/images/20230914_gastoptreden_bij_katholieke_vrouwen_gilde_castricum.webp
@@ -172,7 +179,7 @@
 
 - title: Hofjesconcerten - Haarlem
   date: 25 juni 2022
-  image: 
+  image:
   link: ""
   content: |
     We mochten 2 keer optreden in een prachtig oud hofje in Haarlem. Heerlijk om weer buiten te kunnen zingen en helemaal bijzonder was dat er meerdere mensen in de tuinen zaten die ons jaren geleden ook al gezien hadden bij andere festivals en nu speciaal nog een keer naar ons kwamen luisteren. Helaas vergeten door alle drukte en het rennen van het ene naar het andere optreden om een foto te maken!
@@ -210,21 +217,21 @@
     Vanwege de Corona pandemie is live optreden helaas niet mogelijk. Vandaar dat er een digitaal evenement georganiseerd is in het Texelse bos genaamd digitaal evenement Klifhanger #Kunsdt Festival. Het publiek kan een kaartje downloaden en op verschillende plekken in het bos zijn plaatsen waar je een digitaal optreden kan zien van een artiest.
 
     Ook wij hebben hier aan meegedaan. Het was fijn om toch weer te kunnen zingen met elkaar.
-  
+
 - title: Buitenoptreden bij Bejaardenhuis De Gollards - Texel
   date: 26 juni 2020
   image: content/images/20200626_buitenoptreden_bij_bejaardenhuis_de_gollards_texel.webp
   link: ""
   content: |
     Door het coronavirus was binnen optreden niet mogelijk en hebben we gedurende 2 uur buiten opgetreden voor het bejaardenhuis. Na elke keer 3 liedjes gezongen te hebben liepen we naar een volgend punt buiten langs het gebouw. De mensen genoten van de zang door op het balkon te staan of voor de ramen. Voor ons was het een heftig optreden, mede door de brandende zon en de hitte van 28 graden. Maar we vonden het heel fijn dat we in deze moeilijke tijd toch wat afleiding hebben kunnen geven.
- 
+
 - title: Huiskamerconcert Han Heevel - Castricum
   date: 8 maart 2020
   image: content/images/20200308_huiskamerconcert_han_heevel_castricum.webp
   link: ""
   content: |
     We waren uitgenodigd om in de huiskamer van Han Heevel op te treden. Han Heevel nodigt elke maand artiesten uit om op te treden. We hebben 2 optredens van 3 kwartier verzorgd. Voor onszelf een hele uitdaging, maar de reacties waren laaiend enthousiast. Tja....we nemen altijd van alles mee!
-        
+
 - title: Huiskamerfestival Gluren bij de Buren - Haarlem
   date: 9 februari 2020
   image: content/images/20200209_huiskamerfestival_gluren_bij_de_buren_haarlem.webp
@@ -241,7 +248,7 @@
   image: content/images/20200208_cultuurnacht_oosterend_texel.webp
   content: |
     Tijdens deze cultuurnacht treden er diverse artiesten op die een voorproefje geven van datgene wat komend jaar op cultureel gebied op Texel te beleven is. Wij hebben 3 keer een klein deel laten zien van het programma wat we gaan spelen tijdens huiskamerfestival 'Broadway Den Hoorn'. We speelden in de kapsalon en hebben ons uitermate goed vermaakt. De sfeer in het gehele dorp was super relaxed en gezellig. Mede door de goede organisatie van het evenement!
-    
+
 - title: Candlelight shopping - Castricum
   date: 21 december 2019
   image: content/images/20191221_candlelight_shopping_castricum.webp
@@ -273,7 +280,7 @@
   image: content/images/20190626_zingen_tijdens_een_huwelijksceremonie_texel.webp
   content: |
    Voor ons de eerste keer om tijdens de huwelijksvoltrekking te zingen. We hadden samen met het bruidspaar de verschillende nummers uitgezocht om tijdens de diverse onderdelen van de ceremonie te zingen.
-   
+
    Een heel bijzondere ervaring om in deze prachtige kerk en bij deze gelegenheid te mogen zingen.
 
 - title: Verjaardagsfeest Israël
@@ -299,7 +306,7 @@
   image: content/images/20181118_open_podium_koogerkerk_castricum.webp
   content: |
    Voor de 2e keer mogen optreden in de Kooger Kerk. Nu als afsluitende act na een middag van het Open Podium. Wat een feest om iedereen te zien optreden en zelf het festival te mogen afsluiten. Het was een eer om te doen! Super genoten!
-   
+
 - title: Koogerkerk - Zuid Scharwoude
   date: 9 september 2018
   image: content/images/20180909_koogerkerk_zuid_scharwoude.webp
@@ -307,7 +314,7 @@
    We hebben een optreden gegeven in de prachtige kerk van Zuid Scharwoude. We hadden een programma gemaakt van 2 x 3 kwartier. In het eerste deel speelden we onze show, met de cursus 'Hoe gaan we om met de drama's in ons leven', en na de pauze brachten we meer losse nummers met kleine anekdotes.
 
    Het publiek was uitermate verrast en had dit soort muziek nog niet vaak op deze plek gehoord. Voor ons zeker voor herhaling vatbaar, vandaar dat we in 2019 weer optreden en ook uitgenodigd zijn om op 18 november 2018 mee te doen als afsluiter tijdens het Open Podium.
-   
+
 - title: Radio Texel
   date: 26 juli 2018
   image: content/images/20180726_radio_texel.webp
@@ -353,7 +360,7 @@
    Er werd een benefietdiner verzorgd voor het Tesselhuus (vakantiehuis voor kinderen en volwassenen met een meervoudige handicap). Meerdere Texelse artiesten werden uitgenodigd als 'Parels' van Texel om een optreden te verzorgen.
 
    Ook wij mochten meedoen. Voor deze gelegenheid hadden we ons extra uitgedost om het verrassingseffect te verhogen. En dat heeft gewerkt! Super leuk om te doen!
-   
+
 - title: De Oude Keuken - Castricum
   date: 13 mei 2017
   image: content/images/20170513_de_oude_keuken_castricum.webp
@@ -373,13 +380,13 @@
   image: content/images/20170909_texel_culinair.webp
   content: |
     Voor ons alweer de 3e keer dat we tijdens dit culinaire straatfeest mogen optreden. We hebben onze 'Culinair pakjes' weer aangedaan en zijn de straat ingelopen. Voor eenieder die dat wil zingen we dan een liedje. Dit kan uiteindelijk heel intiem worden als je maar voor 2 mensen zingt (kan ook heel intimiderend of overweldigend zijn voor de luisteraar), maar soms gebeurde het ook dat er ineens 50 mensen om je heen staan die meeluisteren. Altijd voor ons weer een heel intensief festival omdat het buiten zingen zonder versterking best zwaar is en je op moet letten dat je jezelf niet gaat overschreeuwen doordat je veel mensen wilt bereiken met de muziek. Dit voel je dan heel duidelijk de volgende dag... en aangezien wij 2 middag/avonden achter elkaar zingen, is het opletten geblazen!
-    
+
 - title: Dubbelconcert met Brothers 4 Tune - Castricum
   date: 16 september 2017
   image: content/images/20170916_dubbelconcert_met_brothers_4_tune_castricum.webp
   content: |
     We waren uitgenodigd door de mannen a capella groep Brothers-4-Tune om een gezamenlijk optreden te verzorgen in het theater van Castricum. Voor ons weer een mooie gelegenheid om onze nieuwe show met als thema de cursus 'Hoe gaan we om met de drama's in ons leven' te kunnen spelen. Ook voor het eerst dat we met geluidsversterking (headsets) hebben gezongen. Wel even anders omdat je elkaar via de boxen terug hoort en dit vooral in het begin even zoeken was hoe we goed naar elkaar konden 'kleuren'. Maar super leuk om te doen en we hebben zelfs even overwogen om een eigen geluidsinstallatie te kopen. Het was een mooie afwisselende avond. Dit omdat de Brothers een totaal andere manier van zingen en theater maken hebben als wij. Maar dit maakt het voor het publiek juist extra aantrekkelijk.
-    
+
 
 - title: Struun festival - Texel
   date: 19 november 2017
@@ -566,3 +573,734 @@
   image: content/images/20130121_bonte_brons_avond_in_klif_12.webp
   content: |
     Een bijzonder optreden voor ons. Samen met de familie van Anneke gaan we optreden. Eerst zijn wij als Anyway (Anneke Brons) en brengen onze show Broadway 2012 op de planken. Daarna treedt Lauri Brons op met een pianist en brengt prachtige, zowel klassieke als musicalnummers ten gehore. De avond wordt afgesloten met de band Wadever van Martes Brons.
+
+# legacy-review-source-id: 2012-12-19-optreden-glazen-huis-texel-fm
+- title: "Optreden Glazen Huis Texel FM - Texel"
+  date: "19 december 2012"
+  link: ""
+  images:
+    - src: "content/images/20121219_optreden_glazen_huis_texel_fm_texel.webp"
+      alt: "Optreden Glazen Huis Texel FM - Texel"
+      width: 720
+      height: 960
+  content: |
+    We zijn uitgenodigd om een uur op te treden in het Glazen Huis van Texel FM. Na ons optreden zal er op een huiskamerconcert van ons geboden kunnen worden. Alle opbrengsten zijn voor het goed doel!
+
+    Ruthie is net geopereerd aan haar knie. Maar ook dan kun je repeteren en optreden voor de radio!
+
+    Muziek voor alles!
+
+# legacy-review-source-id: 2012-05-25-broadway
+- title: "Broadway - Den Hoorn - Texel"
+  date: "25 mei 2012"
+  link: ""
+  images:
+    - src: "content/images/20120525_broadway_den_hoorn_texel.webp"
+      alt: "Broadway - Den Hoorn - Texel"
+      width: 2048
+      height: 1238
+    - src: "content/images/20120525_broadway_den_hoorn_texel_02.webp"
+      alt: "Broadway - Den Hoorn - Texel"
+      width: 2048
+      height: 1733
+    - src: "content/images/20120525_broadway_den_hoorn_texel_03.webp"
+      alt: "Broadway - Den Hoorn - Texel"
+      width: 2048
+      height: 1826
+    - src: "content/images/20120525_broadway_den_hoorn_texel_04.webp"
+      alt: "Broadway - Den Hoorn - Texel"
+      width: 1867
+      height: 2048
+  content: |
+    Het was dit pinksterweekend al voor de vijfde keer dat wij meededen met dit fantastische evenement! Elke 2 jaar wordt dit georganiseerd en wij maken elke keer weer een geheel nieuw programma voor deze optredens. Dit betekent dus nieuwe nummers zoeken, kijken of ze gearrangeerd kunnen worden, dat is namelijk niet altijd mogelijk omdat we maar met z'n drieën zijn.
+
+    Dan begint het instuderen, een thema bedenken voor de nieuwe show, een verhaallijn, wie heeft welke rol en waarom. Wat willen we vertellen, welke nummers kunnen we daarvoor gebruiken. En wat trekken we aan. Kortom altijd vele vele vragen die beantwoordt dienen te worden.
+
+    Ook dit keer is het weer gelukt. De show was geheel rondom het thema koken geschreven met wat kleine uitstapjes. Maar uiteindelijk was de eindconclusie toch dat het natuurlijk om de liefde gaat in het leven!
+
+# legacy-review-source-id: 2012-05-02-tryout-broadway
+- title: "Tryout Broadway - Castricum"
+  date: "2 mei 2012"
+  link: ""
+  images:
+    - src: "content/images/20120502_tryout_broadway_castricum.webp"
+      alt: "Tryout Broadway"
+      width: 640
+      height: 480
+  content: |
+    Na maanden van oefenen en grote twijfels — zijn de nummers wel leuk, is het verhaal duidelijk, komt over wat we willen zeggen, is de zangkwaliteit hoog genoeg, is het leuk om naar te kijken, wordt het niet afgezaagd, gebeurt er genoeg, worden mensen geraakt en is er voldoende humor? — hebben we besloten om een intieme try-out te organiseren voor vrienden en bekenden. Iedereen zat met een bloknoot op schoot, klaar om te schrijven. De uitslag van het 'publiek' was gelukkig positief, dus we gaan ervoor!
+
+    Het wordt vast weer een prachtig Pinksterweekend tijdens het huiskamerfestival Broadway Den Hoorn! We mogen dan weer 8 voorstellingen geven gedurende 2 avonden in een huiskamer van een inwoner van Den Hoorn. Dus heftig maar wel geweldig om te doen! Er zijn nog kaarten. Te bestellen via
+
+# legacy-review-source-id: 2012-01-15-paradiso-amsterdam
+- title: "Korenfestival - Paradiso - Amsterdam"
+  date: "15 januari 2012"
+  link: ""
+  images:
+    - src: "content/images/20120115_korenfestival_paradiso_amsterdam.webp"
+      alt: "Korenfestival - Paradiso - Amsterdam"
+      width: 480
+      height: 360
+  content: |
+    Ook dit jaar mochten wij weer meedoen met het 'Korenfestival' in Paradiso. Altijd een geweldige sfeer met enthousiast publiek. Dit jaar was het extra bijzonder voor ons omdat we voor de eerste keer het totaal nieuwe programma voor Broadway aan publiek hebben laten zien. Het blijft altijd afwachten hoe het publiek reageert op nog nieuwe nummers en een nieuwe show. Zoals onderstaande mail bevestigt werd ons optreden goed ontvangen!
+
+    Hoi Dames,
+
+    Ik wilde even meegeven dat ik gisteren in Paradiso erg heb genoten van jullie heerlijke en sprankelende optreden. Naast de erg leuke presentatie was de zang erg verfijnd en loepzuiver, ademloos, denk met halfopen mond,-), van A tot Z geamuseerd.
+
+# legacy-review-source-id: 2011-05-14-korendag-oudesluis
+- title: "Korendag - Kerk van Oudesluis - Oudesluis"
+  date: "14 mei 2011"
+  link: ""
+  images:
+    - src: "content/images/20110514_korendag_kerk_van_oudesluis_oudesluis.webp"
+      alt: "Korendag - Kerk van Oudesluis - Oudesluis"
+      width: 1600
+      height: 1200
+    - src: "content/images/20110514_korendag_kerk_van_oudesluis_oudesluis_02.webp"
+      alt: "Korendag - Kerk van Oudesluis - Oudesluis"
+      width: 1600
+      height: 1200
+    - src: "content/images/20110514_korendag_kerk_van_oudesluis_oudesluis_03.webp"
+      alt: "Korendag - Kerk van Oudesluis - Oudesluis"
+      width: 1200
+      height: 1600
+  content: |
+    We waren uitgenodigd voor het 5 jarig bestaand festival 'Korendag Oudesluis". Een klein festival met 5 kleine en grotere koren in het prachtige oude kerkje van Oudesluis. Er was ook een jury aanwezig waarvan we nu wat jurycommentaar zullen vermelden ipv dat wij deze keer zelf een verslag doen.
+
+     Wat een verrasende opkomst met "Rozen en Borsten". Wat een leuke tekst, zo herkenbaar voor de dames onder ons. Ik had de indruk dat we naar een mini-musical zaten te kijken, die alle facetten van de liefde behandelde. De liederen worden leuk aan elkaar gepraat, volgen elkaar goed op. Daardoor houden jullie de aandacht van het publiek goed vast. Het is uitstekend te verstaan, de 3-stemmigheid is erg zuiver, het is komisch (het intuïtief haakwerkje in en uit het rugzakje). Kortom dit is een voorstelling die in het theater niet zou misstaan.
+
+     Heb nog niet eerder meegemaakt dat het publiek, tijdens dit festival, na afloop van een optreden gaat staan tijdens het applaus! Klasse.
+
+    Ik was blij verrast met julie optreden. Vanaf het eerste moment boeiend, vol humor en als geheel een mooistuk theater. Alle liederen spatzuiver vanuit een stemfluitje zonder haperen opgezet en uit het hoofd a capela gezongen. Alle tussenstukjes verbinden de liederen vlekkeloos, dus ik denk dat een of meerdere van julllie een theater of kleinkunst opleiding hebben gehad. Zangtechnisch was alles dik in orde, dixie, dynamiek, verstaanbaarheid, langelijnen en met goede ademtechniek Een afwisselend humorvol en soms vertederende keuze om jullie optreden compleet te maken. Blijf vooral sterk openen en de afwisseling in de liederen hooghouden, dat maakt jullie zo ontstellend boeiend.
+
+     Anyway bestaat uit 3 vrouwen die voor de pauze een theatershow neerzetten met ronduit prachtige zang. Gedurfd, komisch, voor de duvel niet bang en bovendien stijlvol gekleed wisten ze het goed opgekomen publiek tot het laatste item toe te boeien.
+
+# legacy-review-source-id: 2011-01-16-korendagen-paradiso-amsterdam
+- title: "Korendagen - Paradiso - Amsterdam"
+  date: "16 januari 2011"
+  link: ""
+  images:
+    - src: "content/images/20110116_korendagen_paradiso_amsterdam.webp"
+      alt: "Korendagen - Paradiso - Amsterdam"
+      width: 2048
+      height: 1341
+  content: |
+    We hebben alweer voor de derde keer opgetreden tijdens de Paradiso Korendagen. Een groot tweedaags evenement waar tientallen koren een optreden verzorgen van 20 minuten. Je moet als koor er snel bij zijn om je in te schrijven (binnen één dag) want de animo is heel groot. Het is ons dit jaar gelukt om op de 'normale' manier, dus door middel van inschrijving, mee te doen. De andere jaren zijn we steeds gebeld of we wilden komen omdat andere koren uitgevallen waren.
+
+    Het was weer geweldig om mee te maken. We hadden weer een nieuw programma gemaakt met nieuwe nummers. Het publiek reageerde ook nu weer heel enthousiast op ons en blijkbaar blijft het toch bijzonder om drie vrouwen op deze manier te zien optreden.
+
+# legacy-review-source-id: 2010-11-06-vrouwen-van-een-eiland
+- title: "Vrouwen van een Eiland - Texel"
+  date: "6 november 2010"
+  link: ""
+  images:
+    - src: "content/images/20101106_vrouwen_van_een_eiland_texel.webp"
+      alt: "Vrouwen van een Eiland - Texel"
+      width: 561
+      height: 738
+  content: |
+    We hebben 2 optredens verzorgd tijdens dit nieuwe fenomeen op Texel. Vrouwen van een eiland. Een beurs voor en door vrouwen. Voor netwerken met elkaar, met lezingen, een markt, optredens, slowfood diner, modeshow, etc etc. Een geslaagde eerste opzet met zeker grote potentie voor de komende jaren.
+
+    Door op de link te klikken verschijnt een krantenartikel over ons.
+
+# legacy-review-source-id: 2010-10-30-anbo-beurs
+- title: "ANBO Beurs - Texel"
+  date: "30 oktober 2010"
+  link: ""
+  images:
+    - src: "content/images/20101030_anbo_beurs_texel.webp"
+      alt: "ANBO Beurs - Texel"
+      width: 1024
+      height: 683
+    - src: "content/images/20101030_anbo_beurs_texel_02.webp"
+      alt: "ANBO Beurs - Texel"
+      width: 1024
+      height: 683
+  content: |
+    Door het uitvallen van een ander koor zijn we gevraagd om op de ANBO beurs op te treden. Deze werd voor het eerst georganiseerd op Texel. We waren gevraagd op te treden met microfoonversterking. We besloten echter om dit op een andere manier vorm te geven en meer op een a capella manier.
+
+    We zijn de twee beurszalen doorgelopen en hebben op verschillende plekken meerdere liedjes ten gehore gebracht. Het was niet de makkelijkste manier (het is vrij zwaar zingen in een sporthal zonder akoestiek) maar wel weer een mooie ervaring en leuk om te zien dat meerdere 'fans' met ons meeliepen om zo alle nummers te kunnen horen
+
+# legacy-review-source-id: 2010-10-03-de-eerste-cd-opnames
+- title: "De eerste CD opnames !! - Texel"
+  date: "3 oktober 2010"
+  link: ""
+  images:
+    - src: "content/images/20101003_de_eerste_cd_opnames_texel.webp"
+      alt: "De eerste CD opnames !! - Texel"
+      width: 480
+      height: 314
+  content: |
+    We zijn er aan begonnen! Na 12 jaar samen zingen leek het ons nu toch echt tijd worden om een begin te maken met het opnemen van een CD. We hebben in een studio op Texel de eerste 5 nummers opgenomen.
+
+    Na het eerst uitproberen wat de beste positie is (met 1, 2 of 3 microfoons, welke afstanden is de beste enzovoort) hebben we de hele zondag met elkaar alle nummers meerdere keren opgenomen en is nu de fase gekomen om te kijken wat wij het beste resultaat vinden. Kortom de eerste stappen zijn gezet naar een echte CD!
+
+# legacy-review-source-id: 2010-08-27-reactie-op-ons-optreden-bij-de-theatervloot
+- title: "Reactie op ons optreden bij de Theatervloot - De Egberdina - Oude haven van Hoorn"
+  date: "27 augustus 2010"
+  link: ""
+  images:
+    - src: "content/images/20100827_reactie_op_ons_optreden_bij_de_theatervloot_de_egberdina_oude_haven_van_hoorn.webp"
+      alt: "Reactie op ons optreden bij de Theatervloot - De Egberdina - Oude haven van Hoorn"
+      width: 480
+      height: 322
+  content: |
+    Anyway doet het Everywhere!
+
+     In de oude haven van Hoorn, op het schip van kapitein Wouter van Dusseldorp, sinds 1996 de trotse eigenaar van het zeilschip 'Egberdina' luisterden we naar een concert van de Texelse a capella zanggroep Anyway. Het schip blijkt één van de vijf oudste, nog varende zeilschepen in Nederland te zijn. Een klassiek schip met van binnen een prachtig houten interieur.
+
+    Was het de klankkast van het schip of de techniek? De zangeressen zongen loepzuiver. Kwetsbare momenten over vergankelijkheid en verlies zorgden voor een intieme sfeer. Ondanks dat het schip aan de kade bleef zorgden de warme stemmen van Anyway ervoor dat we even helemaal weg waren. Het lied zo mooi gezongen over het kind wat uit huis gaat maakte ons stil. Met bovenaardse kracht werd er onderdeks een bijzondere sfeer gecreëerd. Tussen de nummers werd er luid geapplaudisseerd, en volgend jaar wil de organisatie van de Theatervloot dat ze terugkomen!
+
+    Anyway bestaat uit Irisabella Bakker, Anneke Brons en Ruthie Vazana.
+    Op donderdag 26 augustus gaven ze drie concerten bij de Theatervloot in de haven van Hoorn.
+
+    Annette van Ruitenburg zocht ze op. “Eigenlijk was ik wel een beetje trots, het ademloos luisterende publiek zo te zien genieten”. De Texelse Anyway gaf een professioneel concert. Foto is gemaakt door Annemarie Wolkers- Ven
+
+# legacy-review-source-id: 2010-08-26-theatervloot-in-hoorn
+- title: "Theatervloot - De Egberdina - Haven van Hoorn"
+  date: "26 augustus 2010"
+  link: ""
+  images:
+    - src: "content/images/20100826_theatervloot_de_egberdina_haven_van_hoorn.webp"
+      alt: "Theatervloot - De Egberdina - Haven van Hoorn"
+      width: 2048
+      height: 1536
+  content: |
+    We hebben mogen optreden tijdens 'De Theatervloot' in de haven van Hoorn. Onze optredens waren op het schip 'De Egberdina', een stevenaak. De opzet van dit festival is vergelijkbaar met dat van 'Broadway in Den Hoorn' maar dan op 3 schepen en veel kleinschaliger. De schepen meren af in Medemblik en Hoorn waar de artiest dan 3 optredens op een avond verzorgt en het publiek gaat dan van schip naar schip.
+
+    Ondanks de regen hebben we erg genoten van de sfeer op het schip en de intimiteit die dit met zich meebrengt. Een mooie ervaring. We zijn zelfs uitgenodigd om volgend jaar weer mee te doen en dan zullen we afmeren in de haven van Medemblik.
+
+# legacy-review-source-id: 2010-06-06-opening-restaurant-de-luwte-den-burg-texel
+- title: "Opening restaurant - Restaurant De Luwte - Den Burg - Texel"
+  date: "6 juni 2010"
+  link: ""
+  images:
+    - src: "content/images/20100606_opening_restaurant_restaurant_de_luwte_den_burg_texel.webp"
+      alt: "Opening restaurant - Restaurant De Luwte - Den Burg - Texel"
+      width: 2048
+      height: 1536
+    - src: "content/images/20100606_opening_restaurant_restaurant_de_luwte_den_burg_texel_02.webp"
+      alt: "Opening restaurant - Restaurant De Luwte - Den Burg - Texel"
+      width: 2048
+      height: 1531
+    - src: "content/images/20100606_opening_restaurant_restaurant_de_luwte_den_burg_texel_03.webp"
+      alt: "Opening restaurant - Restaurant De Luwte - Den Burg - Texel"
+      width: 1536
+      height: 2048
+  content: |
+    We hebben de opening verzorgd van een nieuw restaurant op Texel - De Luwte -. Het mooie van dit optreden was dat de eigenaar van het restaurant Evert (van der Have) heet. Een feit is dat de afgelopen 6 jaar wij steeds een show hebben gemaakt rond de persoon 'Evert'. Nu was dit natuurlijk de uitgelezen gelegenheid om al onze 'anecdotes/affaires' met Evert in 1 optreden te verwerken. Erg mooi om te doen en het maakte het ook heel erg persoonlijk, wat duidelijk zijn positief effect had op de restaurant-eigenaar.
+
+    Het blijft een prachtig gegeven dat, doordat je voor elk optreden en elke gelegenheid verschillende aspecten en liedjes combineert, je op deze manier toch weer een nieuw programma maakt waardoor het steeds weer verrassend blijft.
+
+    Na het optreden hebben we een heerlijk diner aangeboden gekregen. Dus voor een ieder die een restaurant zoekt waar op een heerlijke en eerlijke manier gekookt wordt raden wij u aan om naar Evert te gaan in 'De Luwte'- Den Burg - 0222-312939
+
+# legacy-review-source-id: 2010-05-21-broadway-den-hoorn
+- title: "Broadway - Den Hoorn - Texel"
+  date: "21 mei 2010"
+  link: ""
+  images:
+    - src: "content/images/20100521_broadway_den_hoorn_texel.webp"
+      alt: "Broadway - Den Hoorn - Texel"
+      width: 600
+      height: 450
+  content: |
+    Het tweejaarlijkse evenement 'Broadway Den Hoorn' is weer voorbij. Al voor de 7e keer werd dit tijdens het pinksterweekend georganiseerd. Er worden dan in 1 straat 30 huiskamers ingericht als theater waarin dan 4 voorstellingen per avond gegeven worden door artiesten uit heel Nederland. Ook wij waren uitgenodigd (al voor de 5e keer!).
+
+    De afgelopen 1.5 jaar zijn we bezig geweest met het maken van een nieuw programma voor dit mooie evenement. Dit heeft geresulteerd in 10 nieuwe nummers, waar zowel mensen om hebben kunnen lachen als geëmotioneerd van raakten. Het is altijd weer heel spannend om te ervaren hoe de nummers die je zingt over komen op het publiek. Want na 1.5 jaar tegen een muur zingen is toch heel fijn om te merken dat wat je zingt en vertelt 'aankomt' in de zaal. Voor ons was het weer een feest om te doen en kijken we tevreden terug op weer een heel mooi pinksterweekend!
+
+# legacy-review-source-id: 2010-04-23-cursus-evts-estill-voice-training-23-24-25-april-en-8-en-9-mei-op-texel
+- title: "Cursus EVTS (Estill Voice Training) 23, 24, 25 april en 8 en 9 mei - Texel"
+  date: "23 april 2010"
+  link: ""
+  images:
+    - src: "content/images/20100423_cursus_evts_estill_voice_training_23_24_25_april_en_8_en_9_mei_texel.webp"
+      alt: "Cursus EVTS (Estill Voice Training) 23, 24, 25 april en 8 en 9 mei - Texel"
+      width: 2048
+      height: 1536
+    - src: "content/images/20100423_cursus_evts_estill_voice_training_23_24_25_april_en_8_en_9_mei_texel_02.webp"
+      alt: "Cursus EVTS (Estill Voice Training) 23, 24, 25 april en 8 en 9 mei - Texel"
+      width: 2048
+      height: 1536
+  content: |
+    Op 23, 24 en 25 april zal er een cursus EVTS gegeven worden op Texel door Alberto ter Doest.
+
+    Het Estill Voice Training System (EVTS) cursus is een unieke workshop. Jo Estill, doet reeds dertig jaar onderzoek naar de menselijke stem en ontwikkelde van daaruit deze methode. Zo wordt duidelijk dat het zeer goed mogelijk is gezond te zingen in pop, belt, jazz of klassiek. In de cursus wordt verduidelijkt wat we horen. Deze gegevens tonen welke spieren verantwoordelijk en nodig zijn voor de verschillende stemkwaliteiten.
+
+    Vervolgens wordt in de cursus stap voor stap uitgelegd hoe we dit kunnen leren voelen en gebruiken. Hierdoor zijn we in staat om onze spieren, bijbehorende functies en geluid te leren beheersen en om dit in praktijk te brengen in allerlei soorten gezongen en gesproken repertoire.
+
+    EVTS stelt iedereen in staat om zijn/haar vocale mogelijkheden naar wens volledig te ontwikkelen en is niet door smaak of voorkeuren gehinderd.
+
+    Wij zijn de organisator en gaan dus ook meedoen waardoor we hopen dat onze zangkwaliteiten nog meer 'kleurschakeringen' kunnen krijgen!
+
+    Met z'n allen weer even in de schoolbanken. Er waren vanuit heel Nederland cursisten naar Texel gekomen om deze bijzondere cursus mee te maken
+
+# legacy-review-source-id: 2010-04-17-met-muziek-op-pad
+- title: "Met 'Muziek op pad' - Grote Kerk - Den Burg - Texel"
+  date: "17 april 2010"
+  link: ""
+  images:
+    - src: "content/images/20100417_met_muziek_op_pad_grote_kerk_den_burg_texel.webp"
+      alt: "Met 'Muziek op pad' - Grote Kerk - Den Burg - Texel"
+      width: 1569
+      height: 2048
+    - src: "content/images/20100417_met_muziek_op_pad_grote_kerk_den_burg_texel_02.webp"
+      alt: "F41117_1"
+      width: 350
+      height: 263
+  content: |
+    We waren uitgenodigd om de opening te verzorgen in het kader van de muzikale fietstocht 'Met muziek op pad'. Men was in grote getale (ruim 150) op de fiets gestapt om zo van dorp naar dorp en kerk te fietsen om te worden verrast met diverse concerten. Ons optreden was in de grote kerk van Den Burg. Een prachtig gebouw maar met een grote galm. Doordat de kerk vol zat met mensen was de galm een stuk minder en konden we een afwisselende show neerzetten. Dit verraste veel mensen en men ging zowel ontroerd als blij op naar het volgende concert.
+
+    We waren uitgenodigd om de opening met een optreden te verzorgen in het kader van de muzikale fietstocht 'Met muziek op pad'. Er was een groot getale aan mensen (ruim 150) op de fiets gestapt om zo van dorp naar dorp en kerk te fietsen om te worden verrast met diverse concerten. Ons optreden was in de grote kerk van Den Burg. Een prachtig gebouw maar met een grote galm. Doordat de kerk vol zat met mensen was de galm een stuk minder en konden we een afwisselende show neerzetten. Dit verraste veel mensen en men ging zowel ontroerd als blij op naar het volgende concert.
+
+# legacy-review-source-id: 2010-01-23-paradiso-korendagen
+- title: "Korendagen - Paradiso - Amsterdam"
+  date: "23 januari 2010"
+  link: ""
+  images:
+    - src: "content/images/20100123_korendagen_paradiso_amsterdam.webp"
+      alt: "IMG_04811"
+      width: 480
+      height: 271
+  content: |
+    Voor de 2e maal mochten wij meedoen met dit festival. Net als vorig jaar waren wij te laat met inschrijven. Maar ook dit jaar werden wij weer gebeld of wij toch weer wilden komen aangezien er een groep uitgevallen was.
+    Het was vorig jaar een groot feest dus ook nu wilden wij weer graag van de partij zijn.
+
+    Ditmaal hebben we het eerste deel van ons nieuwe 'Broadway 2010' programma ten gehore gebracht. Altijd weer heel spannend om te kijken of de liedjes, de teksten en grapjes overkomen bij het publiek. Naar ons idee is dit gelukt en ook aan de reactie van het publiek te merken was men verrast en enthousiast.
+
+    Dit jaar hebben wij voor het eerst gebruik gemaakt van een extra geluid niet door onszelf gemaakt maar door de iPod. Een spannende heartbeat die ons tijdens het nummer My Heart begeleidde. Een nieuwe maar mooie ervaring, zeker iets om in de toekomst uit te breiden.
+
+# legacy-review-source-id: 2009-11-15-eenakterfestival-klif-12-texel
+- title: "Eenakterfestival - Klif 12 - Den Hoorn - Texel"
+  date: "15 november 2009"
+  link: ""
+  images:
+    - src: "content/images/20091115_eenakterfestival_klif_12_den_hoorn_texel.webp"
+      alt: "Eenakterfestival - Klif 12 - Den Hoorn - Texel"
+      width: 1638
+      height: 1265
+  content: |
+    Deze keer mochten we als toetje fungeren bij het Eenakterfestival in Klif 12 wat om de twee jaar georganiseerd wordt. Meerdere Texelse groepen traden op en lieten van alle kanten hun 'kunsten' zien. Ook wij waren deze keer van de partij.
+
+    Voor ons was dit al een opwarmertje voor het grote festival wat gaat plaatsvinden in het pinksterweekend van 2010, het 'Broadway 2010 Huiskamer Theater Festival'. Wij hebben het begin van ons programma laten horen en zien. Dit gaf veel feedback waardoor er nog veel 'dingetjes' veranderd zullen worden om tijdens het pinksterweekend weer een mooi programma neer te kunnen zetten.
+
+    Aan de linkerkant is een 'link' gemaakt waarmee je naar de site kunt van Klif 12 waar alle informatie te vinden is over het Broadway 2010 Huiskamer Theater Festival.
+
+# legacy-review-source-id: 2009-11-07-balk-vocal-light-pop-festival
+- title: "Balk Vocal Light Pop Festival - Apeldoorn"
+  date: "7 november 2009"
+  link: ""
+  images:
+    - src: "content/images/20091107_balk_vocal_light_pop_festival_apeldoorn.webp"
+      alt: "Balk Vocal Light Pop Festival"
+      width: 1200
+      height: 1600
+  content: |
+    Net als twee jaar geleden hebben wij weer met dit landelijk a capella festival meegedaan. We hebben het eerste deel van de nieuwe show voor 'Broadway huiskamerfestival 2010' op de planken gezet. Het was heel spannend omdat we slechts 1 dag hadden om het nieuwe programma in te studeren aangezien Lizzie Kean net samen met ons het programma op Texel gemaakt had.
+
+    Maar ondanks de korte repetitietijd werd het heel goed ontvangen. Aangezien het festival ook nog een wedstrijdelement toegevoegd had waren we des te verbaasder dat we geëindigd zijn op een gedeelde tweede plaats! (net een half puntje te weinig voor nummer 1). Ook het bijgeleverde juryrapport heeft ons veel positieve backup gegeven.
+
+# legacy-review-source-id: 2009-09-06-zomerdromen-den-helder
+- title: "Zomerdromen - Den Helder"
+  date: "6 september 2009"
+  link: ""
+  images:
+    - src: "content/images/20090906_zomerdromen_den_helder.webp"
+      alt: "Zomerdromen - Den Helder"
+      width: 2048
+      height: 1536
+    - src: "content/images/20090906_zomerdromen_den_helder_02.webp"
+      alt: "Zomerdromen - Den Helder"
+      width: 2048
+      height: 1536
+    - src: "content/images/20090906_zomerdromen_den_helder_03.webp"
+      alt: "Zomerdromen - Den Helder"
+      width: 2048
+      height: 1536
+  content: |
+    Het Zomerdromen festijn wordt jaarlijks georganiseerd in Den Helder. Dit jaar was het voor de vijfde keer.
+    Het is een combinatie van een romantische markt met allerlei kramen van veel zelfgemaakte materialen en lekkere taarten etc. Dit alles voor verschillende goede doelen.
+    Tevens zijn er twee 'tenten' waar muziek gemaakt wordt door veelal plaatselijke koren en muzikanten.
+
+    Dit jaar waren wij als trio ook van de partij.
+    Het was even wat wennen aangezien de locatie 'de tent' een open muziekpodium was waar we tegen een hek aankeken wanneer we op onze stoeltjes zaten om een nummer te vertolken. Tevens was het buiten waardoor veel van ons stemgeluid verloren ging. Gelukkig waren er goede technici van het theater 'De Kampagne' aanwezig waardoor het aanwezige publiek ons toch heel goed kon horen.
+
+# legacy-review-source-id: 2009-08-22-molenaarsweekend
+- title: "Molenaarsweekend - Texel"
+  date: "22 augustus 2009"
+  link: ""
+  images:
+    - src: "content/images/20090822_molenaarsweekend_texel.webp"
+      alt: "IMG_16100"
+      width: 640
+      height: 534
+  content: |
+    Optreden voor eigen familie is toch weer heel anders dan voor een zaal met 'gewoon' publiek. We hadden een speciaal programma gemaakt met typische Molenaars 'eigenaardigheden', die duidelijk aankwamen bij de familie.
+     Veel van de familie had ons nog nooit zien optreden dus was meer dan verrast om op deze manier verrast te worden.
+
+# legacy-review-source-id: 2009-04-04-opening-foto-tentoonstelling
+- title: "Opening Foto tentoonstelling"
+  date: "4 april 2009"
+  link: ""
+  images:
+    - src: "content/images/20090404_opening_foto_tentoonstelling.webp"
+      alt: "Opening Foto tentoonstelling"
+      width: 1600
+      height: 1200
+  content: |
+    Voor het eerst een optreden tijdens een opening van een tentoonstelling.
+    We hadden een speciaal programma gemaakt voor deze gelegenheid. Leuk om te merken dat dit goed aansloeg bij het aanwezige publiek en er veel werd herkend zowel in de teksten als in de gekozen nummers.
+
+# legacy-review-source-id: 2009-01-17-korendagen-in-paradiso
+- title: "Korendagen - Paradiso - Amsterdam"
+  date: "17 januari 2009"
+  link: ""
+  images:
+    - src: "content/images/20090117_korendagen_paradiso_amsterdam.webp"
+      alt: "Korendagen - Paradiso - Amsterdam"
+      width: 1536
+      height: 2048
+    - src: "content/images/20090117_korendagen_paradiso_amsterdam_02.webp"
+      alt: "Korendagen - Paradiso - Amsterdam"
+      width: 2048
+      height: 1536
+  content: |
+    We hadden ons een paar maanden eerder al aangemeld maar we waren te laat voor de inschrijving. Jammer.
+    Maar wat een verrassing: 2 dagen voor het festival werden we gebeld dat we alsnog van harte welkom waren. Het werd voor ons een spannende onderneming: In twee dagen: Programma samenstellen, doorspreken, uitwerken en maar een paar uur om te repeteren.
+
+    Als dat maar goed komt in het beroemde en beruchte Paradiso.
+
+    Zestig koren in alle maten en soorten; geen plaatsje in de grote en kleine zaal vrij; een gekrioel van mensen uit het hele land die voor “hun” koor naar Amsterdam kwamen. Een geweldige sfeer zoals dat in Paradiso ook hoort.
+
+    Ons optreden was gepland in de Kleine zaal. Voor ons waren een paar grote koren met een overeenkomstig en overweldigend volume. Dan wij met z’n drieën.
+
+    Meteen na ons eerste nummer was het publiek enthousiast: een prachtig applaus, goedkeurend gefluit. En met ons slotnummer werd meegeklapt met een staande ovatie als resultaat.
+
+    Ook in de gangen en in foyer veel complimenten: echt allemaal super.
+
+# legacy-review-source-id: 2008-09-13-ineke-50-jaar
+- title: "Ineke 50 jaar !! - Delft"
+  date: "13 september 2008"
+  link: ""
+  images:
+    - src: "content/images/20080913_ineke_50_jaar_delft.webp"
+      alt: "Ineke 50 jaar !! - Delft"
+      width: 2048
+      height: 1362
+    - src: "content/images/20080913_ineke_50_jaar_delft_02.webp"
+      alt: "Ineke 50 jaar !! - Delft"
+      width: 1536
+      height: 2048
+  content: |
+    Na ons optreden op Broadway 2008 kregen we veel positieve reacties en een ervan bracht ons naar Delft voor de viering voor een vijftigjarige. Een grote eer en we hebben ons programma op verzoek daaraan aangepast. Een uur in plaats van 30 minuten. Dat gaf een heel andere spanningsboog die we nog niet kenden. De feestvierders waren heel enthousiast.
+
+    Een paar weken later werd ons een DVD gestuurd waar ons hele optreden was vastgelegd. Dit optreden is nu te bekijken via You Tube onder het kopje 'Anywaytexel' met de afspeellijst Delft.
+
+# legacy-review-source-id: 2008-06-14-castricum-balkfestival
+- title: "Balkfestival - Castricum"
+  date: "14 juni 2008"
+  link: ""
+  images:
+    - src: "content/images/20080614_balkfestival_castricum.webp"
+      alt: "99365464.JzVdPYcX"
+      width: 800
+      height: 554
+    - src: "content/images/20080614_balkfestival_castricum_02.webp"
+      alt: "IMG_3829"
+      width: 576
+      height: 384
+  content: |
+    Ook in 2008 zongen wij op het jaarlijkse Balkfestival, ditmaal was het in Castricum en wel op twee verschillende locaties. We konden daardoor niet ons 'normale' programma van 30 minuten doen.
+
+    Het werden 2 delen van 15 minuten. En dat ging ten koste van de kwaliteit naar ons idee.
+
+    Het 'verhaal' in ons optreden ging hierdoor verloren. Een goede ervaring waardoor we in de toekomst hier rekening mee zullen moeten houden. Ondanks dit hebben we laten zien wat we kunnen en dat wij er nog steeds enorm van genieten om te zingen voor publiek.
+
+# legacy-review-source-id: 2008-05-09-broadway-den-hoorn
+- title: "Broadway - Den Hoorn - Texel"
+  date: "9 mei 2008"
+  link: ""
+  images:
+    - src: "content/images/20080509_broadway_den_hoorn_texel.webp"
+      alt: "Broadway - Den Hoorn - Texel"
+      width: 2048
+      height: 1369
+  content: |
+    Ook dit jaar werden we gevraagd voor optredens op het Broadway Festival Den Hoorn.
+
+    Acht optredens met een heel nieuw programma dat we samen met Lizzie Kean hebben gemaakt. Spannend natuurlijk, dat eerste optreden met een kersvers repertoire.
+
+    Al op het Festival van 2006 werd ons optreden hoog gewaardeerd met fijne reacties en een “goede” pers. Dus nu, in 2008 moest het nog beter.
+
+    Al bij ons eerste optreden was er een ruim applaus met veel complimenten, Vooral bij onze gevoelige liedjes “Love of my Life” en “True Colors” was de zaal muisstil met een en al aandacht. Ook onze humors “Kleine zwakke vrouw”en “I wish I was a punkrocker” waren precies in de roos.
+
+    Een enthousiast publiek met lang aangehouden applaus en goedkeurend gefluit. We waren dik tevreden met 2008.
+
+    Na de voorstellingen voor ons natuurlijk een heerlijk en goed gevoel.
+
+# legacy-review-source-id: 2007-09-17-trouwerij-in-carre
+- title: "Trouwerij - Koninklijk Theater Carré - Amsterdam"
+  date: "17 september 2007"
+  link: ""
+  images:
+    - src: "content/images/20070917_trouwerij_koninklijk_theater_carr_amsterdam.webp"
+      alt: "Trouwerij - Koninklijk Theater Carré - Amsterdam"
+      width: 2048
+      height: 1371
+    - src: "content/images/20070917_trouwerij_koninklijk_theater_carr_amsterdam_02.webp"
+      alt: "Trouwerij - Koninklijk Theater Carré - Amsterdam"
+      width: 2048
+      height: 1371
+  content: |
+    Een optreden in Carré, de grootste droom van elke artiest! En voor ons werd die droom waarheid. Een ervaring die je nooit meer vergeet: de zaal, de bühne, het geluid,het licht en natuurlijk het publiek.
+
+    En wat voor publiek: grote BNN'ers uit de musical- en cabaretwereld. Heel spannend vooral omdat na ons ook o.a. Joke de Kruijff en Karin Bloemen zullen optreden. Dat geeft die beroemde plankenkoorts die ons natuurlijk ook overkwam
+
+    En daarna de kick van het applaus en de complimenten en gesprekken na afloop. Je voelt je trots en blij. Zoiets overkomt je maar een keer.
+
+    Foto's Sanne Weverling
+
+    lees
+
+# legacy-review-source-id: 2007-01-06-galadiner-hotel-opduin
+- title: "Galadiner - Hotel Opduin - De Koog - Texel"
+  date: "6 januari 2007"
+  link: ""
+  images:
+    - src: "content/images/20070106_galadiner_hotel_opduin_de_koog_texel.webp"
+      alt: "Galadiner - Hotel Opduin - De Koog - Texel"
+      width: 680
+      height: 507
+  content: |
+    Een optreden in een viersterrenhotel was ons nog nooit overkomen; ruisende avondjurken en zwarte smokings (dresscode Gala) dat geeft toch een heel bijzondere sfeer. En ons een heel bijzonder gevoel; leuk om dit ook een keer te kunnen doen.
+
+    De avond was ook een groot succes voor een van de Goede Doelen, waaronder het Tesselhuus.
+
+# legacy-review-source-id: 2006-11-05-totaal-vokaal-east-event-festival
+- title: "Totaal Vokaal East Event Festival - Goor"
+  date: "5 november 2006"
+  link: ""
+  images:
+    - src: "content/images/20061105_totaal_vokaal_east_event_festival_goor.webp"
+      alt: "Totaal Vokaal East Event Festival - Goor"
+      width: 969
+      height: 691
+  content: |
+    Wij hadden ons voor dit festival in Goor ingeschreven omdat er ook een jurybeoordeling zou zijn. Voor de allereerste keer een jury die onze zangkunst kritisch zou bekijken en aanhoren: dat voel je goed in lijf en benen!
+
+    En het liep ook goed af. Zie onderstaande link voor de beoordeling
+
+# legacy-review-source-id: 2006-10-01-koffieconcert-de-waal
+- title: "Koffieconcert - Kerk - De Waal - Texel"
+  date: "1 oktober 2006"
+  link: ""
+  images:
+    - src: "content/images/20061001_koffieconcert_kerk_de_waal_texel.webp"
+      alt: "Koffieconcert - Kerk - De Waal - Texel"
+      width: 2048
+      height: 1536
+  content: |
+    In de Texelse krant verscheen over ons een uitgebreid, lovend artikel en daar werd ook ons optreden in het kleine kerkje van de Waal aangekondigd. (zie link.)
+
+    Er traden nog twee andere artiesten op met een voornamelijk klassiek repertoire. Onze show met popnummers was andere koek; het publiek (en ook wij) moest er even aan wennen maar wij kregen een goedkeurend, luid applaus. Na afloop bevestigde veel complimenten dat ons optreden in goede aarde was gevallen.
+
+# legacy-review-source-id: 2006-06-02-broadway-den-hoorn
+- title: "Broadway - Den Hoorn - Texel"
+  date: "2 juni 2006"
+  link: ""
+  images:
+    - src: "content/images/20060602_broadway_den_hoorn_texel.webp"
+      alt: "Broadway - Den Hoorn - Texel"
+      width: 2048
+      height: 1357
+  content: |
+    Ons optreden tijdens het festival ‘Broadway Den Hoorn 2006’ voelde voor ons als een goed zittende jas. Dat gaf zekerheid en een “profi” uitstraling. Onze keuze van tekst en liedjes hielpen ons daarbij. Een heerlijk gevoel om zo te kunnen spelen.
+
+    Zelfs het “gewaagde” lied; “Masochisme Tango” paste helemaal bij dit optreden. Een geweldig nummer waar je wat mee kunt.
+
+    (zie foto)
+
+# legacy-review-source-id: 2005-07-02-totaal-vokaal-festival-amsterdam
+- title: "Totaal Vokaal Festival - Pleintheater - Amsterdam"
+  date: "2 juli 2005"
+  link: ""
+  images:
+    - src: "content/images/20050702_totaal_vokaal_festival_pleintheater_amsterdam.webp"
+      alt: "Anyway, pleintheater 2 juli 2005 006"
+      width: 640
+      height: 480
+    - src: "content/images/20050702_totaal_vokaal_festival_pleintheater_amsterdam_02.webp"
+      alt: "Anyway, pleintheater 2 juli 2005 007"
+      width: 360
+      height: 480
+    - src: "content/images/20050702_totaal_vokaal_festival_pleintheater_amsterdam_03.webp"
+      alt: "Anyway, pleintheater 2 juli 2005 001"
+      width: 500
+      height: 375
+  content: |
+    In 2005 opnieuw een optreden in het Pleintheater in Amsterdam. Het Balkfestival in deze kleine, intieme zaal werd ook dit jaar weer druk bezocht. Het was stampvol met een enthousiast en kritisch publiek
+
+    Ons optreden ging er “heftig” aan toe (zie foto’s) maar uiteindelijk kwam het, met veel applaus, helemaal goed.
+
+# legacy-review-source-id: 2005-02-04-klif-12-open-podium
+- title: "Open Podium - Klif 12 - Den Hoorn - Texel"
+  date: "4 februari 2005"
+  link: ""
+  content: |
+    De eigenaar van theaterrestaurant Klif 12 in Den Hoorn, Cor van Heerwaarden, heeft als initiatief opgezet een open podium voor een ieder die zich geroepen voelt om het podium te betreden.
+    Ook wij hebben weer deze kans genomen en onze zangkunsten te vertonen met meerdere 'artiesten' op dezelfde avond.
+    In onderstaand artikel is de uitnodiging te lezen. Een mooi initiatief om meer mensen te 'verleiden' de kans te wagen om een avond 'artiest' te zijn.
+
+# legacy-review-source-id: 2004-12-24-kerst-hotel-opduin
+- title: "Kerstoptreden - Hotel Opduin - De Koog - Texel"
+  date: "24 december 2004"
+  link: ""
+  images:
+    - src: "content/images/20041224_kerstoptreden_hotel_opduin_de_koog_texel.webp"
+      alt: "Kerstoptreden - Hotel Opduin - De Koog - Texel"
+      width: 1280
+      height: 960
+  content: |
+    Tijdens kerstavond zijn we al meerdere jaren te gast bij Hotel Opduin, een vijfsterrenhotel, in de Koog op Texel.
+    Het hele hotel is dan overweldigend versierd met de prachtigste versierde bomen en andere prachtige zaken om zo alvast de gast een mooi 'kerstgevoel' te geven. Tijdens de borrel voor het diner brengen wij dan een kerstprogramma met de prachtigste nummers voor de gasten zodat ze voordat ze aan het kerstdiner beginnen al helemaal in de kerstsfeer te komen.
+
+# legacy-review-source-id: 2004-07-03-pleintheater-amsterdam
+- title: "Balkfestival - Pleintheater - Amsterdam"
+  date: "3 juli 2004"
+  link: ""
+  images:
+    - src: "content/images/20040703_balkfestival_pleintheater_amsterdam.webp"
+      alt: "040703p110_1074kkkkkkanywaypleinthadam"
+      width: 1149
+      height: 1021
+    - src: "content/images/20040703_balkfestival_pleintheater_amsterdam_02.webp"
+      alt: "040703p110_1076mmmmmanywaypleinthadam"
+      width: 1055
+      height: 987
+  content: |
+    Na onze optredens tijdens Broadway Den Hoorn in 2004 hadden we de smaak dermate te pakken dat we voor het eerst een optreden hebben gedaan aan 'de overkant' (zoals wij Texelaars dit noemen). We hadden ons ingeschreven voor een a capella festival georganiseerd door Balk (de vereniging van a capella groepen). Het was in het Pleintheater in Amsterdam. Dit was de eerste keer dat wij onszelf zouden presenteren buiten het eiland.
+
+    Daar kwamen wij op met stoeltjes, rozen en nog meer attributen iets wat de meeste andere groepen op dat moment nog niet deden. Nadat we onze show gedaan hadden was de verbazing bij het publiek en de andere groepen duidelijk te merken. Er volgden opmerkingen in de trant van ' Hoe kan dit dat we dit nog nooit gezien hebben', ' Dat dit van een eiland komt.', 'Heel vernieuwend om op deze manier a capella nummers te zingen', ' Wie heeft jullie hierbij geholpen?'.
+
+    Voor ons werd het steeds duidelijker dat deze manier van optreden goed bij ons paste en dat door de hulp van Lizzie Kean (zij arrangeert alle nummers en maakt een programma met ons) ook veel mensen die ons zien ervan genieten.
+
+# legacy-review-source-id: 2004-05-28-broadway-den-hoorn
+- title: "Broadway - Den Hoorn - Texel"
+  date: "28 mei 2004"
+  link: ""
+  images:
+    - src: "content/images/20040528_broadway_den_hoorn_texel.webp"
+      alt: "Broadway - Den Hoorn - Texel"
+      width: 1600
+      height: 1200
+  content: |
+    Broadway opnieuw bijzonder festival
+
+    Zoveel artiesten, zoveel verhalen. Misschien gold voor Broadway 2004 zelfs wel dat het aantal verhalen gelijk stond aan het aantal voorstellingen. Zeker is in ieder geval dat iedere bezoeker het vierde huiskamerfestival in Den Hoorn daardoor op een eigen manier beleefde. Wat overheerste, waren de enthousiaste geluiden en de complimenten aan het adres van Klif 12-eigenaar Cor van Heerwaarden en zijn medewerkers, die er opnieuw in geslaagd zijn een evenement van bijzondere allure te organiseren. Met louter uitverkochte avonden kregen zij een mooie beloning voor hun vele werk.
+
+    ‘Wat heb jij gezien?’ en ‘Hoe was het?’. Het waren de meest gestelde vragen tijdens Broadway 2004, dat vrijdag, zaterdag en zondag voor de vierde maal in Den Hoorn werd gehouden. Na iedere voorstelling stroomden de huiskamers, schuren en garages (20 op vrijdag, 29 op zaterdag en 30 op zondag) binnen enkele minuten leeg, richting de gezelligheid en de eet- en drinkstands bij theater Klif 12, waardoor over een afstand van enkele tientallen meters gemiddeld duizend bezoekers bij elkaar dromden, nog afgezien van de suppoosten (twee per theater), cateraars en andere medewerkers van het festival.
+
+    En dan klonken de verhalen. Enthousiaste verhalen, hoofdzakelijk. Natuurlijk, niet altijd waren de verwachtingen volledig uitgekomen. De één zag het liefst een cabaretier met snelle en harde grappen en was geconfronteerd met een zanger en vrolijke liedjes. Een ander had een voorkeur voor kolderieke humor en had serieus toneel te zien gekregen. Maar dan was er altijd wel het besef dat het volgende optreden misschien wel dé verrassing van de avond zou worden. Aan de kwaliteit lag het in ieder geval maar zelden, want die was over het algemeen weer van een hoog niveau.
+
+    Een volledige beschrijving van het festival bieden is ondoenlijk, zelfs voor een verslaggever die zijn functie combineert met die van suppoost en op die manier heel makkelijk een brede indruk krijgt. Want waar moet je over schrijven? Over de Texelse toeschouwers die bij elk theater eerst naar het naambordje bij de deur keken om te zien welke eilandgenoot hier woont? Of over de artiesten die stomverbaasd concludeerden dat de bewoner van het huis voor de eerste voorstelling was vertrokken, de hele avond niet was teruggekomen en zich kennelijk geen enkele zorgen maakte over zijn bezittingen?
+
+    In ieder geval mogen de Texelse bijdragen niet onvermeld blijven. Het waren er ditmaal vier. Zangeressen Anneke Brons, Irisabella Bakker en Ruthie Vazana, die samen het trio Anyway vormden, zongen net als twee jaar geleden driestemmig en a capella en deden dat vol overtuiging.
+
+    Joop Rommets
+
+# legacy-review-source-id: 2003-08-14-klif-12-cabaret-sketches-en-muziek
+- title: "Cabaret, Sketches en Muziek - Klif 12 - Den Hoorn - Texel"
+  date: "14 augustus 2003"
+  link: ""
+  images:
+    - src: "content/images/20030814_cabaret_sketches_en_muziek_klif_12_den_hoorn_texel.webp"
+      alt: "Cabaret, Sketches en Muziek - Klif 12 - Den Hoorn - Texel"
+      width: 1600
+      height: 1200
+    - src: "content/images/20030814_cabaret_sketches_en_muziek_klif_12_den_hoorn_texel_02.webp"
+      alt: "Cabaret, Sketches en Muziek - Klif 12 - Den Hoorn - Texel"
+      width: 1600
+      height: 1200
+  content: |
+    Ook dit jaar waren we weer uitgenodigd om tijdens de zomer meerdere concerten te geven in het theaterrestaurant Klif 12. Dit alles ging in het thema Cabaret, Sketches & Muziek. Deze avonden werden verzorgd door 3 verschillende artiesten en elk nam 1 onderdeel voor zijn rekening.
+    Voor ons weer een prachtig podium en een hele mooie oefening en met heel veel plezier opgetreden.
+
+# legacy-review-source-id: 2002-09-20-balk-lid-geworden
+- title: "Balk lid geworden - Texel"
+  date: "20 september 2002"
+  link: ""
+  images:
+    - src: "content/images/20020920_balk_lid_geworden_texel.webp"
+      alt: "Balk lid geworden"
+      width: 1112
+      height: 1066
+  content: |
+    Na ons optreden met de a capella groep Acapabel zijn we lid geworden van Balk. Dit is een organisatie van a capella groepen waar je veel informatie kunt krijgen over optredens van andere groepen en informatie op allerlei gebied. Tevens doordat je lid bent betaal je voor de Buma rechten.
+    Onderstaand zie je onze inschrijving in het blad samen met de Texelse groep Acapabel.
+
+# legacy-review-source-id: 2002-08-29-klif-12-cabaret-sketches-muziek
+- title: "Cabaret, Sketches & Muziek - Klif 12 - Den Hoorn - Texel"
+  date: "29 augustus 2002"
+  link: ""
+  images:
+    - src: "content/images/20020829_cabaret_sketches_muziek_klif_12_den_hoorn_texel.webp"
+      alt: "Kopie van Bitches"
+      width: 500
+      height: 375
+  content: |
+    Na ons optreden als invallende 'artiest' tijdens Broadway Den Hoorn 2002 zijn wij gevraagd door de organisator van dit festival Cor van Heerwaarden of wij gedurende de zomer meerdere optredens wilden verzorgen in combinatie met andere artiesten. Dit alles onder de noemer Cabaret, Sketches & Muziek.
+    Op een avond waren er 3 onderdelen waar wij het onderdeel muziek voor onze rekening namen.
+    Heel leuk om te doen en voor ons een geweldige kans om op te treden.
+
+# legacy-review-source-id: 2002-05-17-broadway-den-hoorn
+- title: "Broadway - Den Hoorn - Texel"
+  date: "17 mei 2002"
+  link: ""
+  images:
+    - src: "content/images/20020517_broadway_den_hoorn_texel.webp"
+      alt: "TC logo"
+      width: 372
+      height: 71
+  content: |
+    Zoals in onderstaand krantenartikel te lezen valt hebben we tijdens dit festival op de valreep moeten invallen voor een andere zieke artiest. Het was voor ons een prachtige kans om aan een groter publiek te laten zien waar wij enorm van genieten en dat is a capella zingen met elkaar. Tijdens dit festival hebben wij Lizzie Kean ontmoet die vanaf die tijd onze vaste arrangeur, regiseur bedenker, coach. Is en ons helpt om mooie programma's te maken. En hierna veranderde onze naam van The Bitches in ANYWAY
+
+    Huiskamerfestival nu waarschijnlijk ook zakelijk succes
+    Bij de eerste twee afleveringen waren de reacties laaiend enthousiast, maar moest er geld bij. Hoewel de balans nog niet is opgemaakt, lijkt Broadway Den Hoorn 2002 ook financieel uit te kunnen. Een nieuw huiskamerfestival, in 2004, staat dan ook al bijna vast. ‘Als de buurt het niet wil, dan houdt het op, maar die is gelukkig enthousiast’, constateert Cor van Heerwaarden, initiatiefnemer en één van de organisatoren. De Texelse finale van de playbackshow, die dit jaar voor het eerst een onderdeel vormde, was zo’n succes, dat deze waarschijnlijk volgend jaar al herhaald wordt.
+
+    Dat de organisatoren aardig op elkaar ingespeeld zijn geraakt, blijkt uit het bijna vlekkeloze verloop van de voorbereidingen. ‘Cor zei donderdag om half zes tegen me: ik vind er niks aan, want ik heb helemaal geen stress’, lacht Lorier. Toch vielen er de nodige problemen op te lossen. Zo haakten enkele artiesten in week ervoor af wegens ziekte. ‘Ik ben gaan bellen, bellen en nog eens bellen. En uiteindelijk is het gelukt.’ Onder de vervangers waren drie Texelse vrouwen, Anneke Brons, Irisabella Bakker en Ruth Vazana. Ze zongen al eerder samen bij de musicalvereniging en vormen nu sinds kort een trio, The Bitches, dat a capella zingt. De drie zouden pas komende zomer op de Hoornder Donderdagen optreden in Klif 12, maar toonden zich tot opluchting van de organisatoren van Broadway bereid nu al hun diensten te verleden. ‘.
+
+# legacy-review-source-id: 2001-11-04-acapabel-jubileumconcert
+- title: "Acapabel jubileumconcert - Texel"
+  date: "4 november 2001"
+  link: ""
+  images:
+    - src: "content/images/20011104_acapabel_jubileumconcert_texel.webp"
+      alt: "Acapabel jubileumconcert"
+      width: 1112
+      height: 1066
+    - src: "content/images/20011104_acapabel_jubileumconcert_texel_02.webp"
+      alt: "Acapabel jubileumconcert"
+      width: 1125
+      height: 886
+  content: |
+    Ons tweede optreden was er een op uitnodiging. Het grote a capella mannenkoor Acapabel bestond 10 jaar en tijdens dit jubileumconcert waren wij gevraagd om op te treden. Dit was een grote eer voor ons en voor het eerst zonder standaards en geregisseerd door Aris van Zeijlen.
+
+    Zowel voor ons als het publiek was het een spannend optreden. Wij hadden nog nooit voor zoveel mensen op deze manier opgetreden en het publiek had op deze manier nog nooit met ons kennisgemaakt wat de meest uiteenlopende reacties opriep. Dit was voor ons nogmaals de bevestiging dat we verder wilde gaan met het a capella zingen en dat het goed bij ons paste.
+
+# legacy-review-source-id: 2001-06-24-maartenhuis-het-begin
+- title: "Het begin - Maartenhuis - Texel"
+  date: "24 juni 2001"
+  link: ""
+  images:
+    - src: "content/images/20010624_het_begin_maartenhuis_texel.webp"
+      alt: "Het begin - Maartenhuis - Texel"
+      width: 400
+      height: 300
+    - src: "content/images/20010624_het_begin_maartenhuis_texel_02.webp"
+      alt: "Het begin - Maartenhuis - Texel"
+      width: 1600
+      height: 1200
+  content: |
+    Ons eerste optreden, nog wel onder de naam The Bitches, was in het voorjaar van 2001 bij de open dag van het Maartenhuis (een zorginstelling voor gehandicapten).
+
+    Spannend om op deze manier voor het eerst op te treden. De zaal zat vol en was muisstil. Nog onder leiding van Hannie Roos en sommige nummers met pianobegeleiding (zie foto) hebben we een halfuur opgetreden. Na afloop waren de reacties zo positief en enthousiast dat dit naar meer smaakte en ons sterkte in ons gevoel dat a capella zingen voor ons DE manier was en de mogelijkheid was om onze hobby verder uit te breiden.
