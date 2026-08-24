@@ -661,6 +661,11 @@ input, select, textarea {
 		height: auto !important;
 	}
 
+	/* Keep single-image cards stable as mobile browser chrome expands or retracts. */
+	#blog-container .blog-single-image img {
+		max-height: none;
+	}
+
 	#main > #blog-container.posts > article {
 		position: static;
 		width: 100%;
