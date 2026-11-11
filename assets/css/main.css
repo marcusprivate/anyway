@@ -4221,7 +4221,9 @@ input, select, textarea {
 		-webkit-transition: -webkit-transform 1s ease, opacity 1s ease, background-color 0.5s ease;
 		-ms-transition: -ms-transform 1s ease, opacity 1s ease, background-color 0.5s ease;
 		transition: transform 1s ease, opacity 1s ease, background-color 0.5s ease;
-		background: rgba(255, 255, 255, 0.175);
+		background: rgba(30, 37, 45, 0.55);
+		-webkit-backdrop-filter: blur(10px);
+		backdrop-filter: blur(10px);
 		height: 4rem;
 		line-height: 4rem;
 		margin: -4rem auto 0 auto;
@@ -4459,12 +4461,12 @@ input, select, textarea {
 			padding: 0;
 		}
 
-			#main > .posts > article {
+				#main > .posts > article {
 				width: calc(50% - 1rem);
 				padding: 2rem;
 				margin-bottom: 0;
 				border: none;
-				border-bottom: 3px solid #999999;
+				border-bottom: 1px solid var(--color-border, #e2e8f0);
 				border-radius: 0;
 				text-align: center;
 				box-sizing: border-box;
@@ -4494,7 +4496,7 @@ input, select, textarea {
 
 				#main > .posts > article {
 					padding: 1.5rem;
-					border-bottom: 3px solid #999999;
+					border-bottom: 1px solid var(--color-border, #e2e8f0);
 				}
 
 				#main > .posts > article:last-child {
@@ -5487,7 +5489,10 @@ input, select, textarea {
 
 /* Custom: Enhanced Search UI */
 #agenda-search, #blog-search, #repertoire-search {
-    border-color: #212931;
+    border-width: 1px;
+    border-color: var(--color-border-dark, #cbd5e1);
+    border-radius: 0.75rem;
+    background-color: #ffffff;
     padding-left: 2.75rem;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23212931' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
     background-repeat: no-repeat;
@@ -5509,12 +5514,12 @@ input, select, textarea {
 
 .segmented-control button {
     flex: 1;
-    border: solid 2px #212931;
-    background: transparent;
+    border: solid 1px var(--color-border-dark, #cbd5e1);
+    background: #ffffff;
     color: #212931 !important;
     font-size: 0.8rem;
     height: 3rem;
-    line-height: calc(3rem - 4px);
+    line-height: calc(3rem - 2px);
     padding: 0;
     margin: 0;
     border-radius: 0;
@@ -5524,6 +5529,11 @@ input, select, textarea {
 
 .segmented-control button:first-child {
     border-right: none;
+    border-radius: 0.75rem 0 0 0.75rem;
+}
+
+.segmented-control button:last-child {
+    border-radius: 0 0.75rem 0.75rem 0;
 }
 
 .segmented-control button.active {
@@ -5548,7 +5558,10 @@ input, select, textarea {
 }
 
 #blog-year {
-    border-color: #212931;
+    border-width: 1px;
+    border-color: var(--color-border-dark, #cbd5e1);
+    border-radius: 0.75rem;
+    background-color: #ffffff;
     cursor: pointer;
     transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
     /* Dark arrow to match border */
@@ -5677,4 +5690,58 @@ body:not(:has(#intro)) #nav.sticky {
 		align-items: flex-start;
 		flex-direction: column;
 	}
+}
+
+/* Homepage chrome, once the intro has scrolled away, matches the inner masthead. */
+#intro.hidden + #header .logo {
+	border-width: 0 !important;
+	padding: 0.15rem 0;
+	font-size: 1.45rem;
+	letter-spacing: 0.18em;
+}
+
+/* Repertoire reads as a song list: index, title, and a quiet divider. */
+table.repertoire-grid tbody tr,
+table.repertoire-grid tbody tr.highlight-row {
+	background: transparent !important;
+}
+
+table.repertoire-grid td {
+	display: flex;
+	align-items: baseline;
+	gap: 0.85rem;
+	padding: 0.85rem 0.15rem;
+	border: 0 !important;
+	border-bottom: 1px solid var(--color-border, #e2e8f0) !important;
+	line-height: 1.45;
+	text-align: left;
+}
+
+table.repertoire-grid .song-index {
+	flex: 0 0 2rem;
+	color: var(--color-text-muted, #64748b);
+	font-size: 0.8rem;
+	font-weight: 700;
+}
+
+table.repertoire-grid .song-title {
+	flex: 1;
+	min-width: 0;
+	color: #212931;
+}
+
+table.repertoire-grid .song-title a {
+	color: inherit;
+	border-bottom: 0;
+}
+
+table.repertoire-grid .fa-youtube {
+	margin-left: 0.45rem;
+	color: var(--color-primary, #c9553d);
+	font-size: 0.85em;
+}
+
+table.repertoire-grid tbody tr:hover,
+table.repertoire-grid tbody tr:hover td {
+	background: rgba(201, 85, 61, 0.06) !important;
 }

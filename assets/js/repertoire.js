@@ -60,15 +60,11 @@ function initRepertoire() {
             const itemTitle = item.title || '';
             
             // Build content
-            let content = `${itemId}. `;
-            
-            if (item.youtube) {
-                content += `<a href="${item.youtube}" target="_blank" rel="noopener noreferrer">${itemTitle} <i class="icon brands fa-youtube" style="color: #cc181e;"></i></a>`;
-            } else {
-                content += itemTitle;
-            }
-            
-            td.innerHTML = content;
+            const title = item.youtube
+                ? `<a href="${item.youtube}" target="_blank" rel="noopener noreferrer">${itemTitle}<i class="icon brands fa-youtube" aria-hidden="true"></i></a>`
+                : itemTitle;
+
+            td.innerHTML = `<span class="song-index">${itemId}</span><span class="song-title">${title}</span>`;
             tr.appendChild(td);
             
             // Apply zebra striping logic
