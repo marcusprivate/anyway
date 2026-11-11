@@ -5745,3 +5745,81 @@ table.repertoire-grid tbody tr:hover,
 table.repertoire-grid tbody tr:hover td {
 	background: rgba(201, 85, 61, 0.06) !important;
 }
+
+/* Page titles use the homepage story heading: small, left, short terracotta rule. */
+#main > .post header.major {
+	text-align: left;
+}
+
+#main > .post header.major > h1,
+#main > .post header.major h2 {
+	font-size: 1.05rem;
+	letter-spacing: 0.08em;
+	line-height: 1.3;
+	margin: 0;
+}
+
+#main > .post header.major > h1::after {
+	content: "";
+	display: block;
+	width: 2.25rem;
+	height: 2px;
+	margin-top: 0.7rem;
+	background: var(--color-primary, #c9553d);
+}
+
+.blog-page .blog-tools-header,
+.blog-page .blog-tools-header h1 {
+	margin-bottom: 0;
+}
+
+.blog-page .row.blog-tools-grid {
+	justify-content: flex-start;
+}
+
+/* Agenda sections use the same short rule instead of a full-width bar. */
+.agenda-section-header {
+	align-items: flex-start;
+	padding-bottom: 0;
+	border-bottom: 0;
+}
+
+.agenda-section-title::after {
+	content: "";
+	display: block;
+	width: 2.25rem;
+	height: 2px;
+	margin-top: 0.7rem;
+	background: var(--color-primary, #c9553d);
+}
+
+/* Boek Ons, pagination, and Meer info sit with the quiet search fields. */
+.agenda-pagination .button,
+#main .button.primary,
+#blog-container article .actions .button {
+	background: #ffffff;
+	border: 1px solid var(--color-border-dark, #cbd5e1);
+	border-radius: 0.75rem;
+	box-shadow: none;
+	color: #212931 !important;
+	transform: none;
+}
+
+.agenda-pagination .button:hover,
+#main .button.primary:hover,
+#blog-container article .actions .button:hover {
+	background: #ffffff;
+	border-color: var(--color-primary, #c9553d);
+	box-shadow: none;
+	color: var(--color-primary, #c9553d) !important;
+	transform: none;
+}
+
+/* Blog card dates and titles align with the reading text. */
+#main > .posts > article {
+	text-align: left;
+}
+
+#blog-container article ul.actions.special {
+	justify-content: flex-start;
+}
